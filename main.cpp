@@ -56,7 +56,7 @@ float delta_time{0.001};
 float last_frame{0.0};
 
 //location of the point light
-glm::vec4 light_position (0.0,20.0,20.0,1.0);
+glm::vec4 light_position (0.0,5.0,0.0,1.0);
 
 //Font for text display
 Font arial_font ("fonts/ArialBlackLarge.bmp","fonts/ArialBlack.csv",0.1,0.15);
@@ -72,6 +72,8 @@ int main()
         std::cout<<"Failed to initialize GLFWwindow"<<std::endl;
         return -1;
     }
+
+    std::cout << "Program starting..." << std::endl;
 
     //initialize last_x and last_y to the middle of the screen
     last_x = (1.0*SCR_WIDTH)/2.0f;
@@ -128,20 +130,29 @@ int main()
     import_vao.attributes.push_back(BuildAttribute(1,GL_FLOAT,false,stride_size,17*sizeof(float)));
     import_vao.attributes.push_back(BuildAttribute(1,GL_FLOAT,false,stride_size,18*sizeof(float)));
     
-    
+    std::cout << "VAOs created and attributes set up successfully." << std::endl;
+    std::cout << "Now about to load the models..." << std::endl;
+
     ImportOBJ importer;
-    ImportOBJ importer_floor;
+    std::cout << "ImportOBJ created" << std::endl;
+    //ImportOBJ importer_floor;
+    std::cout << "ImportOBJ for floor created" << std::endl;
 
     //import the models
     BasicShape smiley = importer.loadFiles("models/smiley",import_vao);
     BasicShape baseModel = importer.loadFiles("models/baseModel", import_vao);
+    std::cout << "BaseModel imported" << std::endl;
     Avatar baseAvatar(baseModel, 180.0f, glm::vec3(0.0, 0.0, 0.0), IMPORTED_BASIC);
-    BasicShape LouGrossBuilding = importer.loadFiles("models/LouGrossBuilding", import_vao);
+    std::cout << "BaseAvatar created" << std::endl;
+    //BasicShape LouGrossBuilding = importer.loadFiles("models/LouGrossBuilding", import_vao);
     
-    BasicShape tumbling_floor = importer_floor.loadFiles("models/tumbling_floor", import_vao);
-    int tumbling_floor_texture = importer_floor.getTexture();
+    BasicShape tumbling_floor = importer.loadFiles("models/tumbling_floor", import_vao);
+    std::cout << "Tumbling floor imported" << std::endl;
+    int tumbling_floor_texture = importer.getTexture();
+    std::cout << "Tumbling floor texture imported" << std::endl;
 
     arial_font.initialize(texture_vao);
+    std::cout << "Font initialized" << std::endl;
 
     //Create the shapes
     //-------------------------
@@ -165,7 +176,7 @@ int main()
     glm::vec3 light_color (1.0);
     glm::vec3 ambient_color = 0.1f*light_color;
     
-    shader_program.setVec4("point_light.ambient",glm::vec4(0.1f*light_color,1.0));
+    shader_program.setVec4("point_light.ambient",glm::vec4(0.5f*light_color,1.0));
     shader_program.setVec4("point_light.diffuse",glm::vec4(light_color,1.0f));
     shader_program.setVec4("point_light.specular",glm::vec4(0.5f*light_color,1.0f));
     shader_program.setVec4("point_light.position",light_position);
@@ -187,6 +198,8 @@ int main()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    std::cout << "Entering render loop..." << std::endl;
 
     // render loop
     // -----------
@@ -244,14 +257,13 @@ int main()
 
 
         // // Draw the Lou Gross Building
-        shader_program.setInt("shader_state", IMPORTED_BASIC);
-        glm::mat4 LouGrossBuilding_local(1.0);
-        LouGrossBuilding_local = glm::translate(LouGrossBuilding_local, glm::vec3(0.0, 3.0, 0.0));
-        // scale the building to be 10 times larger
-        LouGrossBuilding_local = glm::scale(LouGrossBuilding_local, glm::vec3(10.0, 10.0, 10.0));
-        shader_program.setMat4("model", identity);
-        shader_program.setMat4("local", LouGrossBuilding_local);
-        LouGrossBuilding.Draw();
+        // shader_program.setInt("shader_state", IMPORTED_BASIC);
+        // glm::mat4 LouGrossBuilding_local(1.0);
+        // LouGrossBuilding_local = glm::translate(LouGrossBuilding_local, glm::vec3(0.0, 3.0, 0.0));
+        // LouGrossBuilding_local = glm::scale(LouGrossBuilding_local, glm::vec3(14.0, 14.0, 14.0));
+        // shader_program.setMat4("model", identity);
+        // shader_program.setMat4("local", LouGrossBuilding_local);
+        // LouGrossBuilding.Draw();
 
         // Draw the gymnastics tumbling floor
         shader_program.setInt("shader_state", IMPORTED_TEXTURED);
@@ -278,6 +290,7 @@ int main()
         
         arial_font.DrawText(display_string,glm::vec2(-0.1,0.75),font_program);
 
+        //std::cout << "Frame completed" << std::endl;
     
        
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -286,19 +299,24 @@ int main()
         glfwPollEvents();
     }
 
-
+    std::cout << "Render loop exited, starting cleanup..." << std::endl;
 
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
+    std::cout << "About to deallocate basic_vao" << std::endl;
     glDeleteVertexArrays(1, &(basic_vao.id));
+    std::cout << "About to deallocate import_vao" << std::endl;
     glDeleteVertexArrays(1,&(import_vao.id));
+    std::cout << "About to deallocate texture_vao" << std::endl;
     glDeleteVertexArrays(1,&(texture_vao.id));
 
-    
+    std::cout << "About to deallocate smiley" << std::endl;
     smiley.DeallocateShape();
+    std::cout << "About to deallocate baseModel" << std::endl;
     baseModel.DeallocateShape();
-    LouGrossBuilding.DeallocateShape();
+    //LouGrossBuilding.DeallocateShape();
 
+    std::cout << "Cleanup complete" << std::endl;
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
