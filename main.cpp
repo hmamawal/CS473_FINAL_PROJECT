@@ -133,6 +133,7 @@ int main()
 
     //import the models
     BasicShape smiley = importer.loadFiles("models/smiley",import_vao);
+    BasicShape baseModel = importer.loadFiles("models/BASEmodel", import_vao);
     //BasicShape die = importer.loadFiles("models/die",import_vao);
     //BasicShape tumbling_floor = importer.loadFiles("models/tumbling_floor", import_vao);
 
@@ -233,13 +234,22 @@ int main()
         
 
         //Draw the smiley
+        // shader_program.setInt("shader_state",IMPORTED_BASIC);
+        // glm::mat4 smiley_model(1.0);
+        // glm::mat4 smiley_local = glm::translate(identity,glm::vec3(0.0,1.0,0.0));
+        // //smiley_local = glm::rotate(smiley_local,glm::radians(180.0f),glm::vec3(0.0,1.0,0.0));
+        // shader_program.setMat4("model",smiley_model);
+        // shader_program.setMat4("local",smiley_local);
+        // smiley.Draw();
+
+        //Draw the base model
         shader_program.setInt("shader_state",IMPORTED_BASIC);
-        glm::mat4 smiley_model(1.0);
-        glm::mat4 smiley_local = glm::translate(identity,glm::vec3(0.0,1.0,0.0));
-        //smiley_local = glm::rotate(smiley_local,glm::radians(180.0f),glm::vec3(0.0,1.0,0.0));
-        shader_program.setMat4("model",smiley_model);
-        shader_program.setMat4("local",smiley_local);
-        smiley.Draw();
+        glm::mat4 base_model(1.0);
+        glm::mat4 base_local = glm::translate(identity,glm::vec3(0.0,0.0,0.0));
+        base_local = glm::rotate(base_local,glm::radians(180.0f),glm::vec3(0.0,1.0,0.0));
+        shader_program.setMat4("model",base_model);
+        shader_program.setMat4("local",base_local);
+        baseModel.Draw();
 
         //draw the ship, don't need to use the shader program here
         //   since we already did at the top of the render loop.
@@ -259,29 +269,29 @@ int main()
         floor.Draw();
 
         //draw the die
-        shader_program.setInt("shader_state",IMPORTED_TEXTURED);
-        glm::mat4 die_local(1.0);
-        die_local = glm::translate(die_local,glm::vec3(-2.0,1.0,0.0));
-        die_local = glm::scale(die_local,glm::vec3(0.5,0.5,0.5));
-        //die_local = glm::rotate(die_local,glm::radians(180.0f),glm::vec3(0.0,0.0,1.0));
-        shader_program.setMat4("model",identity);
-        shader_program.setMat4("local",die_local);
-        glBindTexture(GL_TEXTURE_2D,die_texture);
-        //Below is an example of how to handle multiple textures on a single imported
-        //  object (optional)
-        // for (int i = 0; i < die_textures.size(); i++) {
-        //     glActiveTexture(GL_TEXTURE0+i);
-        //     std::string texture_string = "textures["+std::to_string(i)+"]";
-        //     shader_program.setInt(texture_string,i);
-        //     glBindTexture(GL_TEXTURE_2D,die_textures[i]);
-        // }
-        die.Draw();
-        glActiveTexture(GL_TEXTURE0); 
+        // shader_program.setInt("shader_state",IMPORTED_TEXTURED);
+        // glm::mat4 die_local(1.0);
+        // die_local = glm::translate(die_local,glm::vec3(-2.0,1.0,0.0));
+        // die_local = glm::scale(die_local,glm::vec3(0.5,0.5,0.5));
+        // //die_local = glm::rotate(die_local,glm::radians(180.0f),glm::vec3(0.0,0.0,1.0));
+        // shader_program.setMat4("model",identity);
+        // shader_program.setMat4("local",die_local);
+        // glBindTexture(GL_TEXTURE_2D,die_texture);
+        // //Below is an example of how to handle multiple textures on a single imported
+        // //  object (optional)
+        // // for (int i = 0; i < die_textures.size(); i++) {
+        // //     glActiveTexture(GL_TEXTURE0+i);
+        // //     std::string texture_string = "textures["+std::to_string(i)+"]";
+        // //     shader_program.setInt(texture_string,i);
+        // //     glBindTexture(GL_TEXTURE_2D,die_textures[i]);
+        // // }
+        // die.Draw();
+        // glActiveTexture(GL_TEXTURE0); 
 
         // Draw the gymnastics tumbling floor
         shader_program.setInt("shader_state", IMPORTED_TEXTURED);
         glm::mat4 tumbling_floor_local(1.0);
-        tumbling_floor_local = glm::translate(tumbling_floor_local, glm::vec3(0.0, 1.0, 0.0));
+        tumbling_floor_local = glm::translate(tumbling_floor_local, glm::vec3(0.0, 0.4, 0.0));
         shader_program.setMat4("model", identity);
         shader_program.setMat4("local", tumbling_floor_local);
         glBindTexture(GL_TEXTURE_2D, tumbling_floor_texture);
@@ -377,4 +387,4 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     camera.ProcessMouseMovement(xoffset,yoffset);
 
     
-}  
+}
