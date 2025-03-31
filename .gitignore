@@ -1,0 +1,35 @@
+# Ignore compiled binary files
+*.exe
+*.obj
+*.o
+
+# Ignore Blender backup files
+*.blend1
+
+# Ignore Visual Studio Code settings
+.vscode/
+
+# Ignore build artifacts
+build/
+dist/
+
+# Ignore temporary files
+*.tmp
+*.log
+*.bak
+*.swp
+
+# Ignore generated files
+fonts/*.bmp
+fonts/*.csv
+
+# Ignore model files that are not source files
+models/*.mtl
+models/*.obj
+
+# Ignore shader compiled files
+shaders/*.spv
+
+# Ignore texture cache or generated files
+textures/*.cache
+textures/*.tmp
