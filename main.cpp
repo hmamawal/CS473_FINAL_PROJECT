@@ -133,7 +133,8 @@ int main()
 
     //import the models
     BasicShape smiley = importer.loadFiles("models/smiley",import_vao);
-    BasicShape baseModel = importer.loadFiles("models/BASEmodel", import_vao);
+    BasicShape baseModel = importer.loadFiles("models/baseModel", import_vao);
+    Avatar baseAvatar(baseModel, 180.0f, glm::vec3(0.0, 0.0, 0.0), IMPORTED_BASIC);
     //BasicShape die = importer.loadFiles("models/die",import_vao);
     //BasicShape tumbling_floor = importer.loadFiles("models/tumbling_floor", import_vao);
 
@@ -217,6 +218,7 @@ int main()
         // -----
         ProcessInput(window);
         ship.ProcessInput(window,delta_time);
+        baseAvatar.ProcessInput(window, delta_time);
 
         // render
         // ------
@@ -243,17 +245,18 @@ int main()
         // smiley.Draw();
 
         //Draw the base model
-        shader_program.setInt("shader_state",IMPORTED_BASIC);
-        glm::mat4 base_model(1.0);
-        glm::mat4 base_local = glm::translate(identity,glm::vec3(0.0,0.0,0.0));
-        base_local = glm::rotate(base_local,glm::radians(180.0f),glm::vec3(0.0,1.0,0.0));
-        shader_program.setMat4("model",base_model);
-        shader_program.setMat4("local",base_local);
-        baseModel.Draw();
+        // shader_program.setInt("shader_state",IMPORTED_BASIC);
+        // glm::mat4 base_model(1.0);
+        // glm::mat4 base_local = glm::translate(identity,glm::vec3(0.0,0.0,0.0));
+        // base_local = glm::rotate(base_local,glm::radians(180.0f),glm::vec3(0.0,1.0,0.0));
+        // shader_program.setMat4("model",base_model);
+        // shader_program.setMat4("local",base_local);
+        // baseModel.Draw();
 
         //draw the ship, don't need to use the shader program here
         //   since we already did at the top of the render loop.
         ship.Draw(&shader_program,false);
+        baseAvatar.Draw(&shader_program, false);
 
         //Draw the floor
         shader_program.setInt("shader_state",TEXTURED);

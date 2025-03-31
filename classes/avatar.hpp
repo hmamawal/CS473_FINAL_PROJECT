@@ -12,6 +12,11 @@ class Avatar {
         glm::vec3 position;
         glm::vec3 scale;
         int shader_state;
+        bool is_flipping;
+        float flip_progress;
+        float flip_height;
+        float jump_height;
+        float flip_duration;
     
     public:
         Avatar(BasicShape shape, float orientation, glm::vec3 initial_position, int shader_state);
@@ -19,7 +24,7 @@ class Avatar {
         void Scale (glm::vec3 new_scale);
         void Draw (Shader *shader, bool use_shader=false);
         ~Avatar();
-};
+};;
 
 
 #endif //AVATAR_HPP
