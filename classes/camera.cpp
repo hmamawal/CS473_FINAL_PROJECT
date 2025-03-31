@@ -35,10 +35,12 @@ glm::mat4 Camera::GetViewMatrix()
 void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
     {
         float velocity = MovementSpeed * deltaTime;
+        glm::vec3 forward = Front;
+        forward.y = 0.0f; // prevent upward movement
         if (direction == FORWARD)
-            Position += Front * velocity;
+            Position += glm::normalize(forward) * velocity;
         if (direction == BACKWARD)
-            Position -= Front * velocity;
+            Position -= glm::normalize(forward) * velocity;
         if (direction == LEFT)
             Position -= Right * velocity;
         if (direction == RIGHT)

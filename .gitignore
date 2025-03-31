@@ -33,3 +33,5 @@ shaders/*.spv
 # Ignore texture cache or generated files
 textures/*.cache
 textures/*.tmp
+.aider*
+.aider.chat.history.md
