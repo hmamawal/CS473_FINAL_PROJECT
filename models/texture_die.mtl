@@ -1,0 +1,62 @@
+# Blender 4.3.2 MTL File: 'texture_die.blend'
+# www.blender.org
+
+newmtl Material
+Ns 1000.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.007908 0.298484 0.800007
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 0.500000
+illum 9
+
+newmtl Material.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/Jason Cody/West Point/Courses - AY25-2/Lessons/L19 - Modeling 2/ICE_19_1_Starter/textures/mars.jpg
+
+newmtl Material.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/Jason Cody/West Point/Courses - AY25-2/Lessons/L19 - Modeling 2/ICE_19_1_Starter/textures/space.jpg
+
+newmtl Material.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/Jason Cody/West Point/Courses - AY25-2/Lessons/L19 - Modeling 2/ICE_19_1_Starter/textures/hull_texture.png
+
+newmtl Material.004
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/Jason Cody/West Point/Courses - AY25-2/Lessons/L19 - Modeling 2/ICE_19_1_Starter/textures/tile.jpg
+
+newmtl Material.005
+Ns 1000.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd C:/Users/Jason Cody/West Point/Courses - AY25-2/Lessons/L19 - Modeling 2/ICE_19_1_Starter/textures/grass.png
+map_d C:/Users/Jason Cody/West Point/Courses - AY25-2/Lessons/L19 - Modeling 2/ICE_19_1_Starter/textures/grass.png
