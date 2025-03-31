@@ -134,30 +134,12 @@ int main()
     //import the models
     BasicShape smiley = importer.loadFiles("models/smiley",import_vao);
     BasicShape baseModel = importer.loadFiles("models/baseModel", import_vao);
+    BasicShape LouGrossBuilding = importer.loadFiles("models/LouGrossBuilding", import_vao);
     Avatar baseAvatar(baseModel, 180.0f, glm::vec3(0.0, 0.0, 0.0), IMPORTED_BASIC);
-    //BasicShape die = importer.loadFiles("models/die",import_vao);
-    //BasicShape tumbling_floor = importer.loadFiles("models/tumbling_floor", import_vao);
-
-    // import the models using separate importer instances
-    ImportOBJ importer_die;
-    BasicShape die = importer_die.loadFiles("models/die", import_vao);
-    int die_texture = importer_die.getTexture();
 
     ImportOBJ importer_floor;
     BasicShape tumbling_floor = importer_floor.loadFiles("models/tumbling_floor", import_vao);
     int tumbling_floor_texture = importer_floor.getTexture();
-
-
-    //import the die -- note that getAllTextures supports multiple textures
-    //int die_texture = importer.getTexture();
-    //int tumbling_floor_texture = importer.getTexture();
-
-    // std::vector<unsigned int> die_textures = importer.getAllTextures();
-    // for (int i = 0; i < die_textures.size(); i++) {
-    //     std::cout<<"Texture:"<<i<<" "<<die_textures[i]<<std::endl;
-    // }
-    // Avatar ship((importer.loadFiles("models/ship",import_vao)),90.0f,glm::vec3(2.0,1.0,0.0),IMPORTED_BASIC);;
-    // ship.Scale(glm::vec3(0.4,0.4,0.4));
 
     arial_font.initialize(texture_vao);
 
@@ -252,15 +234,6 @@ int main()
         glBindTexture(GL_TEXTURE_2D,floor_texture);
         floor.Draw();
 
-        //draw the die
-        // shader_program.setInt("shader_state",IMPORTED_TEXTURED);
-        // glm::mat4 die_local(1.0);
-        // die_local = glm::translate(die_local,glm::vec3(-2.0,1.0,0.0));
-        // die_local = glm::scale(die_local,glm::vec3(0.5,0.5,0.5));
-        // //die_local = glm::rotate(die_local,glm::radians(180.0f),glm::vec3(0.0,0.0,1.0));
-        // shader_program.setMat4("model",identity);
-        // shader_program.setMat4("local",die_local);
-        // glBindTexture(GL_TEXTURE_2D,die_texture);
         // //Below is an example of how to handle multiple textures on a single imported
         // //  object (optional)
         // // for (int i = 0; i < die_textures.size(); i++) {
@@ -269,8 +242,17 @@ int main()
         // //     shader_program.setInt(texture_string,i);
         // //     glBindTexture(GL_TEXTURE_2D,die_textures[i]);
         // // }
-        // die.Draw();
-        // glActiveTexture(GL_TEXTURE0); 
+
+
+        // // Draw the Lou Gross Building
+        shader_program.setInt("shader_state", IMPORTED_BASIC);
+        glm::mat4 LouGrossBuilding_local(1.0);
+        LouGrossBuilding_local = glm::translate(LouGrossBuilding_local, glm::vec3(0.0, 3.0, 0.0));
+        // scale the building to be 10 times larger
+        LouGrossBuilding_local = glm::scale(LouGrossBuilding_local, glm::vec3(10.0, 10.0, 10.0));
+        shader_program.setMat4("model", identity);
+        shader_program.setMat4("local", LouGrossBuilding_local);
+        LouGrossBuilding.Draw();
 
         // Draw the gymnastics tumbling floor
         shader_program.setInt("shader_state", IMPORTED_TEXTURED);
@@ -315,7 +297,8 @@ int main()
 
     
     smiley.DeallocateShape();
-    die.DeallocateShape();
+    baseModel.DeallocateShape();
+    LouGrossBuilding.DeallocateShape();
 
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
