@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<!-- saved from url=(0048)https://learnopengl.com/Advanced-OpenGL/Cubemaps -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>LearnOpenGL - Cubemaps</title>	<!--<title>Learn OpenGL, extensive tutorial resource for learning Modern OpenGL</title>-->
+    <link rel="shortcut icon" type="image/ico" href="https://learnopengl.com/favicon.ico">
+    <meta name="description" content="Learn OpenGL . com provides good and clear modern 3.3+ OpenGL tutorials with clear examples. A great resource to learn modern OpenGL aimed at beginners.">
+	<meta name="fragment" content="!"> 
+    <script async="" defer="" src="./LearnOpenGL - Cubemaps_files/launchpad.bundle.js.download"></script><script async="" src="./LearnOpenGL - Cubemaps_files/analytics.js.download"></script><script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-51879160-1', 'learnopengl.com');
+      ga('send', 'pageview');
+
+    </script>
+    <script>
+	
+			(adsbygoogle = window.adsbygoogle || []).push({
+				google_ad_client: "ca-pub-7855791439695850",
+				enable_page_level_ads: true
+			});    </script>
+	<script async="async" src="./LearnOpenGL - Cubemaps_files/f.txt"></script>
+	<script>
+	
+				var googletag = googletag || {};
+				googletag.cmd = googletag.cmd || [];
+					</script>
+	<script type="text/javascript" src="./LearnOpenGL - Cubemaps_files/1681.js.download"></script>	<script src="./LearnOpenGL - Cubemaps_files/jquery-1.11.0.min.js.download"></script>
+	<script src="./LearnOpenGL - Cubemaps_files/hoverintent.js.download"></script>
+	<link rel="stylesheet" type="text/css" href="./LearnOpenGL - Cubemaps_files/layout.css">
+    <link rel="stylesheet" type="text/css" href="./LearnOpenGL - Cubemaps_files/obsidian.css">
+    <script src="./LearnOpenGL - Cubemaps_files/highlight.pack.js.download"></script>    
+    <script src="./LearnOpenGL - Cubemaps_files/functions.js.download"></script>
+    <script type="text/javascript" src="./LearnOpenGL - Cubemaps_files/MathJax.js.download"></script>
+    <script>
+    // Has to be loaded last due to content bug 
+    MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+    });
+    </script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script>  
+        $(document).ready(function() {
+            // check if user visited from the old # based urls, re-direct to ?p= form
+            if(window.location.hash)
+            {
+                var name = window.location.hash.substring(2);
+                // name = name.replace(/-/g," ");
+                var index = name.indexOf('#'); // Remove any hash fragments from the url (Disquss adds hash fragments for comments, but results in 404 pages)
+                if(index >= 0)
+                    name = name.substring(0, index);
+                
+                window.location.href = "https://learnopengl.com/" + name;
+            } else {
+                    // Check if data has been succesfully loaded, if so: change title bar as ajax hash fragment
+                    var title = $('#content-url').text();
+                  
+					// place video tag 
+					 if(title != '' ) {
+											//var videoad = "%3Cdiv id=\'waldo-tag-14070\'%3E %3Cscript%3Egoogletag.cmd.push(function() {googletag.display(\'waldo-tag-14070\'); }); %3C/script%3E%3C/div%3E";
+						//$('#content p:nth-of-type(3)').after(unescape(videoad));
+										}
+					
+                    // Adjust ads for correct bottom positioning based on content size
+                    // window.setTimeout(function() {  
+                        // AdPositioning();
+                     // }, 3000);
+                  
+                  
+                    // set API resets after time-out (once content is properly loaded)
+                    window.setTimeout(function() {  
+                        MathJax.Hub.Queue(["Typeset",MathJax.Hub]);    
+                        
+                        var page_url = title == "" ? "http://www.learnopengl.com/" : "http://www.learnopengl.com/" + title;
+                        if(typeof DISQUS !== 'undefined') {                                              
+                            DISQUS.reset({
+                              reload: true,
+                              config: function () {  
+                                this.page.identifier = title;  
+                                this.page.url = page_url;
+                              }
+                            });
+                            $('#disqus_thread').show();
+                        }
+                           // Refresh callbacks on <function> tags
+                        SetFunctionTagCallbacks();        
+                    }, 1000);
+                                        
+                    // Zet ook de juiste button op 'selected'
+                    $('#nav li span, #nav li a').removeClass('selected');                
+                    if(title != '')
+                    {                    
+                        $('#nav li[id=\'' + title + '\']').children('span, a').addClass('selected');
+                    }
+                    // En open menu waar nodig
+                    var parents = $('#nav span.selected, #nav a.selected').parents('li').children('span.closed, a.closed');
+                    var index = 0;
+                    for(index = parents.length - 1; index >= 0; index--)
+                    {             
+                        
+                        var id = $(parents[index]).attr("id").replace( /^\D+/g, '');
+                        MenuClick(id, false);
+                    }                          
+                
+            }
+        });
+        
+        // Set up DISQUS
+        // $(document).ready(function() {
+            var disqus_shortname = 'learnopengl';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();           
+        // });
+    </script><script type="text/javascript" async="" src="./LearnOpenGL - Cubemaps_files/embed.js.download"></script>
+<style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Menu_Button .MathJax_Hover_Arrow {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -khtml-border-radius: 4px; font-family: 'Courier New',Courier; font-size: 9px; color: #F0F0F0}
+.MathJax_Menu_Button .MathJax_Hover_Arrow span {display: block; background-color: #AAA; border: 1px solid; border-radius: 3px; line-height: 0; padding: 4px}
+.MathJax_Hover_Arrow:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_Hover_Arrow:hover span {background-color: #CCC!important}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_About.MathJax_MousePost {outline: none}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
+.MathJax_ContextMenu:focus {outline: none}
+.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
+#MathJax_AboutClose {top: .2em; right: .2em}
+.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
+.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
+.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
+.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_MenuClose:hover span {background-color: #CCC!important}
+.MathJax_MenuClose:hover:focus {outline: none}
+</style><style type="text/css">.MathJax_Preview .MJXf-math {color: inherit!important}
+</style><style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXp-script {font-size: .8em}
+.MJXp-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXp-bold {font-weight: bold}
+.MJXp-italic {font-style: italic}
+.MJXp-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-largeop {font-size: 150%}
+.MJXp-largeop.MJXp-int {vertical-align: -.2em}
+.MJXp-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXp-display {display: block; text-align: center; margin: 1em 0}
+.MJXp-math span {display: inline-block}
+.MJXp-box {display: block!important; text-align: center}
+.MJXp-box:after {content: " "}
+.MJXp-rule {display: block!important; margin-top: .1em}
+.MJXp-char {display: block!important}
+.MJXp-mo {margin: 0 .15em}
+.MJXp-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXp-denom {display: inline-table!important; width: 100%}
+.MJXp-denom > * {display: table-row!important}
+.MJXp-surd {vertical-align: top}
+.MJXp-surd > * {display: block!important}
+.MJXp-script-box > *  {display: table!important; height: 50%}
+.MJXp-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXp-script-box > *:last-child > * {vertical-align: bottom}
+.MJXp-script-box > * > * > * {display: block!important}
+.MJXp-mphantom {visibility: hidden}
+.MJXp-munderover {display: inline-table!important}
+.MJXp-over {display: inline-block!important; text-align: center}
+.MJXp-over > * {display: block!important}
+.MJXp-munderover > * {display: table-row!important}
+.MJXp-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXp-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXp-mtr {display: table-row!important}
+.MJXp-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXp-mtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-mlabeledtr {display: table-row!important}
+.MJXp-mlabeledtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mlabeledtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXp-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXp-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXp-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXp-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXp-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXp-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXp-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXp-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXp-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXp-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_PHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style><script src="./LearnOpenGL - Cubemaps_files/launchpad-liveramp.js.download" async="" charset="UTF-8"></script><style type="text/css">.MathJax_Display {text-align: center; margin: 1em 0em; position: relative; display: block!important; text-indent: 0; max-width: none; max-height: none; min-width: 0; min-height: 0; width: 100%}
+.MathJax .merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MathJax .MJX-monospace {font-family: monospace}
+.MathJax .MJX-sans-serif {font-family: sans-serif}
+#MathJax_Tooltip {background-color: InfoBackground; color: InfoText; border: 1px solid black; box-shadow: 2px 2px 5px #AAAAAA; -webkit-box-shadow: 2px 2px 5px #AAAAAA; -moz-box-shadow: 2px 2px 5px #AAAAAA; -khtml-box-shadow: 2px 2px 5px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true'); padding: 3px 4px; z-index: 401; position: absolute; left: 0; top: 0; width: auto; height: auto; display: none}
+.MathJax {display: inline; font-style: normal; font-weight: normal; line-height: normal; font-size: 100%; font-size-adjust: none; text-indent: 0; text-align: left; text-transform: none; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0; min-height: 0; border: 0; padding: 0; margin: 0}
+.MathJax:focus, body :focus .MathJax {display: inline-table}
+.MathJax img, .MathJax nobr, .MathJax a {border: 0; padding: 0; margin: 0; max-width: none; max-height: none; min-width: 0; min-height: 0; vertical-align: 0; line-height: normal; text-decoration: none}
+img.MathJax_strut {border: 0!important; padding: 0!important; margin: 0!important; vertical-align: 0!important}
+.MathJax span {display: inline; position: static; border: 0; padding: 0; margin: 0; vertical-align: 0; line-height: normal; text-decoration: none}
+.MathJax nobr {white-space: nowrap!important}
+.MathJax img {display: inline!important; float: none!important}
+.MathJax * {transition: none; -webkit-transition: none; -moz-transition: none; -ms-transition: none; -o-transition: none}
+.MathJax_Processing {visibility: hidden; position: fixed; width: 0; height: 0; overflow: hidden}
+.MathJax_Processed {display: none!important}
+.MathJax_ExBox {display: block!important; overflow: hidden; width: 1px; height: 60ex; min-height: 0; max-height: none}
+.MathJax .MathJax_EmBox {display: block!important; overflow: hidden; width: 1px; height: 60em; min-height: 0; max-height: none}
+.MathJax .MathJax_HitBox {cursor: text; background: white; opacity: 0; filter: alpha(opacity=0)}
+.MathJax .MathJax_HitBox * {filter: none; opacity: 1; background: transparent}
+#MathJax_Tooltip * {filter: none; opacity: 1; background: transparent}
+@font-face {font-family: MathJax_Main; src: url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff?rev=2.6.1') format('woff'), url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf?rev=2.6.1') format('opentype')}
+@font-face {font-family: MathJax_Main-bold; src: url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/woff/MathJax_Main-Bold.woff?rev=2.6.1') format('woff'), url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/otf/MathJax_Main-Bold.otf?rev=2.6.1') format('opentype')}
+@font-face {font-family: MathJax_Main-italic; src: url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/woff/MathJax_Main-Italic.woff?rev=2.6.1') format('woff'), url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/otf/MathJax_Main-Italic.otf?rev=2.6.1') format('opentype')}
+@font-face {font-family: MathJax_Math-italic; src: url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/woff/MathJax_Math-Italic.woff?rev=2.6.1') format('woff'), url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/otf/MathJax_Math-Italic.otf?rev=2.6.1') format('opentype')}
+@font-face {font-family: MathJax_Caligraphic; src: url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/woff/MathJax_Caligraphic-Regular.woff?rev=2.6.1') format('woff'), url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/otf/MathJax_Caligraphic-Regular.otf?rev=2.6.1') format('opentype')}
+@font-face {font-family: MathJax_Size1; src: url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/woff/MathJax_Size1-Regular.woff?rev=2.6.1') format('woff'), url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/otf/MathJax_Size1-Regular.otf?rev=2.6.1') format('opentype')}
+@font-face {font-family: MathJax_Size2; src: url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/woff/MathJax_Size2-Regular.woff?rev=2.6.1') format('woff'), url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/otf/MathJax_Size2-Regular.otf?rev=2.6.1') format('opentype')}
+@font-face {font-family: MathJax_Size3; src: url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/woff/MathJax_Size3-Regular.woff?rev=2.6.1') format('woff'), url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/otf/MathJax_Size3-Regular.otf?rev=2.6.1') format('opentype')}
+@font-face {font-family: MathJax_Size4; src: url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/woff/MathJax_Size4-Regular.woff?rev=2.6.1') format('woff'), url('https://learnopengl.com/js/mathjax/fonts/HTML-CSS/TeX/otf/MathJax_Size4-Regular.otf?rev=2.6.1') format('opentype')}
+.MathJax .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+<body style="" data-new-gr-c-s-check-loaded="14.1098.0" data-gr-ext-installed=""><div style="visibility: hidden; overflow: hidden; position: absolute; top: 0px; height: 1px; width: auto; padding: 0px; border: 0px; margin: 0px; text-align: left; text-indent: 0px; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal;"><div id="MathJax_Hidden"></div></div><div id="MathJax_Message" style="display: none;"></div>
+<iframe style="display: none;" src="./LearnOpenGL - Cubemaps_files/saved_resource.html"></iframe><a href="https://learnopengl.com/">
+<div id="header">
+</div>
+</a>
+
+<div id="supercontainer">
+    <!-- 728x90/320x50 -->
+    <div id="header_ad">
+	<div id="waldo-tag-6194"></div>    </div>
+    <div id="rightad_container">
+        <div id="rightad">       
+			<div id="waldo-tag-1715"></div>        </div>
+
+        <div id="admessage">
+            If you're running AdBlock, please consider whitelisting this site if you'd like to support LearnOpenGL (it helps <strong>a lot</strong>); and no worries, I won't be mad if you don't :)
+        </div>
+		
+		<!--<div id="rightonetenthad">
+
+        </div>-->
+        
+        <!--<div id="rightthreetenthad">
+
+        </div>-->
+		
+		
+					<div id="rightfifthtenthad">			
+						<div id="waldo-tag-2246"></div>
+					</div>
+						
+		<!--<div id="rightseventhtenthdad">
+
+        </div>-->
+
+        		
+    </div>
+    <div id="container">
+        <div id="loading"></div>
+<script> 
+$(document).ready(function() {
+$('#menu-item4').mousedown(function() { MenuClick(4, true) });
+$('#menu-item48').mousedown(function() { MenuClick(48, true) });
+$('#menu-item56').mousedown(function() { MenuClick(56, true) });
+$('#menu-item63').mousedown(function() { MenuClick(63, true) });
+$('#menu-item100').mousedown(function() { MenuClick(100, true) });
+$('#menu-item102').mousedown(function() { MenuClick(102, true) });
+$('#menu-item113').mousedown(function() { MenuClick(113, true) });
+$('#menu-item116').mousedown(function() { MenuClick(116, true) });
+$('#menu-item78').mousedown(function() { MenuClick(78, true) });
+$('#menu-item81').mousedown(function() { MenuClick(81, true) });
+$('#menu-item85').mousedown(function() { MenuClick(85, true) });
+$('#menu-item125').mousedown(function() { MenuClick(125, true) });
+$('#menu-item128').mousedown(function() { MenuClick(128, true) });
+$('#menu-item129').mousedown(function() { MenuClick(129, true) });
+$('#menu-item133').mousedown(function() { MenuClick(133, true) });
+$('#menu-item134').mousedown(function() { MenuClick(134, true) });
+$('#menu-item138').mousedown(function() { MenuClick(138, true) });
+$('#menu-item142').mousedown(function() { MenuClick(142, true) });
+$('#menu-item143').mousedown(function() { MenuClick(143, true) });
+}); 
+</script>   
+    <div id="nav">
+         <div id="social">
+            <a href="https://github.com/JoeyDeVries/LearnOpenGL" target="_blank">
+                    <img src="./LearnOpenGL - Cubemaps_files/github.png" class="social_ico">
+            </a>
+            <a href="https://twitter.com/JoeyDeVriez" target="_blank">
+                <img src="./LearnOpenGL - Cubemaps_files/twitter.png" class="social_ico">
+            </a>
+          
+        </div>
+    <img src="./LearnOpenGL - Cubemaps_files/nav-button_bottom-arrow.png" style="display: none"><ol><li id="Introduction"><a id="menu-item1" href="https://learnopengl.com/Introduction">Introduction </a></li><li id="Getting-started"><span id="menu-item4" class="closed">Getting started </span><ol id="menu-items-of4" style="display:none;"><li id="Getting-started/OpenGL"><a id="menu-item49" href="https://learnopengl.com/Getting-started/OpenGL">OpenGL </a></li><li id="Getting-started/Creating-a-window"><a id="menu-item5" href="https://learnopengl.com/Getting-started/Creating-a-window">Creating a window </a></li><li id="Getting-started/Hello-Window"><a id="menu-item6" href="https://learnopengl.com/Getting-started/Hello-Window">Hello Window </a></li><li id="Getting-started/Hello-Triangle"><a id="menu-item38" href="https://learnopengl.com/Getting-started/Hello-Triangle">Hello Triangle </a></li><li id="Getting-started/Shaders"><a id="menu-item39" href="https://learnopengl.com/Getting-started/Shaders">Shaders </a></li><li id="Getting-started/Textures"><a id="menu-item40" href="https://learnopengl.com/Getting-started/Textures">Textures </a></li><li id="Getting-started/Transformations"><a id="menu-item43" href="https://learnopengl.com/Getting-started/Transformations">Transformations </a></li><li id="Getting-started/Coordinate-Systems"><a id="menu-item44" href="https://learnopengl.com/Getting-started/Coordinate-Systems">Coordinate Systems </a></li><li id="Getting-started/Camera"><a id="menu-item47" href="https://learnopengl.com/Getting-started/Camera">Camera </a></li><li id="Getting-started/Review"><a id="menu-item50" href="https://learnopengl.com/Getting-started/Review">Review </a></li></ol></li><li id="Lighting"><span id="menu-item48" class="closed">Lighting </span><ol id="menu-items-of48" style="display:none;"><li id="Lighting/Colors"><a id="menu-item51" href="https://learnopengl.com/Lighting/Colors">Colors </a></li><li id="Lighting/Basic-Lighting"><a id="menu-item52" href="https://learnopengl.com/Lighting/Basic-Lighting">Basic Lighting </a></li><li id="Lighting/Materials"><a id="menu-item53" href="https://learnopengl.com/Lighting/Materials">Materials </a></li><li id="Lighting/Lighting-maps"><a id="menu-item54" href="https://learnopengl.com/Lighting/Lighting-maps">Lighting maps </a></li><li id="Lighting/Light-casters"><a id="menu-item55" href="https://learnopengl.com/Lighting/Light-casters">Light casters </a></li><li id="Lighting/Multiple-lights"><a id="menu-item58" href="https://learnopengl.com/Lighting/Multiple-lights">Multiple lights </a></li><li id="Lighting/Review"><a id="menu-item57" href="https://learnopengl.com/Lighting/Review">Review </a></li></ol></li><li id="Model-Loading"><span id="menu-item56" class="closed">Model Loading </span><ol id="menu-items-of56" style="display:none;"><li id="Model-Loading/Assimp"><a id="menu-item59" href="https://learnopengl.com/Model-Loading/Assimp">Assimp </a></li><li id="Model-Loading/Mesh"><a id="menu-item60" href="https://learnopengl.com/Model-Loading/Mesh">Mesh </a></li><li id="Model-Loading/Model"><a id="menu-item61" href="https://learnopengl.com/Model-Loading/Model">Model </a></li></ol></li><li id="Advanced-OpenGL"><span id="menu-item63" class="open">Advanced OpenGL </span><ol id="menu-items-of63" style=""><li id="Advanced-OpenGL/Depth-testing"><a id="menu-item72" href="https://learnopengl.com/Advanced-OpenGL/Depth-testing">Depth testing </a></li><li id="Advanced-OpenGL/Stencil-testing"><a id="menu-item73" href="https://learnopengl.com/Advanced-OpenGL/Stencil-testing">Stencil testing </a></li><li id="Advanced-OpenGL/Blending"><a id="menu-item74" href="https://learnopengl.com/Advanced-OpenGL/Blending">Blending </a></li><li id="Advanced-OpenGL/Face-culling"><a id="menu-item77" href="https://learnopengl.com/Advanced-OpenGL/Face-culling">Face culling </a></li><li id="Advanced-OpenGL/Framebuffers"><a id="menu-item65" href="https://learnopengl.com/Advanced-OpenGL/Framebuffers">Framebuffers </a></li><li id="Advanced-OpenGL/Cubemaps"><a id="menu-item66" href="https://learnopengl.com/Advanced-OpenGL/Cubemaps" class="selected">Cubemaps </a></li><li id="Advanced-OpenGL/Advanced-Data"><a id="menu-item69" href="https://learnopengl.com/Advanced-OpenGL/Advanced-Data">Advanced Data </a></li><li id="Advanced-OpenGL/Advanced-GLSL"><a id="menu-item67" href="https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL">Advanced GLSL </a></li><li id="Advanced-OpenGL/Geometry-Shader"><a id="menu-item68" href="https://learnopengl.com/Advanced-OpenGL/Geometry-Shader">Geometry Shader </a></li><li id="Advanced-OpenGL/Instancing"><a id="menu-item70" href="https://learnopengl.com/Advanced-OpenGL/Instancing">Instancing </a></li><li id="Advanced-OpenGL/Anti-Aliasing"><a id="menu-item75" href="https://learnopengl.com/Advanced-OpenGL/Anti-Aliasing">Anti Aliasing </a></li></ol></li><li id="Advanced-Lighting"><span id="menu-item100" class="closed">Advanced Lighting </span><ol id="menu-items-of100" style="display:none;"><li id="Advanced-Lighting/Advanced-Lighting"><a id="menu-item101" href="https://learnopengl.com/Advanced-Lighting/Advanced-Lighting">Advanced Lighting </a></li><li id="Advanced-Lighting/Gamma-Correction"><a id="menu-item110" href="https://learnopengl.com/Advanced-Lighting/Gamma-Correction">Gamma Correction </a></li><li id="Advanced-Lighting/Shadows"><span id="menu-item102" class="closed">Shadows </span><ol id="menu-items-of102" style="display:none;"><li id="Advanced-Lighting/Shadows/Shadow-Mapping"><a id="menu-item103" href="https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping">Shadow Mapping </a></li><li id="Advanced-Lighting/Shadows/Point-Shadows"><a id="menu-item104" href="https://learnopengl.com/Advanced-Lighting/Shadows/Point-Shadows">Point Shadows </a></li></ol></li><li id="Advanced-Lighting/Normal-Mapping"><a id="menu-item106" href="https://learnopengl.com/Advanced-Lighting/Normal-Mapping">Normal Mapping </a></li><li id="Advanced-Lighting/Parallax-Mapping"><a id="menu-item107" href="https://learnopengl.com/Advanced-Lighting/Parallax-Mapping">Parallax Mapping </a></li><li id="Advanced-Lighting/HDR"><a id="menu-item111" href="https://learnopengl.com/Advanced-Lighting/HDR">HDR </a></li><li id="Advanced-Lighting/Bloom"><a id="menu-item112" href="https://learnopengl.com/Advanced-Lighting/Bloom">Bloom </a></li><li id="Advanced-Lighting/Deferred-Shading"><a id="menu-item108" href="https://learnopengl.com/Advanced-Lighting/Deferred-Shading">Deferred Shading </a></li><li id="Advanced-Lighting/SSAO"><a id="menu-item109" href="https://learnopengl.com/Advanced-Lighting/SSAO">SSAO </a></li></ol></li><li id="PBR"><span id="menu-item113" class="closed">PBR </span><ol id="menu-items-of113" style="display:none;"><li id="PBR/Theory"><a id="menu-item114" href="https://learnopengl.com/PBR/Theory">Theory </a></li><li id="PBR/Lighting"><a id="menu-item115" href="https://learnopengl.com/PBR/Lighting">Lighting </a></li><li id="PBR/IBL"><span id="menu-item116" class="closed">IBL </span><ol id="menu-items-of116" style="display:none;"><li id="PBR/IBL/Diffuse-irradiance"><a id="menu-item117" href="https://learnopengl.com/PBR/IBL/Diffuse-irradiance">Diffuse irradiance </a></li><li id="PBR/IBL/Specular-IBL"><a id="menu-item118" href="https://learnopengl.com/PBR/IBL/Specular-IBL">Specular IBL </a></li></ol></li></ol></li><li id="In-Practice"><span id="menu-item78" class="closed">In Practice </span><ol id="menu-items-of78" style="display:none;"><li id="In-Practice/Debugging"><a id="menu-item79" href="https://learnopengl.com/In-Practice/Debugging">Debugging </a></li><li id="In-Practice/Text-Rendering"><a id="menu-item80" href="https://learnopengl.com/In-Practice/Text-Rendering">Text Rendering </a></li><li id="In-Practice/2D-Game"><span id="menu-item81" class="closed">2D Game </span><ol id="menu-items-of81" style="display:none;"><li id="In-Practice/2D-Game/Breakout"><a id="menu-item82" href="https://learnopengl.com/In-Practice/2D-Game/Breakout">Breakout </a></li><li id="In-Practice/2D-Game/Setting-up"><a id="menu-item88" href="https://learnopengl.com/In-Practice/2D-Game/Setting-up">Setting up </a></li><li id="In-Practice/2D-Game/Rendering-Sprites"><a id="menu-item83" href="https://learnopengl.com/In-Practice/2D-Game/Rendering-Sprites">Rendering Sprites </a></li><li id="In-Practice/2D-Game/Levels"><a id="menu-item84" href="https://learnopengl.com/In-Practice/2D-Game/Levels">Levels </a></li><li id="In-Practice/2D-Game/Collisions"><span id="menu-item85" class="closed">Collisions </span><ol id="menu-items-of85" style="display:none;"><li id="In-Practice/2D-Game/Collisions/Ball"><a id="menu-item95" href="https://learnopengl.com/In-Practice/2D-Game/Collisions/Ball">Ball </a></li><li id="In-Practice/2D-Game/Collisions/Collision-detection"><a id="menu-item96" href="https://learnopengl.com/In-Practice/2D-Game/Collisions/Collision-detection">Collision detection </a></li><li id="In-Practice/2D-Game/Collisions/Collision-resolution"><a id="menu-item97" href="https://learnopengl.com/In-Practice/2D-Game/Collisions/Collision-resolution">Collision resolution </a></li></ol></li><li id="In-Practice/2D-Game/Particles"><a id="menu-item89" href="https://learnopengl.com/In-Practice/2D-Game/Particles">Particles </a></li><li id="In-Practice/2D-Game/Postprocessing"><a id="menu-item90" href="https://learnopengl.com/In-Practice/2D-Game/Postprocessing">Postprocessing </a></li><li id="In-Practice/2D-Game/Powerups"><a id="menu-item91" href="https://learnopengl.com/In-Practice/2D-Game/Powerups">Powerups </a></li><li id="In-Practice/2D-Game/Audio"><a id="menu-item94" href="https://learnopengl.com/In-Practice/2D-Game/Audio">Audio </a></li><li id="In-Practice/2D-Game/Render-text"><a id="menu-item92" href="https://learnopengl.com/In-Practice/2D-Game/Render-text">Render text </a></li><li id="In-Practice/2D-Game/Final-thoughts"><a id="menu-item93" href="https://learnopengl.com/In-Practice/2D-Game/Final-thoughts">Final thoughts </a></li></ol></li></ol></li><li id="Guest-Articles"><span id="menu-item125" class="closed">Guest Articles </span><ol id="menu-items-of125" style="display:none;"><li id="Guest-Articles/How-to-publish"><a id="menu-item126" href="https://learnopengl.com/Guest-Articles/How-to-publish">How to publish </a></li><li id="Guest-Articles/2020"><span id="menu-item128" class="closed">2020 </span><ol id="menu-items-of128" style="display:none;"><li id="Guest-Articles/2020/OIT"><span id="menu-item129" class="closed">OIT </span><ol id="menu-items-of129" style="display:none;"><li id="Guest-Articles/2020/OIT/Introduction"><a id="menu-item130" href="https://learnopengl.com/Guest-Articles/2020/OIT/Introduction">Introduction </a></li><li id="Guest-Articles/2020/OIT/Weighted-Blended"><a id="menu-item132" href="https://learnopengl.com/Guest-Articles/2020/OIT/Weighted-Blended">Weighted Blended </a></li></ol></li><li id="Guest-Articles/2020/Skeletal-Animation"><a id="menu-item131" href="https://learnopengl.com/Guest-Articles/2020/Skeletal-Animation">Skeletal Animation </a></li></ol></li><li id="Guest-Articles/2021"><span id="menu-item133" class="closed">2021 </span><ol id="menu-items-of133" style="display:none;"><li id="Guest-Articles/2021/CSM"><a id="menu-item137" href="https://learnopengl.com/Guest-Articles/2021/CSM">CSM </a></li><li id="Guest-Articles/2021/Scene"><span id="menu-item134" class="closed">Scene </span><ol id="menu-items-of134" style="display:none;"><li id="Guest-Articles/2021/Scene/Scene-Graph"><a id="menu-item135" href="https://learnopengl.com/Guest-Articles/2021/Scene/Scene-Graph">Scene Graph </a></li><li id="Guest-Articles/2021/Scene/Frustum-Culling"><a id="menu-item136" href="https://learnopengl.com/Guest-Articles/2021/Scene/Frustum-Culling">Frustum Culling </a></li></ol></li><li id="Guest-Articles/2021/Tessellation"><span id="menu-item138" class="closed">Tessellation </span><ol id="menu-items-of138" style="display:none;"><li id="Guest-Articles/2021/Tessellation/Height-map"><a id="menu-item139" href="https://learnopengl.com/Guest-Articles/2021/Tessellation/Height-map">Height map </a></li><li id="Guest-Articles/2021/Tessellation/Tessellation"><a id="menu-item140" href="https://learnopengl.com/Guest-Articles/2021/Tessellation/Tessellation">Tessellation </a></li></ol></li><li id="Guest-Articles/2021/DSA"><a id="menu-item141" href="https://learnopengl.com/Guest-Articles/2021/DSA">DSA </a></li></ol></li><li id="Guest-Articles/2022"><span id="menu-item142" class="closed">2022 </span><ol id="menu-items-of142" style="display:none;"><li id="Guest-Articles/2022/Compute-Shaders"><span id="menu-item143" class="closed">Compute Shaders </span><ol id="menu-items-of143" style="display:none;"><li id="Guest-Articles/2022/Compute-Shaders/Introduction"><a id="menu-item144" href="https://learnopengl.com/Guest-Articles/2022/Compute-Shaders/Introduction">Introduction </a></li></ol></li><li id="Guest-Articles/2022/Phys.-Based-Bloom"><a id="menu-item145" href="https://learnopengl.com/Guest-Articles/2022/Phys.-Based-Bloom">Phys. Based Bloom </a></li><li id="Guest-Articles/2022/Area-Lights"><a id="menu-item146" href="https://learnopengl.com/Guest-Articles/2022/Area-Lights">Area Lights </a></li></ol></li></ol></li><li id="Code-repository"><a id="menu-item99" href="https://learnopengl.com/Code-repository">Code repository </a></li><li id="Translations"><a id="menu-item119" href="https://learnopengl.com/Translations">Translations </a></li><li id="Privacy"><a id="menu-item147" href="https://learnopengl.com/Privacy">Privacy </a></li><li id="About"><a id="menu-item2" href="https://learnopengl.com/About">About </a></li></ol>		<div id="menu_book">
+            <a href="https://geni.us/learnopengl" target="_blank"><img src="./LearnOpenGL - Cubemaps_files/below_menu.png" class="clean"></a>
+        </div>
+       <div id="donate">
+            <a href="https://www.paypal.me/learnopengl/" target="_blank">
+                <div id="donate_img"></div>
+                <img style="display: none" src="./LearnOpenGL - Cubemaps_files/donate_button_hover.png">
+            </a>
+        </div>       
+		
+		
+					<div id="lefttwotenthad">
+						<div id="waldo-tag-2245"></div>		
+					</div>
+						
+		<!--<div id="leftfourthtenthad">
+
+        </div>-->
+		
+		
+					<div id="leftsixthtenthad">
+						<div id="waldo-tag-1684"></div>		
+					</div>
+						
+		<!--<div id="lefteighttenthad">
+
+        </div>-->
+		    </div>
+    
+    <div id="content">
+    <h1 id="content-title">Cubemaps</h1>
+<h1 id="content-url" style="display:none;">Advanced-OpenGL/Cubemaps</h1>
+<p>
+  We've been using 2D textures for a while now, but there are more texture types we haven't explored yet and in this chapter we'll discuss a texture type that is a combination of multiple textures mapped into one: a <def>cube map</def>.
+</p>
+
+<p>
+  A cubemap is a texture that contains 6 individual 2D textures that each form one side of a cube: a textured cube. You may be wondering what the point is of such a cube? Why bother combining 6 individual textures into a single entity instead of just using 6 individual textures? Well, cube maps have the useful property that they can be indexed/sampled using a direction vector. Imagine we have a 1x1x1 unit cube with the origin of a direction vector residing at its center. Sampling a texture value from the cube map with an orange direction vector looks a bit like this:
+</p>
+
+<img src="./LearnOpenGL - Cubemaps_files/cubemaps_sampling.png" class="clean" alt="Indexing/Sampling from a cubemap in OpenGL">
+
+<note>
+  The magnitude of the direction vector doesn't matter. As long as a direction is supplied, OpenGL retrieves the corresponding texels that the direction hits (eventually) and returns the properly sampled texture value.
+</note>
+
+<p>
+  If we imagine we have a cube shape that we attach such a cubemap to, this direction vector would be similar to the (interpolated) local vertex position of the cube. This way we can sample the cubemap using the cube's actual position vectors as long as the cube is centered on the origin. We thus consider all vertex positions of the cube to be its texture coordinates when sampling a cubemap. The result is a texture coordinate that accesses the proper individual <def>face</def> texture of the cubemap.
+</p>
+
+<h2>Creating a cubemap</h2>
+<p>
+  A cubemap is a texture like any other texture, so to create one we generate a texture and bind it to the proper texture target before we do any further texture operations. This time binding it to <var>GL_TEXTURE_CUBE_MAP</var>:
+</p>
+
+<pre class="cpp"><code class=" hljs ">
+<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> textureID;
+<function id="50">glGenTextures</function>(<span class="hljs-number">1</span>, &amp;textureID);
+<function id="48">glBindTexture</function>(GL_TEXTURE_CUBE_MAP, textureID);
+</code></pre>
+
+<p>
+  Because a cubemap contains 6 textures, one for each face, we have to call <fun><function id="52">glTexImage2D</function></fun> six times with their parameters set similarly to the previous chapters. This time however, we have to set the texture <em>target</em> parameter to match a specific face of the cubemap, telling OpenGL which side of the cubemap we're creating a texture for. This means we have to call <fun><function id="52">glTexImage2D</function></fun> once for each face of the cubemap.  
+</p>
+
+<p>
+  Since we have 6 faces OpenGL gives us 6 special texture targets for targeting a face of the cubemap:
+</p>
+
+<table>
+  <tbody><tr>
+    <th>Texture target</th>
+    <th>Orientation</th>
+  </tr>
+  <tr>
+    <td><code>GL_TEXTURE_CUBE_MAP_POSITIVE_X</code></td>
+    <td>Right</td>
+  </tr>
+ <tr>
+    <td><code>GL_TEXTURE_CUBE_MAP_NEGATIVE_X</code></td>
+    <td>Left</td>
+  </tr>
+  <tr>
+    <td><code>GL_TEXTURE_CUBE_MAP_POSITIVE_Y</code></td>
+    <td>Top</td>
+  </tr>
+  <tr>
+    <td><code>GL_TEXTURE_CUBE_MAP_NEGATIVE_Y</code></td>
+    <td>Bottom</td>
+  </tr>
+  <tr>
+    <td><code>GL_TEXTURE_CUBE_MAP_POSITIVE_Z</code></td>
+    <td>Back</td>
+  </tr>
+  <tr>
+    <td><code>GL_TEXTURE_CUBE_MAP_NEGATIVE_Z</code></td>
+    <td>Front</td>
+  </tr>  
+</tbody></table>
+
+<p>
+  Like many of OpenGL's enums, their behind-the-scenes <fun>int</fun> value is linearly incremented, so if we were to have an array or vector of texture locations we could loop over them by starting with <var>GL_TEXTURE_CUBE_MAP_POSITIVE_X</var> and incrementing the enum by 1 each iteration, effectively looping through all the texture targets:
+</p>
+
+<pre><code class=" hljs cpp">
+<span class="hljs-keyword">int</span> width, height, nrChannels;
+<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">char</span> *data;  
+<span class="hljs-keyword">for</span>(<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; textures_faces.size(); i++)
+{
+    data = stbi_load(textures_faces[i].c_str(), &amp;width, &amp;height, &amp;nrChannels, <span class="hljs-number">0</span>);
+    <function id="52">glTexImage2D</function>(
+        GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 
+        <span class="hljs-number">0</span>, GL_RGB, width, height, <span class="hljs-number">0</span>, GL_RGB, <span class="hljs-built_in">GL_UNSIGNED_BYTE</span>, data
+    );
+}
+</code></pre>
+
+<p>
+  Here we have a <fun>vector</fun> called <var>textures_faces</var> that contain the locations of all the textures required for the cubemap in the order as given in the table. This generates a texture for each face of the currently bound cubemap.
+</p>
+
+<p>
+  Because a cubemap is a texture like any other texture, we will also specify its wrapping and filtering methods:
+</p>
+
+<pre><code class=" hljs ">
+<function id="15">glTexParameter</function>i(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+<function id="15">glTexParameter</function>i(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+<function id="15">glTexParameter</function>i(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+<function id="15">glTexParameter</function>i(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+<function id="15">glTexParameter</function>i(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);  
+</code></pre>
+
+<p>
+  Don't be scared by the <var>GL_TEXTURE_WRAP_R</var>, this simply sets the wrapping method for the texture's <code>R</code> coordinate which corresponds to the texture's 3rd dimension (like <code>z</code> for positions). We set the wrapping method to <var>GL_CLAMP_TO_EDGE</var> since texture coordinates that are exactly between two faces may not hit an exact face (due to some hardware limitations) so by using <var>GL_CLAMP_TO_EDGE</var> OpenGL always returns their edge values whenever we sample between faces.
+</p>
+
+<p>
+  Then before drawing the objects that will use the cubemap, we activate the corresponding texture unit and bind the cubemap before rendering; not much of a difference compared to normal 2D textures.  
+</p>
+
+<p>
+  Within the fragment shader we also have to use a different sampler of the type <code>samplerCube</code> that we sample from using the <fun>texture</fun> function, but this time using a <code>vec3</code> direction vector instead of a <code>vec2</code>. An example of fragment shader using a cubemap looks like this:
+</p>
+
+<pre><code class=" hljs cpp">
+<span class="hljs-keyword">in</span> <span class="hljs-built_in">vec3</span> textureDir; <span class="hljs-comment">// direction vector representing a 3D texture coordinate</span>
+<span class="hljs-keyword">uniform</span> samplerCube cubemap; <span class="hljs-comment">// cubemap texture sampler</span>
+
+<span class="hljs-keyword">void</span> main()
+{             
+    FragColor = texture(cubemap, textureDir);
+}  
+</code></pre>
+
+
+<p>
+  That is still great and all, but why bother? Well, it just so happens that there are quite a few interesting techniques that are a lot easier to implement with a cubemap. One of those techniques is creating a <def>skybox</def>.
+</p>
+
+<h1>Skybox</h1>
+<p>
+  A skybox is a (large) cube that encompasses the entire scene and contains 6 images of a surrounding environment, giving the player the illusion that the environment he's in is actually much larger than it actually is. Some examples of skyboxes used in videogames are images of mountains, of clouds, or of a starry night sky. An example of a skybox, using starry night sky images, can be seen in the following screenshot of the third elder scrolls game:
+</p>
+
+<img src="./LearnOpenGL - Cubemaps_files/cubemaps_morrowind.jpg" alt="Image of morrowind with a skybox">
+
+<p>
+  You probably guessed by now that skyboxes like this suit cubemaps perfectly: we have a cube that has 6 faces and needs to be textured per face. In the previous image they used several images of a night sky to give the illusion the player is in some large universe while he's actually inside a tiny little box. 
+</p>
+
+<p>
+  There are usually enough resources online where you could find skyboxes like that. These skybox images usually have the following pattern:
+</p>
+
+<img src="./LearnOpenGL - Cubemaps_files/cubemaps_skybox.png" class="clean" alt="Image of a skybox for a cubemap in OpenGL">
+
+<p>
+  If you would fold those 6 sides into a cube you'd get the completely textured cube that simulates a large landscape. Some resources provide the skybox in a format like that in which case you'd have to manually extract the 6 face images, but in most cases they're provided as 6 single texture images.
+</p>
+
+<p>
+  This particular (high-quality) skybox is what we'll use for our scene and can be downloaded <a href="https://learnopengl.com/img/textures/skybox.zip" target="_blank">here</a>.
+</p>
+
+<h2>Loading a skybox</h2>
+<p>
+  Since a skybox is by itself just a cubemap, loading a skybox isn't too different from what we've seen at the start of this chapter. To load the skybox we're going to use the following function that accepts a <fun>vector</fun> of 6 texture locations:
+</p>
+
+<pre><code class=" hljs cpp">
+<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> loadCubemap(<span class="hljs-stl_container"><span class="hljs-built_in">vector</span>&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;</span> faces)
+{
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> textureID;
+    <function id="50">glGenTextures</function>(<span class="hljs-number">1</span>, &amp;textureID);
+    <function id="48">glBindTexture</function>(GL_TEXTURE_CUBE_MAP, textureID);
+
+    <span class="hljs-keyword">int</span> width, height, nrChannels;
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; faces.size(); i++)
+    {
+        <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">char</span> *data = stbi_load(faces[i].c_str(), &amp;width, &amp;height, &amp;nrChannels, <span class="hljs-number">0</span>);
+        <span class="hljs-keyword">if</span> (data)
+        {
+            <function id="52">glTexImage2D</function>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 
+                         <span class="hljs-number">0</span>, GL_RGB, width, height, <span class="hljs-number">0</span>, GL_RGB, <span class="hljs-built_in">GL_UNSIGNED_BYTE</span>, data
+            );
+            stbi_image_free(data);
+        }
+        <span class="hljs-keyword">else</span>
+        {
+            <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"Cubemap tex failed to load at path: "</span> &lt;&lt; faces[i] &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span>;
+            stbi_image_free(data);
+        }
+    }
+    <function id="15">glTexParameter</function>i(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    <function id="15">glTexParameter</function>i(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    <function id="15">glTexParameter</function>i(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    <function id="15">glTexParameter</function>i(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    <function id="15">glTexParameter</function>i(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    <span class="hljs-keyword">return</span> textureID;
+}  
+</code></pre>
+
+<p>
+  The function itself shouldn't be too surprising. It is basically all the cubemap code we've seen in the previous section, but combined in a single manageable function.
+</p>
+
+<p>
+  Now, before we call this function we'll load the appropriate texture paths in a vector in the order as specified by the cubemap enums:
+</p>
+
+<pre><code class=" hljs cpp">
+<span class="hljs-stl_container"><span class="hljs-built_in">vector</span>&lt;<span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span>&gt;</span> faces;
+{
+    <span class="hljs-string">"right.jpg"</span>,
+    <span class="hljs-string">"left.jpg"</span>,
+    <span class="hljs-string">"top.jpg"</span>,
+    <span class="hljs-string">"bottom.jpg"</span>,
+    <span class="hljs-string">"front.jpg"</span>,
+    <span class="hljs-string">"back.jpg"</span>
+};
+<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> cubemapTexture = loadCubemap(faces);  
+</code></pre>
+
+<p>
+  We loaded the skybox as a cubemap with <var>cubemapTexture</var> as its id. We can now finally bind it to a cube to replace that lame clear color we've been using all this time.
+</p>
+
+<h2>Displaying a skybox</h2>
+<p>
+  Because a skybox is drawn on a cube we'll need another VAO, VBO and a fresh set of vertices like any other 3D object. You can get its vertex data <a href="https://learnopengl.com/code_viewer.php?code=advanced/cubemaps_skybox_data" target="_blank">here</a>.   
+</p>
+
+<p>
+  A cubemap used to texture a 3D cube can be sampled using the local positions of the cube as its texture coordinates. When a cube is centered on the origin (0,0,0) each of its position vectors is also a direction vector from the origin. This direction vector is exactly what we need to get the corresponding texture value at that specific cube's position. For this reason we only need to supply position vectors and don't need texture coordinates.
+</p>
+
+<p>
+  To render the skybox we'll need a new set of shaders which aren't too complicated. Because we only have one vertex attribute the vertex shader is quite simple:
+</p>
+
+<pre><code class=" hljs cpp">
+<span class="hljs-preprocessor">#version 330 core</span>
+<span class="hljs-keyword">layout</span> (location = <span class="hljs-number">0</span>) <span class="hljs-keyword">in</span> <span class="hljs-built_in">vec3</span> aPos;
+
+<span class="hljs-keyword">out</span> <span class="hljs-built_in">vec3</span> TexCoords;
+
+<span class="hljs-keyword">uniform</span> <span class="hljs-built_in">mat4</span> projection;
+<span class="hljs-keyword">uniform</span> <span class="hljs-built_in">mat4</span> view;
+
+<span class="hljs-keyword">void</span> main()
+{
+    TexCoords = aPos;
+    gl_Position = projection * view * <span class="hljs-built_in">vec4</span>(aPos, <span class="hljs-number">1.0</span>);
+}  
+</code></pre>
+
+<p>
+  The interesting part of this vertex shader is that we set the incoming local position vector as the outcoming texture coordinate for (interpolated) use in the fragment shader. The fragment shader then takes these as input to sample a <code>samplerCube</code>:
+</p>
+
+<pre><code class=" hljs cpp">
+<span class="hljs-preprocessor">#version 330 core</span>
+<span class="hljs-keyword">out</span> <span class="hljs-built_in">vec4</span> FragColor;
+
+<span class="hljs-keyword">in</span> <span class="hljs-built_in">vec3</span> TexCoords;
+
+<span class="hljs-keyword">uniform</span> samplerCube skybox;
+
+<span class="hljs-keyword">void</span> main()
+{    
+    FragColor = texture(skybox, TexCoords);
+}
+</code></pre>
+
+<p>
+  The fragment shader is relatively straightforward. We take the vertex attribute's interpolated position vector as the texture's direction vector and use it to sample the texture values from the cubemap.
+</p>
+
+<p>
+  Rendering the skybox is easy now that we have a cubemap texture, we simply bind the cubemap texture and the <var>skybox</var> sampler is automatically filled with the skybox cubemap. To draw the skybox we're going to draw it as the first object in the scene and disable depth writing. This way the skybox will always be drawn at the background of all the other objects since the unit cube is most likely smaller than the rest of the scene.
+</p>
+
+<pre><code class=" hljs cpp">
+<function id="65">glDepthMask</function>(<span class="hljs-built_in">GL_FALSE</span>);
+skyboxShader.use();
+<span class="hljs-comment">// ... set view and projection matrix</span>
+<function id="27">glBindVertexArray</function>(skyboxVAO);
+<function id="48">glBindTexture</function>(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+<function id="1">glDrawArrays</function>(GL_TRIANGLES, <span class="hljs-number">0</span>, <span class="hljs-number">36</span>);
+<function id="65">glDepthMask</function>(<span class="hljs-built_in">GL_TRUE</span>);
+<span class="hljs-comment">// ... draw rest of the scene</span>
+</code></pre>
+
+<p>
+  If you run this you will get into difficulties though. We want the skybox to be centered around the player so that no matter how far the player moves, the skybox won't get any closer, giving the impression the surrounding environment is extremely large. The current view matrix however transforms all the skybox's positions by rotating, scaling and translating them, so if the player moves, the cubemap moves as well! We want to remove the translation part of the view matrix so only rotation will affect the skybox's position vectors. 
+</p>
+
+<p>
+  You may remember from the <a href="https://learnopengl.com/Lighting/Basic-Lighting" target="_blank">basic lighting</a> chapter that we can remove the translation section of transformation matrices by taking the upper-left 3x3 matrix of the 4x4 matrix. We can achieve this by converting the view matrix to a 3x3 matrix (removing translation) and converting it back to a 4x4 matrix:
+</p>
+
+<pre><code class=" hljs cpp">
+glm::<span class="hljs-built_in">mat4</span> view = glm::<span class="hljs-built_in">mat4</span>(glm::<span class="hljs-built_in">mat3</span>(camera.GetViewMatrix()));  
+</code></pre>
+
+<p>
+  This removes any translation, but keeps all rotation transformations so the user can still look around the scene. 
+</p>
+
+<p></p><div id="in_content_ad_2">
+				<!-- 728x90/300x250/320x50 --><div id="waldo-tag-15502"></div>
+				</div><p>
+  The result is a scene that instantly looks enormous due to our skybox. If you'd fly around the basic container you immediately get a sense of scale which dramatically improves the realism of the scene. The result looks something like this:
+</p>
+
+<img src="./LearnOpenGL - Cubemaps_files/cubemaps_skybox_result.png" class="clean" alt="Image of a skybox in an OpenGL scene">
+
+<p>
+  Try experimenting with different skyboxes and see how they can have an enormous impact on the look and feel of your scene.
+</p>
+
+<h2>An optimization</h2>
+<p>
+  Right now we've rendered the skybox first before we rendered all the other objects in the scene. This works great, but isn't too efficient. If we render the skybox first we're running the fragment shader for each pixel on the screen even though only a small part of the skybox will eventually be visible; fragments that could have easily been discarded using <def>early depth testing</def> saving us valuable bandwidth.
+</p>
+
+<p>
+  So to give us a slight performance boost we're going to render the skybox last. This way, the depth buffer is completely filled with all the scene's depth values so we only have to render the skybox's fragments wherever the early depth test passes, greatly reducing the number of fragment shader calls. The problem is that the skybox will most likely render on top of all other objects since it's only a 1x1x1 cube, succeeding most depth tests. Simply rendering it without depth testing is not a solution since the skybox will then still overwrite all the other objects in the scene as it's rendered last. We need to trick the depth buffer into believing that the skybox has the maximum depth value of <code>1.0</code> so that it fails the depth test wherever there's a different object in front of it.
+</p>
+
+<p>
+  In the <a href="https://learnopengl.com/Getting-started/Coordinate-Systems" target="_blank">coordinate systems</a> chapter we said that <em>perspective division</em> is performed after the vertex shader has run, dividing the <var>gl_Position</var>'s <code>xyz</code> coordinates by its <code>w</code> component. We also know from the <a href="https://learnopengl.com/Advanced-OpenGL/Depth-testing" target="_blank">depth testing</a> chapter that the <code>z</code> component of the resulting division is equal to that vertex's depth value. Using this information we can set the <code>z</code> component of the output position equal to its <code>w</code> component which will result in a <code>z</code> component that is always equal to <code>1.0</code>, because when the perspective division is applied its <code>z</code> component translates to <code>w</code> / <code>w</code> = <code>1.0</code>:
+</p>
+
+<pre><code class=" hljs cpp">
+<span class="hljs-keyword">void</span> main()
+{
+    TexCoords = aPos;
+    <span class="hljs-built_in">vec4</span> pos = projection * view * <span class="hljs-built_in">vec4</span>(aPos, <span class="hljs-number">1.0</span>);
+    gl_Position = pos.xyww;
+}  
+</code></pre>
+
+<p>
+  The resulting <em>normalized device coordinates</em> will then always have a <code>z</code> value equal to <code>1.0</code>: the maximum depth value. The skybox will as a result only be rendered wherever there are no objects visible (only then it will pass the depth test, everything else is in front of the skybox).
+</p>
+
+<p>
+  We do have to change the depth function a little by setting it to <var>GL_LEQUAL</var> instead of the default <var>GL_LESS</var>. The depth buffer will be filled with values of <code>1.0</code> for the skybox, so we need to make sure the skybox passes the depth tests with values <em>less than or equal</em> to the depth buffer instead of <em>less than</em>. 
+</p>
+
+<p>
+  You can find the more optimized version of the source code <a href="https://learnopengl.com/code_viewer_gh.php?code=src/4.advanced_opengl/6.1.cubemaps_skybox/cubemaps_skybox.cpp" target="_blank">here</a>.
+</p>
+
+<h1>Environment mapping</h1>
+<p>
+  We now have the entire surrounding environment mapped in a single texture object and we could use that information for more than just a skybox. Using a cubemap with an environment, we could give objects reflective or refractive properties. Techniques that use an environment cubemap like this are called <def>environment mapping</def> techniques and the two most popular ones are <def>reflection</def> and <def>refraction</def>.
+</p>
+
+<h2>Reflection</h2>
+<p>
+  Reflection is the property that an object (or part of an object) <def>reflects</def> its surrounding environment e.g. the object's colors are more or less equal to its environment based on the angle of the viewer. A mirror for example is a reflective object: it reflects its surroundings based on the viewer's angle.
+</p>
+
+<p>
+  The basics of reflection are not that difficult. The following image shows how we can calculate a <def>reflection vector</def> and use that vector to sample from a cubemap:
+</p>
+
+<img src="./LearnOpenGL - Cubemaps_files/cubemaps_reflection_theory.png" class="clean" alt="Image of how to calculate reflection.">
+
+<p>
+  We calculate a reflection vector <span class="MathJax_Preview" style="color: inherit;"></span><span class="MathJax" id="MathJax-Element-1-Frame" tabindex="0" style="position: relative;" data-mathml="&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;&lt;mstyle mathcolor=&quot;green&quot;&gt;&lt;mrow class=&quot;MJX-TeXAtom-ORD&quot;&gt;&lt;mover&gt;&lt;mi&gt;R&lt;/mi&gt;&lt;mo stretchy=&quot;false&quot;&gt;&amp;#x00AF;&lt;/mo&gt;&lt;/mover&gt;&lt;/mrow&gt;&lt;/mstyle&gt;&lt;/math&gt;" role="presentation"><nobr aria-hidden="true"><span class="math" id="MathJax-Span-1" role="math" style="width: 0.919em; display: inline-block;"><span style="display: inline-block; position: relative; width: 0.757em; height: 0px; font-size: 116%;"><span style="position: absolute; clip: rect(1.242em, 1000.76em, 2.427em, -999.997em); top: -2.26em; left: 0.003em;"><span class="mrow" id="MathJax-Span-2"><span class="mstyle" id="MathJax-Span-3" style="color: green;"><span class="mrow" id="MathJax-Span-4" style="color: green;"><span class="texatom" id="MathJax-Span-5" style="color: green;"><span class="mrow" id="MathJax-Span-6" style="color: green;"><span class="munderover" id="MathJax-Span-7" style="color: green;"><span style="display: inline-block; position: relative; width: 0.757em; height: 0px;"><span style="position: absolute; clip: rect(3.128em, 1000.76em, 4.151em, -999.997em); top: -3.984em; left: 0.003em;"><span class="mi" id="MathJax-Span-8" style="font-family: MathJax_Math-italic; color: green;">R</span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span><span style="position: absolute; clip: rect(3.235em, 1000.43em, 3.613em, -999.997em); top: -4.254em; left: 0.218em;"><span class="mo" id="MathJax-Span-9" style="font-family: MathJax_Main; color: green;">¯</span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span></span></span></span></span></span></span></span><span style="display: inline-block; width: 0px; height: 2.266em;"></span></span></span><span style="display: inline-block; overflow: hidden; vertical-align: -0.059em; border-left: 0px solid; width: 0px; height: 1.128em;"></span></span></nobr><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mstyle mathcolor="green"><mrow class="MJX-TeXAtom-ORD"><mover><mi>R</mi><mo stretchy="false">¯</mo></mover></mrow></mstyle></math></span></span><script type="math/tex" id="MathJax-Element-1">\color{green}{\bar{R}}</script> around the object's normal vector <span class="MathJax_Preview" style="color: inherit;"></span><span class="MathJax" id="MathJax-Element-2-Frame" tabindex="0" style="position: relative;" data-mathml="&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;&lt;mstyle mathcolor=&quot;red&quot;&gt;&lt;mrow class=&quot;MJX-TeXAtom-ORD&quot;&gt;&lt;mover&gt;&lt;mi&gt;N&lt;/mi&gt;&lt;mo stretchy=&quot;false&quot;&gt;&amp;#x00AF;&lt;/mo&gt;&lt;/mover&gt;&lt;/mrow&gt;&lt;/mstyle&gt;&lt;/math&gt;" role="presentation"><nobr aria-hidden="true"><span class="math" id="MathJax-Span-10" role="math" style="width: 1.026em; display: inline-block;"><span style="display: inline-block; position: relative; width: 0.865em; height: 0px; font-size: 116%;"><span style="position: absolute; clip: rect(1.242em, 1000.87em, 2.427em, -999.997em); top: -2.26em; left: 0.003em;"><span class="mrow" id="MathJax-Span-11"><span class="mstyle" id="MathJax-Span-12" style="color: red;"><span class="mrow" id="MathJax-Span-13" style="color: red;"><span class="texatom" id="MathJax-Span-14" style="color: red;"><span class="mrow" id="MathJax-Span-15" style="color: red;"><span class="munderover" id="MathJax-Span-16" style="color: red;"><span style="display: inline-block; position: relative; width: 0.865em; height: 0px;"><span style="position: absolute; clip: rect(3.128em, 1000.87em, 4.151em, -999.997em); top: -3.984em; left: 0.003em;"><span class="mi" id="MathJax-Span-17" style="font-family: MathJax_Math-italic; color: red;">N<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.11em;"></span></span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span><span style="position: absolute; clip: rect(3.235em, 1000.43em, 3.613em, -999.997em); top: -4.254em; left: 0.38em;"><span class="mo" id="MathJax-Span-18" style="font-family: MathJax_Main; color: red;">¯</span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span></span></span></span></span></span></span></span><span style="display: inline-block; width: 0px; height: 2.266em;"></span></span></span><span style="display: inline-block; overflow: hidden; vertical-align: -0.059em; border-left: 0px solid; width: 0px; height: 1.128em;"></span></span></nobr><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mstyle mathcolor="red"><mrow class="MJX-TeXAtom-ORD"><mover><mi>N</mi><mo stretchy="false">¯</mo></mover></mrow></mstyle></math></span></span><script type="math/tex" id="MathJax-Element-2">\color{red}{\bar{N}}</script> based on the view direction vector <span class="MathJax_Preview" style="color: inherit;"></span><span class="MathJax" id="MathJax-Element-3-Frame" tabindex="0" style="position: relative;" data-mathml="&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;&lt;mstyle mathcolor=&quot;gray&quot;&gt;&lt;mrow class=&quot;MJX-TeXAtom-ORD&quot;&gt;&lt;mover&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;mo stretchy=&quot;false&quot;&gt;&amp;#x00AF;&lt;/mo&gt;&lt;/mover&gt;&lt;/mrow&gt;&lt;/mstyle&gt;&lt;/math&gt;" role="presentation"><nobr aria-hidden="true"><span class="math" id="MathJax-Span-19" role="math" style="width: 0.811em; display: inline-block;"><span style="display: inline-block; position: relative; width: 0.703em; height: 0px; font-size: 116%;"><span style="position: absolute; clip: rect(1.242em, 1000.65em, 2.427em, -999.997em); top: -2.26em; left: 0.003em;"><span class="mrow" id="MathJax-Span-20"><span class="mstyle" id="MathJax-Span-21" style="color: gray;"><span class="mrow" id="MathJax-Span-22" style="color: gray;"><span class="texatom" id="MathJax-Span-23" style="color: gray;"><span class="mrow" id="MathJax-Span-24" style="color: gray;"><span class="munderover" id="MathJax-Span-25" style="color: gray;"><span style="display: inline-block; position: relative; width: 0.703em; height: 0px;"><span style="position: absolute; clip: rect(3.128em, 1000.49em, 4.151em, -999.997em); top: -3.984em; left: 0.003em;"><span class="mi" id="MathJax-Span-26" style="font-family: MathJax_Math-italic; color: gray;">I<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.057em;"></span></span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span><span style="position: absolute; clip: rect(3.235em, 1000.43em, 3.613em, -999.997em); top: -4.254em; left: 0.164em;"><span class="mo" id="MathJax-Span-27" style="font-family: MathJax_Main; color: gray;">¯</span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span></span></span></span></span></span></span></span><span style="display: inline-block; width: 0px; height: 2.266em;"></span></span></span><span style="display: inline-block; overflow: hidden; vertical-align: -0.059em; border-left: 0px solid; width: 0px; height: 1.128em;"></span></span></nobr><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mstyle mathcolor="gray"><mrow class="MJX-TeXAtom-ORD"><mover><mi>I</mi><mo stretchy="false">¯</mo></mover></mrow></mstyle></math></span></span><script type="math/tex" id="MathJax-Element-3">\color{gray}{\bar{I}}</script>. We can calculate this reflection vector using GLSL's built-in <fun>reflect</fun> function. The resulting vector <span class="MathJax_Preview" style="color: inherit;"></span><span class="MathJax" id="MathJax-Element-4-Frame" tabindex="0" style="position: relative;" data-mathml="&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;&lt;mstyle mathcolor=&quot;green&quot;&gt;&lt;mrow class=&quot;MJX-TeXAtom-ORD&quot;&gt;&lt;mover&gt;&lt;mi&gt;R&lt;/mi&gt;&lt;mo stretchy=&quot;false&quot;&gt;&amp;#x00AF;&lt;/mo&gt;&lt;/mover&gt;&lt;/mrow&gt;&lt;/mstyle&gt;&lt;/math&gt;" role="presentation"><nobr aria-hidden="true"><span class="math" id="MathJax-Span-28" role="math" style="width: 0.919em; display: inline-block;"><span style="display: inline-block; position: relative; width: 0.757em; height: 0px; font-size: 116%;"><span style="position: absolute; clip: rect(1.242em, 1000.76em, 2.427em, -999.997em); top: -2.26em; left: 0.003em;"><span class="mrow" id="MathJax-Span-29"><span class="mstyle" id="MathJax-Span-30" style="color: green;"><span class="mrow" id="MathJax-Span-31" style="color: green;"><span class="texatom" id="MathJax-Span-32" style="color: green;"><span class="mrow" id="MathJax-Span-33" style="color: green;"><span class="munderover" id="MathJax-Span-34" style="color: green;"><span style="display: inline-block; position: relative; width: 0.757em; height: 0px;"><span style="position: absolute; clip: rect(3.128em, 1000.76em, 4.151em, -999.997em); top: -3.984em; left: 0.003em;"><span class="mi" id="MathJax-Span-35" style="font-family: MathJax_Math-italic; color: green;">R</span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span><span style="position: absolute; clip: rect(3.235em, 1000.43em, 3.613em, -999.997em); top: -4.254em; left: 0.218em;"><span class="mo" id="MathJax-Span-36" style="font-family: MathJax_Main; color: green;">¯</span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span></span></span></span></span></span></span></span><span style="display: inline-block; width: 0px; height: 2.266em;"></span></span></span><span style="display: inline-block; overflow: hidden; vertical-align: -0.059em; border-left: 0px solid; width: 0px; height: 1.128em;"></span></span></nobr><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mstyle mathcolor="green"><mrow class="MJX-TeXAtom-ORD"><mover><mi>R</mi><mo stretchy="false">¯</mo></mover></mrow></mstyle></math></span></span><script type="math/tex" id="MathJax-Element-4">\color{green}{\bar{R}}</script> is then used as a direction vector to index/sample the cubemap, returning a color value of the environment. The resulting effect is that the object seems to reflect the skybox.
+</p>
+
+<p>
+  Since we already have a skybox setup in our scene, creating reflections isn't too difficult. We'll change the fragment shader used by the container to give the container reflective properties:
+</p>
+
+<pre><code class=" hljs cpp">
+<span class="hljs-preprocessor">#version 330 core</span>
+<span class="hljs-keyword">out</span> <span class="hljs-built_in">vec4</span> FragColor;
+
+<span class="hljs-keyword">in</span> <span class="hljs-built_in">vec3</span> Normal;
+<span class="hljs-keyword">in</span> <span class="hljs-built_in">vec3</span> Position;
+
+<span class="hljs-keyword">uniform</span> <span class="hljs-built_in">vec3</span> cameraPos;
+<span class="hljs-keyword">uniform</span> samplerCube skybox;
+
+<span class="hljs-keyword">void</span> main()
+{             
+    <span class="hljs-built_in">vec3</span> I = normalize(Position - cameraPos);
+    <span class="hljs-built_in">vec3</span> R = reflect(I, normalize(Normal));
+    FragColor = <span class="hljs-built_in">vec4</span>(texture(skybox, R).rgb, <span class="hljs-number">1.0</span>);
+}
+</code></pre>
+
+<p>
+  We first calculate the view/camera direction vector <var>I</var> and use this to calculate the reflect vector <var>R</var> which we then use to sample from the skybox cubemap. Note that we have the fragment's interpolated <var>Normal</var> and <var>Position</var> variable again so we'll need to adjust the vertex shader as well:
+</p>
+
+<pre><code class=" hljs cpp">
+<span class="hljs-preprocessor">#version 330 core</span>
+<span class="hljs-keyword">layout</span> (location = <span class="hljs-number">0</span>) <span class="hljs-keyword">in</span> <span class="hljs-built_in">vec3</span> aPos;
+<span class="hljs-keyword">layout</span> (location = <span class="hljs-number">1</span>) <span class="hljs-keyword">in</span> <span class="hljs-built_in">vec3</span> aNormal;
+
+<span class="hljs-keyword">out</span> <span class="hljs-built_in">vec3</span> Normal;
+<span class="hljs-keyword">out</span> <span class="hljs-built_in">vec3</span> Position;
+
+<span class="hljs-keyword">uniform</span> <span class="hljs-built_in">mat4</span> model;
+<span class="hljs-keyword">uniform</span> <span class="hljs-built_in">mat4</span> view;
+<span class="hljs-keyword">uniform</span> <span class="hljs-built_in">mat4</span> projection;
+
+<span class="hljs-keyword">void</span> main()
+{
+    Normal = <span class="hljs-built_in">mat3</span>(transpose(inverse(model))) * aNormal;
+    Position = <span class="hljs-built_in">vec3</span>(model * <span class="hljs-built_in">vec4</span>(aPos, <span class="hljs-number">1.0</span>));
+    gl_Position = projection * view * <span class="hljs-built_in">vec4</span>(Position, <span class="hljs-number">1.0</span>);
+}  
+</code></pre>
+
+<p>
+  We're using normal vectors so we'll want to transform them with a normal matrix again. The <var>Position</var> output vector is a world-space position vector. This <var>Position</var> output of the vertex shader is used to calculate the view direction vector in the fragment shader.
+</p>
+
+<p>
+  Because we're using normals you'll want to update the <a href="https://learnopengl.com/code_viewer.php?code=lighting/basic_lighting_vertex_data" target="_blank">vertex data</a> and update the attribute pointers as well. Also make sure to set the <var>cameraPos</var> uniform.
+</p>
+
+<p>
+  Then we also want to bind the cubemap texture before rendering the container:
+</p>
+
+<pre class="cpp"><code class=" hljs ">
+<function id="27">glBindVertexArray</function>(cubeVAO);
+<function id="48">glBindTexture</function>(GL_TEXTURE_CUBE_MAP, skyboxTexture);  		
+<function id="1">glDrawArrays</function>(GL_TRIANGLES, <span class="hljs-number">0</span>, <span class="hljs-number">36</span>);	  
+</code></pre>
+
+<p>
+  Compiling and running your code gives you a container that acts like a perfect mirror. The surrounding skybox is perfectly reflected on the container:
+</p>
+
+<img src="./LearnOpenGL - Cubemaps_files/cubemaps_reflection.png" class="clean" alt="Image of a cube reflecting a skybox via cubemaps via environment mapping.">
+
+<p>
+  You can find the full source code <a href="https://learnopengl.com/code_viewer_gh.php?code=src/4.advanced_opengl/6.2.cubemaps_environment_mapping/cubemaps_environment_mapping.cpp" target="_blank">here</a>.
+</p>
+
+<p>
+  When reflection is applied to an entire object (like the container) the object looks as if it has a high reflective material like steel or chrome. If we were to load a more interesting object (like the backpack model from the <a href="https://learnopengl.com/Model-Loading/Model" target="_blank">model loading</a> chapters) we'd get the effect that the object looks to be entirely made out of chrome:
+</p>
+
+<img src="./LearnOpenGL - Cubemaps_files/cubemaps_reflection_nanosuit.png" alt="Image of a Backpack model reflecting a skybox via cubemaps via environment mapping.">
+
+<p>
+  This looks quite awesome, but in reality most models aren't all completely reflective. We could for instance introduce <def>reflection maps</def> that give the models another extra level of detail. Just like diffuse and specular maps, reflection maps are texture images that we can sample to determine the reflectivity of a fragment. Using these reflection maps we can determine which parts of the model show reflection and by what intensity. <!--In the exercise of this chapter it's up to you to introduce reflection maps in the model loader we created earlier, significantly boosting the detail of the 3D object.-->
+</p>
+
+<h2>Refraction</h2>
+<p>
+  Another form of environment mapping is called <def>refraction</def> and is similar to reflection. Refraction is the change in direction of light due to the change of the material the light flows through. Refraction is what we commonly see with water-like surfaces where the light doesn't enter straight through, but bends a little. It's like looking at your arm when it's halfway in the water.
+</p>
+
+<p>
+  Refraction is described by <a href="http://en.wikipedia.org/wiki/Snell%27s_law" target="_blank">Snell's law</a> that with environment maps looks a bit like this:
+</p>
+
+<img src="./LearnOpenGL - Cubemaps_files/cubemaps_refraction_theory.png" class="clean" alt="Image explaining refraction of light for use with cubemaps.">
+
+<p>
+  Again, we have a view vector <span class="MathJax_Preview" style="color: inherit;"></span><span class="MathJax" id="MathJax-Element-5-Frame" tabindex="0" style="position: relative;" data-mathml="&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;&lt;mstyle mathcolor=&quot;gray&quot;&gt;&lt;mrow class=&quot;MJX-TeXAtom-ORD&quot;&gt;&lt;mover&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;mo stretchy=&quot;false&quot;&gt;&amp;#x00AF;&lt;/mo&gt;&lt;/mover&gt;&lt;/mrow&gt;&lt;/mstyle&gt;&lt;/math&gt;" role="presentation"><nobr aria-hidden="true"><span class="math" id="MathJax-Span-37" role="math" style="width: 0.811em; display: inline-block;"><span style="display: inline-block; position: relative; width: 0.703em; height: 0px; font-size: 116%;"><span style="position: absolute; clip: rect(1.242em, 1000.65em, 2.427em, -999.997em); top: -2.26em; left: 0.003em;"><span class="mrow" id="MathJax-Span-38"><span class="mstyle" id="MathJax-Span-39" style="color: gray;"><span class="mrow" id="MathJax-Span-40" style="color: gray;"><span class="texatom" id="MathJax-Span-41" style="color: gray;"><span class="mrow" id="MathJax-Span-42" style="color: gray;"><span class="munderover" id="MathJax-Span-43" style="color: gray;"><span style="display: inline-block; position: relative; width: 0.703em; height: 0px;"><span style="position: absolute; clip: rect(3.128em, 1000.49em, 4.151em, -999.997em); top: -3.984em; left: 0.003em;"><span class="mi" id="MathJax-Span-44" style="font-family: MathJax_Math-italic; color: gray;">I<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.057em;"></span></span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span><span style="position: absolute; clip: rect(3.235em, 1000.43em, 3.613em, -999.997em); top: -4.254em; left: 0.164em;"><span class="mo" id="MathJax-Span-45" style="font-family: MathJax_Main; color: gray;">¯</span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span></span></span></span></span></span></span></span><span style="display: inline-block; width: 0px; height: 2.266em;"></span></span></span><span style="display: inline-block; overflow: hidden; vertical-align: -0.059em; border-left: 0px solid; width: 0px; height: 1.128em;"></span></span></nobr><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mstyle mathcolor="gray"><mrow class="MJX-TeXAtom-ORD"><mover><mi>I</mi><mo stretchy="false">¯</mo></mover></mrow></mstyle></math></span></span><script type="math/tex" id="MathJax-Element-5">\color{gray}{\bar{I}}</script>, a normal vector <span class="MathJax_Preview" style="color: inherit;"></span><span class="MathJax" id="MathJax-Element-6-Frame" tabindex="0" style="position: relative;" data-mathml="&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;&lt;mstyle mathcolor=&quot;red&quot;&gt;&lt;mrow class=&quot;MJX-TeXAtom-ORD&quot;&gt;&lt;mover&gt;&lt;mi&gt;N&lt;/mi&gt;&lt;mo stretchy=&quot;false&quot;&gt;&amp;#x00AF;&lt;/mo&gt;&lt;/mover&gt;&lt;/mrow&gt;&lt;/mstyle&gt;&lt;/math&gt;" role="presentation"><nobr aria-hidden="true"><span class="math" id="MathJax-Span-46" role="math" style="width: 1.026em; display: inline-block;"><span style="display: inline-block; position: relative; width: 0.865em; height: 0px; font-size: 116%;"><span style="position: absolute; clip: rect(1.242em, 1000.87em, 2.427em, -999.997em); top: -2.26em; left: 0.003em;"><span class="mrow" id="MathJax-Span-47"><span class="mstyle" id="MathJax-Span-48" style="color: red;"><span class="mrow" id="MathJax-Span-49" style="color: red;"><span class="texatom" id="MathJax-Span-50" style="color: red;"><span class="mrow" id="MathJax-Span-51" style="color: red;"><span class="munderover" id="MathJax-Span-52" style="color: red;"><span style="display: inline-block; position: relative; width: 0.865em; height: 0px;"><span style="position: absolute; clip: rect(3.128em, 1000.87em, 4.151em, -999.997em); top: -3.984em; left: 0.003em;"><span class="mi" id="MathJax-Span-53" style="font-family: MathJax_Math-italic; color: red;">N<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.11em;"></span></span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span><span style="position: absolute; clip: rect(3.235em, 1000.43em, 3.613em, -999.997em); top: -4.254em; left: 0.38em;"><span class="mo" id="MathJax-Span-54" style="font-family: MathJax_Main; color: red;">¯</span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span></span></span></span></span></span></span></span><span style="display: inline-block; width: 0px; height: 2.266em;"></span></span></span><span style="display: inline-block; overflow: hidden; vertical-align: -0.059em; border-left: 0px solid; width: 0px; height: 1.128em;"></span></span></nobr><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mstyle mathcolor="red"><mrow class="MJX-TeXAtom-ORD"><mover><mi>N</mi><mo stretchy="false">¯</mo></mover></mrow></mstyle></math></span></span><script type="math/tex" id="MathJax-Element-6">\color{red}{\bar{N}}</script> and this time a resulting refraction vector <span class="MathJax_Preview" style="color: inherit;"></span><span class="MathJax" id="MathJax-Element-7-Frame" tabindex="0" style="position: relative;" data-mathml="&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;&lt;mstyle mathcolor=&quot;green&quot;&gt;&lt;mrow class=&quot;MJX-TeXAtom-ORD&quot;&gt;&lt;mover&gt;&lt;mi&gt;R&lt;/mi&gt;&lt;mo stretchy=&quot;false&quot;&gt;&amp;#x00AF;&lt;/mo&gt;&lt;/mover&gt;&lt;/mrow&gt;&lt;/mstyle&gt;&lt;/math&gt;" role="presentation"><nobr aria-hidden="true"><span class="math" id="MathJax-Span-55" role="math" style="width: 0.919em; display: inline-block;"><span style="display: inline-block; position: relative; width: 0.757em; height: 0px; font-size: 116%;"><span style="position: absolute; clip: rect(1.242em, 1000.76em, 2.427em, -999.997em); top: -2.26em; left: 0.003em;"><span class="mrow" id="MathJax-Span-56"><span class="mstyle" id="MathJax-Span-57" style="color: green;"><span class="mrow" id="MathJax-Span-58" style="color: green;"><span class="texatom" id="MathJax-Span-59" style="color: green;"><span class="mrow" id="MathJax-Span-60" style="color: green;"><span class="munderover" id="MathJax-Span-61" style="color: green;"><span style="display: inline-block; position: relative; width: 0.757em; height: 0px;"><span style="position: absolute; clip: rect(3.128em, 1000.76em, 4.151em, -999.997em); top: -3.984em; left: 0.003em;"><span class="mi" id="MathJax-Span-62" style="font-family: MathJax_Math-italic; color: green;">R</span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span><span style="position: absolute; clip: rect(3.235em, 1000.43em, 3.613em, -999.997em); top: -4.254em; left: 0.218em;"><span class="mo" id="MathJax-Span-63" style="font-family: MathJax_Main; color: green;">¯</span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span></span></span></span></span></span></span></span><span style="display: inline-block; width: 0px; height: 2.266em;"></span></span></span><span style="display: inline-block; overflow: hidden; vertical-align: -0.059em; border-left: 0px solid; width: 0px; height: 1.128em;"></span></span></nobr><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mstyle mathcolor="green"><mrow class="MJX-TeXAtom-ORD"><mover><mi>R</mi><mo stretchy="false">¯</mo></mover></mrow></mstyle></math></span></span><script type="math/tex" id="MathJax-Element-7">\color{green}{\bar{R}}</script>. As you can see, the direction of the view vector is slightly bend. This resulting bended vector <span class="MathJax_Preview" style="color: inherit;"></span><span class="MathJax" id="MathJax-Element-8-Frame" tabindex="0" style="position: relative;" data-mathml="&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;&lt;mstyle mathcolor=&quot;green&quot;&gt;&lt;mrow class=&quot;MJX-TeXAtom-ORD&quot;&gt;&lt;mover&gt;&lt;mi&gt;R&lt;/mi&gt;&lt;mo stretchy=&quot;false&quot;&gt;&amp;#x00AF;&lt;/mo&gt;&lt;/mover&gt;&lt;/mrow&gt;&lt;/mstyle&gt;&lt;/math&gt;" role="presentation"><nobr aria-hidden="true"><span class="math" id="MathJax-Span-64" role="math" style="width: 0.919em; display: inline-block;"><span style="display: inline-block; position: relative; width: 0.757em; height: 0px; font-size: 116%;"><span style="position: absolute; clip: rect(1.242em, 1000.76em, 2.427em, -999.997em); top: -2.26em; left: 0.003em;"><span class="mrow" id="MathJax-Span-65"><span class="mstyle" id="MathJax-Span-66" style="color: green;"><span class="mrow" id="MathJax-Span-67" style="color: green;"><span class="texatom" id="MathJax-Span-68" style="color: green;"><span class="mrow" id="MathJax-Span-69" style="color: green;"><span class="munderover" id="MathJax-Span-70" style="color: green;"><span style="display: inline-block; position: relative; width: 0.757em; height: 0px;"><span style="position: absolute; clip: rect(3.128em, 1000.76em, 4.151em, -999.997em); top: -3.984em; left: 0.003em;"><span class="mi" id="MathJax-Span-71" style="font-family: MathJax_Math-italic; color: green;">R</span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span><span style="position: absolute; clip: rect(3.235em, 1000.43em, 3.613em, -999.997em); top: -4.254em; left: 0.218em;"><span class="mo" id="MathJax-Span-72" style="font-family: MathJax_Main; color: green;">¯</span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span></span></span></span></span></span></span></span><span style="display: inline-block; width: 0px; height: 2.266em;"></span></span></span><span style="display: inline-block; overflow: hidden; vertical-align: -0.059em; border-left: 0px solid; width: 0px; height: 1.128em;"></span></span></nobr><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mstyle mathcolor="green"><mrow class="MJX-TeXAtom-ORD"><mover><mi>R</mi><mo stretchy="false">¯</mo></mover></mrow></mstyle></math></span></span><script type="math/tex" id="MathJax-Element-8">\color{green}{\bar{R}}</script> is then used to sample from the cubemap.
+</p>
+
+<p>
+  Refraction is fairly easy to implement using GLSL's built-in <fun>refract</fun> function that expects a normal vector, a view direction, and a ratio between both materials' <def>refractive indices</def>.
+</p>
+
+<p>
+  The refractive index determines the amount light distorts/bends in a material where each material has its own refractive index. A list of the most common refractive indices are given in the following table:
+</p>
+
+<table>
+  <tbody><tr>
+    <th>Material</th>
+    <th>Refractive index</th>
+  </tr>
+  <tr>
+    <td>Air</td>
+    <td>1.00</td>
+  </tr>
+  <tr>
+    <td>Water</td>
+    <td>1.33</td>
+  </tr>
+  <tr>
+    <td>Ice</td>
+    <td>1.309</td>
+  </tr>
+  <tr>
+    <td>Glass</td>
+    <td>1.52</td>
+  </tr>
+  <tr>
+    <td>Diamond</td>
+    <td>2.42</td>
+  </tr>
+</tbody></table>
+
+<p>
+  We use these refractive indices to calculate the ratio between both materials the light passes through. In our case, the light/view ray goes from <em>air</em> to <em>glass</em> (if we assume the object is made of glass) so the ratio becomes <span class="MathJax_Preview" style="color: inherit;"></span><span class="MathJax" id="MathJax-Element-9-Frame" tabindex="0" style="position: relative;" data-mathml="&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;&lt;mfrac&gt;&lt;mn&gt;1.00&lt;/mn&gt;&lt;mn&gt;1.52&lt;/mn&gt;&lt;/mfrac&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mn&gt;0.658&lt;/mn&gt;&lt;/math&gt;" role="presentation"><nobr aria-hidden="true"><span class="math" id="MathJax-Span-73" role="math" style="width: 6.091em; display: inline-block;"><span style="display: inline-block; position: relative; width: 5.229em; height: 0px; font-size: 116%;"><span style="position: absolute; clip: rect(1.188em, 1005.17em, 2.804em, -999.997em); top: -2.26em; left: 0.003em;"><span class="mrow" id="MathJax-Span-74"><span class="mfrac" id="MathJax-Span-75"><span style="display: inline-block; position: relative; width: 1.404em; height: 0px; margin-right: 0.11em; margin-left: 0.11em;"><span style="position: absolute; clip: rect(3.343em, 1001.24em, 4.151em, -999.997em); top: -4.415em; left: 50%; margin-left: -0.644em;"><span class="mn" id="MathJax-Span-76" style="font-size: 70.7%; font-family: MathJax_Main;">1.00</span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span><span style="position: absolute; clip: rect(3.343em, 1001.24em, 4.151em, -999.997em); top: -3.607em; left: 50%; margin-left: -0.644em;"><span class="mn" id="MathJax-Span-77" style="font-size: 70.7%; font-family: MathJax_Main;">1.52</span><span style="display: inline-block; width: 0px; height: 3.99em;"></span></span><span style="position: absolute; clip: rect(0.865em, 1001.4em, 1.242em, -999.997em); top: -1.29em; left: 0.003em;"><span style="display: inline-block; overflow: hidden; vertical-align: 0.003em; border-top: 1.3px solid; width: 1.404em; height: 0px;"></span><span style="display: inline-block; width: 0px; height: 1.08em;"></span></span></span></span><span class="mo" id="MathJax-Span-78" style="font-family: MathJax_Main; padding-left: 0.272em;">=</span><span class="mn" id="MathJax-Span-79" style="font-family: MathJax_Main; padding-left: 0.272em;">0.658</span></span><span style="display: inline-block; width: 0px; height: 2.266em;"></span></span></span><span style="display: inline-block; overflow: hidden; vertical-align: -0.497em; border-left: 0px solid; width: 0px; height: 1.628em;"></span></span></nobr><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1.00</mn><mn>1.52</mn></mfrac><mo>=</mo><mn>0.658</mn></math></span></span><script type="math/tex" id="MathJax-Element-9">\frac{1.00}{1.52} = 0.658</script>.
+</p>
+
+<p>
+  We already have the cubemap bound, supplied the vertex data with normals, and set the camera position as a uniform. The only thing we have to change is the fragment shader:
+</p>
+
+<pre><code class=" hljs cpp">
+<span class="hljs-keyword">void</span> main()
+{             
+    <span class="hljs-keyword">float</span> ratio = <span class="hljs-number">1.00</span> / <span class="hljs-number">1.52</span>;
+    <span class="hljs-built_in">vec3</span> I = normalize(Position - cameraPos);
+    <span class="hljs-built_in">vec3</span> R = refract(I, normalize(Normal), ratio);
+    FragColor = <span class="hljs-built_in">vec4</span>(texture(skybox, R).rgb, <span class="hljs-number">1.0</span>);
+}  
+</code></pre>
+
+<p>
+  By changing the refractive indices you can create completely different visual results. Compiling the application and running the results on the container object is not so interesting though as it doesn't really show the effect refraction has aside that it acts as a magnifying glass right now. Using the same shaders on the loaded 3D model however does show us the effect we're looking for: a glass-like object.
+</p>
+
+<img src="./LearnOpenGL - Cubemaps_files/cubemaps_refraction.png" alt="Image of environment maps using refraction in OpenGL">
+
+<p>
+  You can imagine that with the right combination of lighting, reflection, refraction and vertex movement, you can create pretty neat water graphics. Do note that for physically accurate results we should refract the light <strong>again</strong> when it leaves the object; now we simply used single-sided refraction which is fine for most purposes.
+</p>
+
+<h2>Dynamic environment maps</h2>
+<p>
+  Right now we've been using a static combination of images as the skybox, which looks great, but it doesn't include the actual 3D scene with possibly moving objects. We didn't really notice this so far, because we only used a single object. If we had a mirror-like objects with multiple surrounding objects, only the skybox would be visible in the mirror as if it was the only object in the scene.
+</p>
+
+<p>
+  Using framebuffers it is possible to create a texture of the scene for all 6 different angles from the object in question and store those in a cubemap each frame. We can then use this (dynamically generated) cubemap to create realistic reflection and refractive surfaces that include all other objects. This is called <def>dynamic environment mapping</def>, because we dynamically create a cubemap of an object's surroundings and use that as its environment map.
+</p>
+
+<p>
+  While it looks great, it has one enormous disadvantage: we have to render the scene 6 times per object using an environment map, which is an enormous performance penalty on your application. Modern applications try to use the skybox as much as possible and where possible pre-render cubemaps wherever they can to still sort-of create dynamic environment maps. While dynamic environment mapping is a great technique, it requires a lot of clever tricks and hacks to get it working in an actual rendering application without too many performance drops.
+</p>
+
+
+
+<!--<h2>Exercises</h2>
+<ul>
+  <li>Try to introduce reflection maps into the model loader we created in the <a href="https://learnopengl.com/Model-Loading/Assimp" target="_blank">model loading</a> chapters. You can find the upgraded nanosuit model with reflection maps included <a href="/objects/nanosuit_reflection.zip" target="_blank">here</a>. There are a few things to note though:</li>
+  <ul>
+    <li>Assimp doesn't really seem to like reflection maps in most object formats so we cheated a little by storing the reflection maps as <em>ambient maps</em>. You can then load the reflection maps by specifying <var>aiTextureType_AMBIENT</var> as the texture type when loading materials.</li>  
+    <li>I sort of hastily created reflection map textures from the specular texture images, so the reflection maps won't map exactly to the model in some places :).</li>
+    <li>Since the model loader by itself already takes up 3 texture units in the shader, you'll have to bind the skybox to a 4th texture unit since we'll also sample from the skybox in the same shader.</li>    
+    </ul>
+   <li>If you did things right it'll look something like <a href="/img/advanced/cubemaps_reflection_map.png" target="_blank">this</a>.
+  </li>
+</ul>
+-->    </div>
+    
+    <div id="hover" style="display: none; top: 1159px; left: 638px;"><h2>glTexImage2D</h2><h3>Textures</h3><p></p><p>
+  The function <code>glTexImage2D</code> generates the texture image on the currently bound texture object at the active texture unit. The function expects destination and source data from where the source image is expected to be an array of data (usually a byte array).
+</p>
+
+<p>
+    The parameters of <code>glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid * data)</code> are as follows:
+  </p><ul>
+    <li><code>target</code>: Specifies the texture target of which the most common are <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code> and <code>GL_TEXTURE_3D</code>. </li>
+    <li><code>level</code>: Specifies the level-of-detail number. Level 0 is the base image level. Level <code>n</code> is the <code>n</code>th mipmap reduction image. </li>
+    <li><code>internalFormat</code>: Specifies the number of color components in the texture.   </li>
+    <li><code>width</code>: Specifies the width of the texture image. </li>
+    <li><code>height</code>: Specifies the height of the texture image, or the number of layers in a texture array. </li>
+    <li><code>border</code>: This value must be 0. </li>
+    <li><code>format</code>: Specifies the format of the pixel data  </li>
+    <li><code>type</code>:  Specifies the data type of the pixel data. </li>
+    <li><code>data</code>: Specifies a pointer to the image data in memory.</li>
+  </ul>
+<p></p>
+
+<h4>Example usage</h4>
+<pre class="cpp hljs "><code>
+<span class="hljs-comment">// Load and generate the texture</span>
+<span class="hljs-keyword">int</span> width, height;
+<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">char</span>* image = SOIL_load_image(<span class="hljs-string">"container.jpg"</span>, &amp;width, &amp;eight, <span class="hljs-number">0</span>, SOIL_LOAD_RGB); 
+glTexImage2D(GL_TEXTURE_2D, <span class="hljs-number">0</span>, GL_RGB, width, height, <span class="hljs-number">0</span>, GL_RGB, <span class="hljs-built_in">GL_UNSIGNED_BYTE</span>, image);
+</code></pre><p></p></div>
+	
+	
+<!-- 728x90/320x50 sticky footer -->
+<div id="waldo-tag-6196"></div><div id="disqus_thread" style="display: block;"><iframe id="dsq-app1989" name="dsq-app1989" allowtransparency="true" frameborder="0" scrolling="no" tabindex="0" title="Disqus" width="100%" src="./LearnOpenGL - Cubemaps_files/saved_resource(1).html" style="width: 1px !important; min-width: 100% !important; border: none !important; overflow: hidden !important; height: 15817px !important;" horizontalscrolling="no" verticalscrolling="no"></iframe></div>
+
+</div> <!-- container div -->
+
+
+</div> <!-- super container div -->
+
+<div style="position: absolute; width: 0px; height: 0px; overflow: hidden; padding: 0px; border: 0px; margin: 0px;"><div id="MathJax_Font_Test" style="position: absolute; visibility: hidden; top: 0px; left: 0px; width: auto; padding: 0px; border: 0px; margin: 0px; white-space: nowrap; text-align: left; text-indent: 0px; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; font-size: 40px; font-weight: normal; font-style: normal; font-size-adjust: none; font-family: MathJax_Main, sans-serif;"></div></div><iframe name="__launchpadLocator" style="display: none;" src="./LearnOpenGL - Cubemaps_files/saved_resource(2).html"></iframe></body><grammarly-desktop-integration data-grammarly-shadow-root="true"><template shadowrootmode="open"><style>
+      div.grammarly-desktop-integration {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select:none;
+        user-select:none;
+      }
+
+      div.grammarly-desktop-integration:before {
+        content: attr(data-content);
+      }
+    </style><div aria-label="grammarly-integration" role="group" tabindex="-1" class="grammarly-desktop-integration" data-content="{&quot;mode&quot;:&quot;full&quot;,&quot;isActive&quot;:true,&quot;isUserDisabled&quot;:false}"></div></template></grammarly-desktop-integration></html>
