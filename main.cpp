@@ -130,14 +130,14 @@ int main()
     
     
     ImportOBJ importer;
+    ImportOBJ importer_floor;
 
     //import the models
     BasicShape smiley = importer.loadFiles("models/smiley",import_vao);
     BasicShape baseModel = importer.loadFiles("models/baseModel", import_vao);
-    BasicShape LouGrossBuilding = importer.loadFiles("models/LouGrossBuilding", import_vao);
     Avatar baseAvatar(baseModel, 180.0f, glm::vec3(0.0, 0.0, 0.0), IMPORTED_BASIC);
-
-    ImportOBJ importer_floor;
+    BasicShape LouGrossBuilding = importer.loadFiles("models/LouGrossBuilding", import_vao);
+    
     BasicShape tumbling_floor = importer_floor.loadFiles("models/tumbling_floor", import_vao);
     int tumbling_floor_texture = importer_floor.getTexture();
 
@@ -216,9 +216,8 @@ int main()
         shader_program.setMat4("view",view);
         shader_program.setVec4("view_position",glm::vec4(camera.Position,1.0));
 
-        //draw the ship and the baseAvatar, don't need to use the shader program here
+        //draw and the baseAvatar, don't need to use the shader program here
         //   since we already did at the top of the render loop.
-        //ship.Draw(&shader_program,false);
         baseAvatar.Draw(&shader_program, false);
 
         //Draw the floor
