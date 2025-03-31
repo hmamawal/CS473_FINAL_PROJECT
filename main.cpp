@@ -156,8 +156,8 @@ int main()
     // for (int i = 0; i < die_textures.size(); i++) {
     //     std::cout<<"Texture:"<<i<<" "<<die_textures[i]<<std::endl;
     // }
-    Avatar ship((importer.loadFiles("models/ship",import_vao)),90.0f,glm::vec3(2.0,1.0,0.0),IMPORTED_BASIC);;
-    ship.Scale(glm::vec3(0.4,0.4,0.4));
+    // Avatar ship((importer.loadFiles("models/ship",import_vao)),90.0f,glm::vec3(2.0,1.0,0.0),IMPORTED_BASIC);;
+    // ship.Scale(glm::vec3(0.4,0.4,0.4));
 
     arial_font.initialize(texture_vao);
 
@@ -217,7 +217,7 @@ int main()
         // input
         // -----
         ProcessInput(window);
-        ship.ProcessInput(window,delta_time);
+        //ship.ProcessInput(window,delta_time);
         baseAvatar.ProcessInput(window, delta_time);
 
         // render
@@ -233,29 +233,10 @@ int main()
         view = camera.GetViewMatrix();
         shader_program.setMat4("view",view);
         shader_program.setVec4("view_position",glm::vec4(camera.Position,1.0));
-        
 
-        //Draw the smiley
-        // shader_program.setInt("shader_state",IMPORTED_BASIC);
-        // glm::mat4 smiley_model(1.0);
-        // glm::mat4 smiley_local = glm::translate(identity,glm::vec3(0.0,1.0,0.0));
-        // //smiley_local = glm::rotate(smiley_local,glm::radians(180.0f),glm::vec3(0.0,1.0,0.0));
-        // shader_program.setMat4("model",smiley_model);
-        // shader_program.setMat4("local",smiley_local);
-        // smiley.Draw();
-
-        //Draw the base model
-        // shader_program.setInt("shader_state",IMPORTED_BASIC);
-        // glm::mat4 base_model(1.0);
-        // glm::mat4 base_local = glm::translate(identity,glm::vec3(0.0,0.0,0.0));
-        // base_local = glm::rotate(base_local,glm::radians(180.0f),glm::vec3(0.0,1.0,0.0));
-        // shader_program.setMat4("model",base_model);
-        // shader_program.setMat4("local",base_local);
-        // baseModel.Draw();
-
-        //draw the ship, don't need to use the shader program here
+        //draw the ship and the baseAvatar, don't need to use the shader program here
         //   since we already did at the top of the render loop.
-        ship.Draw(&shader_program,false);
+        //ship.Draw(&shader_program,false);
         baseAvatar.Draw(&shader_program, false);
 
         //Draw the floor

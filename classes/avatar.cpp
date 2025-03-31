@@ -15,8 +15,8 @@ Avatar::Avatar(BasicShape shape, float orientation, glm::vec3 initial_position, 
     this->is_flipping = false;
     this->flip_progress = 0.0f;
     this->flip_height = 0.0f;
-    this->jump_height = 3.0f;  // Maximum height of jump
-    this->flip_duration = 1.0f; // Time to complete flip in seconds
+    this->jump_height = 5.0f;  // Increased from 3.0f for more dramatic effect
+    this->flip_duration = 1.2f; // Slightly longer to give time for the full sequence
 }
 
 
@@ -41,8 +41,18 @@ void Avatar::ProcessInput(GLFWwindow *window, float time_passed) {
     if (is_flipping) {
         flip_progress += time_passed / flip_duration;
         
-        // Calculate height using a parabolic curve
-        flip_height = jump_height * sin(flip_progress * 3.14159f);
+        // Modified height curve - rises quickly then falls
+        // Use a modified sine curve that front-loads the jump
+        if (flip_progress < 0.3f) {
+            // Rise quickly to ~90% of height in the first 30% of animation
+            flip_height = jump_height * (flip_progress / 0.3f) * 0.9f;
+        } else if (flip_progress < 0.8f) {
+            // Hold near max height during main rotation
+            flip_height = jump_height * 0.9f + (jump_height * 0.1f * sin((flip_progress - 0.3f) * 3.14159f / 0.5f));
+        } else {
+            // Fall for the last 20%
+            flip_height = jump_height * (1.0f - ((flip_progress - 0.8f) / 0.2f));
+        }
         
         // Reset when animation completes
         if (flip_progress >= 1.0f) {
@@ -68,8 +78,18 @@ void Avatar::Draw(Shader *shader, bool use_shader) {
     // Add vertical offset for jump
     if (is_flipping) {
         local = glm::translate(local, glm::vec3(0.0f, flip_height, 0.0f));
-        // Apply backflip rotation (360 degrees around X-axis)
-        local = glm::rotate(local, glm::radians(flip_progress * 360.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        
+        // Start rotation only after initial rise (20% into animation)
+        // Complete rotation before landing (90% of animation)
+        if (flip_progress > 0.2f && flip_progress < 0.9f) {
+            // Map 0.2-0.9 range to 0-1 for rotation progress
+            float rotation_progress = (flip_progress - 0.2f) / 0.7f;
+            // Apply faster rotation in middle of jump
+            local = glm::rotate(local, glm::radians(rotation_progress * 360.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        } else if (flip_progress >= 0.9f) {
+            // Keep final rotation
+            local = glm::rotate(local, glm::radians(360.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        }
     }
     
     local = glm::rotate(local, glm::radians(this->current_rotation), glm::vec3(0.0, 1.0, 0.0));
