@@ -27,3 +27,5 @@ textures/*.cache
 textures/*.tmp
 .aider*
 .aider.chat.history.md
+
+/Blender_files

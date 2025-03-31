@@ -133,9 +133,23 @@ int main()
 
     //import the models
     BasicShape smiley = importer.loadFiles("models/smiley",import_vao);
-    BasicShape die = importer.loadFiles("models/die",import_vao);
+    //BasicShape die = importer.loadFiles("models/die",import_vao);
+    //BasicShape tumbling_floor = importer.loadFiles("models/tumbling_floor", import_vao);
+
+    // import the models using separate importer instances
+    ImportOBJ importer_die;
+    BasicShape die = importer_die.loadFiles("models/die", import_vao);
+    int die_texture = importer_die.getTexture();
+
+    ImportOBJ importer_floor;
+    BasicShape tumbling_floor = importer_floor.loadFiles("models/tumbling_floor", import_vao);
+    int tumbling_floor_texture = importer_floor.getTexture();
+
+
     //import the die -- note that getAllTextures supports multiple textures
-    int die_texture = importer.getTexture();
+    //int die_texture = importer.getTexture();
+    //int tumbling_floor_texture = importer.getTexture();
+
     // std::vector<unsigned int> die_textures = importer.getAllTextures();
     // for (int i = 0; i < die_textures.size(); i++) {
     //     std::cout<<"Texture:"<<i<<" "<<die_textures[i]<<std::endl;
@@ -263,6 +277,15 @@ int main()
         // }
         die.Draw();
         glActiveTexture(GL_TEXTURE0); 
+
+        // Draw the gymnastics tumbling floor
+        shader_program.setInt("shader_state", IMPORTED_TEXTURED);
+        glm::mat4 tumbling_floor_local(1.0);
+        tumbling_floor_local = glm::translate(tumbling_floor_local, glm::vec3(0.0, 1.0, 0.0));
+        shader_program.setMat4("model", identity);
+        shader_program.setMat4("local", tumbling_floor_local);
+        glBindTexture(GL_TEXTURE_2D, tumbling_floor_texture);
+        tumbling_floor.Draw();
 
         if (camera.Position.y < 0.5) {
             camera.Position.y = 0.5;
