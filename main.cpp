@@ -165,7 +165,7 @@ int main()
     //-------------------------
     unsigned int floor_texture = GetTexture("./textures/hull_texture.png");
     
-    BasicShape floor = GetTexturedRectangle(texture_vao,glm::vec3(-50.0,-50.0,0.0),100.0,100.0,20.0,false);
+    BasicShape floor = GetTexturedRectangle(texture_vao,glm::vec3(-25.0,-25.0,0.0),50.0,50.0,20.0,false);
 
     //set up the shader program    
     shader_program.use();
