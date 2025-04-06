@@ -139,7 +139,7 @@ int main()
     std::cout << "ImportOBJ for floor created" << std::endl;
 
     //import the models
-    BasicShape smiley = importer.loadFiles("models/smiley",import_vao);
+    //BasicShape smiley = importer.loadFiles("models/smiley",import_vao);
     BasicShape baseModel = importer.loadFiles("models/baseModel", import_vao);
     std::cout << "BaseModel imported" << std::endl;
     Avatar baseAvatar(baseModel, 180.0f, glm::vec3(0.0, 0.0, 0.0), IMPORTED_BASIC);
@@ -310,8 +310,8 @@ int main()
     std::cout << "About to deallocate texture_vao" << std::endl;
     glDeleteVertexArrays(1,&(texture_vao.id));
 
-    std::cout << "About to deallocate smiley" << std::endl;
-    smiley.DeallocateShape();
+    //std::cout << "About to deallocate smiley" << std::endl;
+    //smiley.DeallocateShape();
     std::cout << "About to deallocate baseModel" << std::endl;
     baseModel.DeallocateShape();
     //LouGrossBuilding.DeallocateShape();
