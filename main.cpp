@@ -139,17 +139,26 @@ int main()
     std::cout << "ImportOBJ for floor created" << std::endl;
 
     //import the models
-    //BasicShape smiley = importer.loadFiles("models/smiley",import_vao);
+
     BasicShape baseModel = importer.loadFiles("models/baseModel", import_vao);
     std::cout << "BaseModel imported" << std::endl;
     Avatar baseAvatar(baseModel, 180.0f, glm::vec3(0.0, 0.0, 0.0), IMPORTED_BASIC);
     std::cout << "BaseAvatar created" << std::endl;
     //BasicShape LouGrossBuilding = importer.loadFiles("models/LouGrossBuilding", import_vao);
+
     
     BasicShape tumbling_floor = importer.loadFiles("models/tumbling_floor", import_vao);
     std::cout << "Tumbling floor imported" << std::endl;
     int tumbling_floor_texture = importer.getTexture();
     std::cout << "Tumbling floor texture imported" << std::endl;
+
+    // import vault table, which has a texture just like the tumbling floor (but it has multiple textures)
+    BasicShape vault_table = importer.loadFiles("models/VaultTable", import_vao);
+    std::vector<unsigned int> vault_table_textures = importer.getAllTextures();
+    for (int i = 0; i < vault_table_textures.size(); i++) {
+        std::cout << "Vault table texture " << i << ": " << vault_table_textures[i] << std::endl;
+    }
+    std::cout << "Vault table imported with " << vault_table_textures.size() << " textures." << std::endl;
 
     arial_font.initialize(texture_vao);
     std::cout << "Font initialized" << std::endl;
@@ -273,6 +282,23 @@ int main()
         shader_program.setMat4("local", tumbling_floor_local);
         glBindTexture(GL_TEXTURE_2D, tumbling_floor_texture);
         tumbling_floor.Draw();
+
+        // Draw the vault table
+        shader_program.setInt("shader_state", IMPORTED_TEXTURED);
+        glm::mat4 vault_table_local(1.0);
+        vault_table_local = glm::translate(vault_table_local, glm::vec3(5.0, 0.4, 0.0));
+        shader_program.setMat4("model", identity);
+        shader_program.setMat4("local", vault_table_local);
+
+        // Bind and set all textures for the VaultTable
+        for (int i = 0; i < vault_table_textures.size(); i++) {
+            glActiveTexture(GL_TEXTURE0 + i);
+            std::string texture_string = "textures[" + std::to_string(i) + "]";
+            shader_program.setInt(texture_string, i);
+            glBindTexture(GL_TEXTURE_2D, vault_table_textures[i]);
+        }
+        vault_table.Draw();
+        glActiveTexture(GL_TEXTURE0); // Reset active texture to default
 
         if (camera.Position.y < 0.5) {
             camera.Position.y = 0.5;
