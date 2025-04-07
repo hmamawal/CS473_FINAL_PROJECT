@@ -1,0 +1,102 @@
+# Blender 4.4.0 MTL File: 'Building.blend'
+# www.blender.org
+
+newmtl Black.012
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/hunter.mamawal/Classes/CS473_Computer_Graphics/CS473_PROJECT2/textures/usma_duty.png
+
+newmtl Country
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/hunter.mamawal/Classes/CS473_Computer_Graphics/CS473_PROJECT2/textures/usma_country.png
+
+newmtl Country.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/hunter.mamawal/Classes/CS473_Computer_Graphics/CS473_PROJECT2/textures/usma_country.png
+
+newmtl Duty
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/hunter.mamawal/Classes/CS473_Computer_Graphics/CS473_PROJECT2/textures/usma_duty.png
+
+newmtl Gold.012
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/hunter.mamawal/Classes/CS473_Computer_Graphics/CS473_PROJECT2/textures/metal.png
+
+newmtl Honor
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/hunter.mamawal/Classes/CS473_Computer_Graphics/CS473_PROJECT2/textures/usma_honor.png
+
+newmtl Honor.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/hunter.mamawal/Classes/CS473_Computer_Graphics/CS473_PROJECT2/textures/usma_honor.png
+
+newmtl Honor.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/hunter.mamawal/Classes/CS473_Computer_Graphics/CS473_PROJECT2/textures/usma_honor.png
+
+newmtl White.012
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl WoodFloor
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/hunter.mamawal/Classes/CS473_Computer_Graphics/CS473_PROJECT2/textures/wood.jpg
