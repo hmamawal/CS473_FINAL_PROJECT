@@ -6,6 +6,7 @@
 #include "classes/Font.hpp"
 #include "classes/import_object.hpp"
 #include "classes/avatar.hpp"
+#include "classes/gym_avatar.hpp"
 
 //Enumeration Type: ObjectType
 //Determines how shaders will draw different objects:
@@ -173,6 +174,16 @@ int main()
     BasicShape high_bar = importer.loadFiles("models/HighBar", import_vao);
     std::cout << "High Bar imported" << std::endl;
 
+    // Create the gym avatar that will interact with the high bar
+    // Load the same base model for the gymnast
+    BasicShape gymModel = importer.loadFiles("models/baseModel", import_vao);
+    std::cout << "Gym model imported" << std::endl;
+    
+    // High bar position is at (-10.0, 2.0, 0.0) with a radius of 0.1
+    glm::vec3 high_bar_position(-10.0f, 2.0f, 0.0f); // Raised the bar to a proper height
+    GymAvatar gymAvatar(gymModel, 180.0f, glm::vec3(-10.0f, 0.4f, 0.0f), IMPORTED_BASIC, high_bar_position, 0.1f);
+    std::cout << "GymAvatar created" << std::endl;
+    gymAvatar.Scale(glm::vec3(0.3f, 0.3f, 0.3f)); // Make the gymnast smaller to match base avatar
 
     arial_font.initialize(texture_vao);
     std::cout << "Font initialized" << std::endl;
@@ -236,6 +247,9 @@ int main()
         // -----
         ProcessInput(window);
         baseAvatar.ProcessInput(window, delta_time);
+        
+        // Process input for the gymnastics avatar
+        gymAvatar.ProcessInput(window, delta_time);
 
         // render
         // ------
@@ -324,10 +338,14 @@ int main()
         // Draw the high bar
         shader_program.setInt("shader_state", IMPORTED_BASIC);
         glm::mat4 high_bar_local(1.0);
-        high_bar_local = glm::translate(high_bar_local, glm::vec3(-10.0, 0.0, 0.0));
+        high_bar_local = glm::translate(high_bar_local, high_bar_position);
         shader_program.setMat4("model", identity);
         shader_program.setMat4("local", high_bar_local);
         high_bar.Draw();
+        
+        // Draw the gym avatar that interacts with the high bar
+        shader_program.setInt("shader_state", IMPORTED_BASIC);
+        gymAvatar.Draw(&shader_program, false);
 
         if (camera.Position.y < 0.5) {
             camera.Position.y = 0.5;
@@ -377,6 +395,8 @@ int main()
     vault_table.DeallocateShape();
     std::cout << "About to deallocate high_bar" << std::endl;
     high_bar.DeallocateShape();
+    std::cout << "About to deallocate gymModel" << std::endl;
+    gymModel.DeallocateShape();
     std::cout << "About to deallocate floor" << std::endl;
     floor.DeallocateShape();
 
