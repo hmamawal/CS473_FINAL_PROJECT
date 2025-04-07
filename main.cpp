@@ -160,6 +160,11 @@ int main()
     }
     std::cout << "Vault table imported with " << vault_table_textures.size() << " textures." << std::endl;
 
+    // now import the High Bar, which has no texture
+    BasicShape high_bar = importer.loadFiles("models/HighBar", import_vao);
+    std::cout << "High Bar imported" << std::endl;
+
+
     arial_font.initialize(texture_vao);
     std::cout << "Font initialized" << std::endl;
 
@@ -299,6 +304,14 @@ int main()
         }
         vault_table.Draw();
         glActiveTexture(GL_TEXTURE0); // Reset active texture to default
+
+        // Draw the high bar
+        shader_program.setInt("shader_state", IMPORTED_BASIC);
+        glm::mat4 high_bar_local(1.0);
+        high_bar_local = glm::translate(high_bar_local, glm::vec3(-10.0, 2.5, 0.0));
+        shader_program.setMat4("model", identity);
+        shader_program.setMat4("local", high_bar_local);
+        high_bar.Draw();
 
         if (camera.Position.y < 0.5) {
             camera.Position.y = 0.5;
