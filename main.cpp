@@ -144,7 +144,6 @@ int main()
     std::cout << "BaseModel imported" << std::endl;
     Avatar baseAvatar(baseModel, 180.0f, glm::vec3(0.0, 0.0, 0.0), IMPORTED_BASIC);
     std::cout << "BaseAvatar created" << std::endl;
-    //BasicShape LouGrossBuilding = importer.loadFiles("models/LouGrossBuilding", import_vao);
 
     
     BasicShape tumbling_floor = importer.loadFiles("models/tumbling_floor", import_vao);
@@ -159,6 +158,15 @@ int main()
         std::cout << "Vault table texture " << i << ": " << vault_table_textures[i] << std::endl;
     }
     std::cout << "Vault table imported with " << vault_table_textures.size() << " textures." << std::endl;
+
+    // import the complex building, which has multiple textures like the vault table
+    BasicShape LouGrossBuilding = importer.loadFiles("models/ComplexBuilding", import_vao);
+    std::cout << "Lou Gross Building imported" << std::endl;
+    std::vector<unsigned int> die_textures = importer.getAllTextures();
+    for (int i = 0; i < die_textures.size(); i++) {
+        std::cout << "Lou Gross Building texture " << i << ": " << die_textures[i] << std::endl;
+    }
+    std::cout << "Lou Gross Building imported with " << die_textures.size() << " textures." << std::endl;
 
     // now import the High Bar, which has no texture
     BasicShape high_bar = importer.loadFiles("models/HighBar", import_vao);
@@ -269,16 +277,6 @@ int main()
         // //     glBindTexture(GL_TEXTURE_2D,die_textures[i]);
         // // }
 
-
-        // // Draw the Lou Gross Building
-        // shader_program.setInt("shader_state", IMPORTED_BASIC);
-        // glm::mat4 LouGrossBuilding_local(1.0);
-        // LouGrossBuilding_local = glm::translate(LouGrossBuilding_local, glm::vec3(0.0, 3.0, 0.0));
-        // LouGrossBuilding_local = glm::scale(LouGrossBuilding_local, glm::vec3(14.0, 14.0, 14.0));
-        // shader_program.setMat4("model", identity);
-        // shader_program.setMat4("local", LouGrossBuilding_local);
-        // LouGrossBuilding.Draw();
-
         // Draw the gymnastics tumbling floor
         shader_program.setInt("shader_state", IMPORTED_TEXTURED);
         glm::mat4 tumbling_floor_local(1.0);
@@ -303,6 +301,24 @@ int main()
             glBindTexture(GL_TEXTURE_2D, vault_table_textures[i]);
         }
         vault_table.Draw();
+        glActiveTexture(GL_TEXTURE0); // Reset active texture to default
+
+        // Draw the Lou Gross Building
+        shader_program.setInt("shader_state", IMPORTED_TEXTURED);
+        glm::mat4 building_local(1.0);
+        building_local = glm::translate(building_local, glm::vec3(0.0, 0.0, 0.0));
+        // scale the building to fit the scene
+        building_local = glm::scale(building_local, glm::vec3(2, 2, 2));
+        shader_program.setMat4("model", identity);
+        shader_program.setMat4("local", building_local);
+        // Bind and set all textures for the Lou Gross Building
+        for (int i = 0; i < die_textures.size(); i++) {
+            glActiveTexture(GL_TEXTURE0 + i);
+            std::string texture_string = "textures[" + std::to_string(i) + "]";
+            shader_program.setInt(texture_string, i);
+            glBindTexture(GL_TEXTURE_2D, die_textures[i]);
+        }
+        LouGrossBuilding.Draw();
         glActiveTexture(GL_TEXTURE0); // Reset active texture to default
 
         // Draw the high bar
@@ -353,7 +369,16 @@ int main()
     //smiley.DeallocateShape();
     std::cout << "About to deallocate baseModel" << std::endl;
     baseModel.DeallocateShape();
-    //LouGrossBuilding.DeallocateShape();
+    std::cout << "About to deallocate baseAvatar" << std::endl;
+    LouGrossBuilding.DeallocateShape();
+    std::cout << "About to deallocate tumbling_floor" << std::endl;
+    tumbling_floor.DeallocateShape();
+    std::cout << "About to deallocate vault_table" << std::endl;
+    vault_table.DeallocateShape();
+    std::cout << "About to deallocate high_bar" << std::endl;
+    high_bar.DeallocateShape();
+    std::cout << "About to deallocate floor" << std::endl;
+    floor.DeallocateShape();
 
     std::cout << "Cleanup complete" << std::endl;
 
