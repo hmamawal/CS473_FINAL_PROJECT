@@ -142,8 +142,9 @@ int main()
 
     BasicShape baseModel = importer.loadFiles("models/baseModel", import_vao);
     std::cout << "BaseModel imported" << std::endl;
-    Avatar baseAvatar(baseModel, 180.0f, glm::vec3(0.0, 0.0, 0.0), IMPORTED_BASIC);
+    Avatar baseAvatar(baseModel, 180.0f, glm::vec3(0.0, 0.4, 0.0), IMPORTED_BASIC);
     std::cout << "BaseAvatar created" << std::endl;
+    baseAvatar.Scale(glm::vec3(0.5f, 0.5f, 0.5f)); 
 
     
     BasicShape tumbling_floor = importer.loadFiles("models/tumbling_floor", import_vao);
@@ -162,11 +163,11 @@ int main()
     // import the complex building, which has multiple textures like the vault table
     BasicShape LouGrossBuilding = importer.loadFiles("models/ComplexBuilding", import_vao);
     std::cout << "Lou Gross Building imported" << std::endl;
-    std::vector<unsigned int> die_textures = importer.getAllTextures();
-    for (int i = 0; i < die_textures.size(); i++) {
-        std::cout << "Lou Gross Building texture " << i << ": " << die_textures[i] << std::endl;
+    std::vector<unsigned int> building_textures = importer.getAllTextures();
+    for (int i = 0; i < building_textures.size(); i++) {
+        std::cout << "Lou Gross Building texture " << i << ": " << building_textures[i] << std::endl;
     }
-    std::cout << "Lou Gross Building imported with " << die_textures.size() << " textures." << std::endl;
+    std::cout << "Lou Gross Building imported with " << building_textures.size() << " textures." << std::endl;
 
     // now import the High Bar, which has no texture
     BasicShape high_bar = importer.loadFiles("models/HighBar", import_vao);
@@ -234,7 +235,6 @@ int main()
         // input
         // -----
         ProcessInput(window);
-        //ship.ProcessInput(window,delta_time);
         baseAvatar.ProcessInput(window, delta_time);
 
         // render
@@ -289,7 +289,7 @@ int main()
         // Draw the vault table
         shader_program.setInt("shader_state", IMPORTED_TEXTURED);
         glm::mat4 vault_table_local(1.0);
-        vault_table_local = glm::translate(vault_table_local, glm::vec3(5.0, 0.4, 0.0));
+        vault_table_local = glm::translate(vault_table_local, glm::vec3(8.0, 0.0, 0.0));
         shader_program.setMat4("model", identity);
         shader_program.setMat4("local", vault_table_local);
 
@@ -312,11 +312,11 @@ int main()
         shader_program.setMat4("model", identity);
         shader_program.setMat4("local", building_local);
         // Bind and set all textures for the Lou Gross Building
-        for (int i = 0; i < die_textures.size(); i++) {
+        for (int i = 0; i < building_textures.size(); i++) {
             glActiveTexture(GL_TEXTURE0 + i);
             std::string texture_string = "textures[" + std::to_string(i) + "]";
             shader_program.setInt(texture_string, i);
-            glBindTexture(GL_TEXTURE_2D, die_textures[i]);
+            glBindTexture(GL_TEXTURE_2D, building_textures[i]);
         }
         LouGrossBuilding.Draw();
         glActiveTexture(GL_TEXTURE0); // Reset active texture to default
@@ -324,7 +324,7 @@ int main()
         // Draw the high bar
         shader_program.setInt("shader_state", IMPORTED_BASIC);
         glm::mat4 high_bar_local(1.0);
-        high_bar_local = glm::translate(high_bar_local, glm::vec3(-10.0, 2.5, 0.0));
+        high_bar_local = glm::translate(high_bar_local, glm::vec3(-10.0, 0.0, 0.0));
         shader_program.setMat4("model", identity);
         shader_program.setMat4("local", high_bar_local);
         high_bar.Draw();
