@@ -1,4 +1,3 @@
-
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
@@ -65,11 +64,9 @@ public:
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
 
-
     // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
     void ProcessMouseScroll(float yoffset);
 
-private:
     // Calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors();
 };

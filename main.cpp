@@ -56,6 +56,13 @@ Camera camera(glm::vec3(0.0f,1.0f,25.0f),glm::vec3(0.0f,1.0f,0.0f),-90.0f,0.0f);
 float delta_time{0.001};
 float last_frame{0.0};
 
+//Camera mode flag for toggling between normal and avatar view
+bool avatar_camera_mode = false;
+glm::vec3 original_camera_position(0.0f, 1.0f, 25.0f);
+float original_camera_yaw = -90.0f;
+float original_camera_pitch = 0.0f;
+bool c_key_pressed = false;
+
 //location of the point light
 glm::vec4 light_position (0.0,5.0,0.0,1.0);
 
@@ -237,6 +244,32 @@ int main()
         // -----
         ProcessInput(window);
         baseAvatar.ProcessInput(window, delta_time);
+        
+        // Update camera position based on avatar if in avatar camera mode
+        if (avatar_camera_mode) {
+            // Position camera at avatar's eye level
+            glm::vec3 avatarPos = baseAvatar.GetPosition();
+            float extraHeight = baseAvatar.IsFlipping() ? baseAvatar.GetFlipHeight() : 0.0f;
+            camera.Position = glm::vec3(avatarPos.x, avatarPos.y + 2.0f + extraHeight, avatarPos.z);
+            
+            // Set camera orientation based on avatar's rotation
+            camera.Yaw = baseAvatar.GetRotation() - 90.0f; // -90 offset to face forward
+            
+            // If the avatar is flipping, adjust the pitch to look in the direction of the flip
+            if (baseAvatar.IsFlipping()) {
+                float flipProgress = baseAvatar.GetFlipHeight() / baseAvatar.GetJumpHeight();
+                if (flipProgress > 0.2f && flipProgress < 0.9f) {
+                    // Map 0.2-0.9 range to 0-360 for rotation during flip
+                    float flipRotation = ((flipProgress - 0.2f) / 0.7f) * 360.0f;
+                    camera.Pitch = -flipRotation; // Negative because we're flipping forward
+                    // Clamp pitch to prevent camera from going upside down
+                    if (camera.Pitch < -89.0f) camera.Pitch = -89.0f;
+                    if (camera.Pitch > 89.0f) camera.Pitch = 89.0f;
+                }
+            }
+            
+            camera.updateCameraVectors();
+        }
 
         // render
         // ------
@@ -403,6 +436,29 @@ void ProcessInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
+    // Toggle camera view when 'C' is pressed (only once per keypress)
+    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
+        if (!c_key_pressed) {
+            c_key_pressed = true;
+            avatar_camera_mode = !avatar_camera_mode;
+
+            // Save original camera position when switching to avatar camera
+            if (avatar_camera_mode) {
+                original_camera_position = camera.Position;
+                original_camera_yaw = camera.Yaw;
+                original_camera_pitch = camera.Pitch;
+            } else {
+                // Restore the original camera position when switching back to normal view
+                camera.Position = original_camera_position;
+                camera.Yaw = original_camera_yaw;
+                camera.Pitch = original_camera_pitch;
+                camera.updateCameraVectors();
+            }
+        }
+    } else {
+        c_key_pressed = false;
+    }
+
     if (glfwGetKey(window,GLFW_KEY_W)==GLFW_PRESS) {
         camera.ProcessKeyboard(FORWARD,delta_time);
     }
@@ -418,8 +474,6 @@ void ProcessInput(GLFWwindow *window)
     if (glfwGetKey(window,GLFW_KEY_D)==GLFW_PRESS) {
         camera.ProcessKeyboard(RIGHT,delta_time);
     }
-
-
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)

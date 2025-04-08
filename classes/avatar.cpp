@@ -100,7 +100,6 @@ void Avatar::Draw(Shader *shader, bool use_shader) {
     this->body.Draw();
 }
 
-
 Avatar::~Avatar() {
     this->body.DeallocateShape();
 }

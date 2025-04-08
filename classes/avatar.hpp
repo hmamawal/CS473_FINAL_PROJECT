@@ -23,8 +23,15 @@ class Avatar {
         void ProcessInput (GLFWwindow *window, float time_passed);
         void Scale (glm::vec3 new_scale);
         void Draw (Shader *shader, bool use_shader=false);
+        
+        // Getter methods for camera positioning
+        glm::vec3 GetPosition() const { return position; }
+        float GetRotation() const { return current_rotation; }
+        float GetFlipHeight() const { return flip_height; }
+        bool IsFlipping() const { return is_flipping; }
+        float GetJumpHeight() const { return jump_height; }
         ~Avatar();
-};;
+};
 
 
 #endif //AVATAR_HPP
