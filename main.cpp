@@ -250,22 +250,48 @@ int main()
             // Position camera at avatar's eye level
             glm::vec3 avatarPos = baseAvatar.GetPosition();
             float extraHeight = baseAvatar.IsFlipping() ? baseAvatar.GetFlipHeight() : 0.0f;
-            camera.Position = glm::vec3(avatarPos.x, avatarPos.y + 2.0f + extraHeight, avatarPos.z);
             
             // Set camera orientation based on avatar's rotation
             camera.Yaw = baseAvatar.GetRotation() - 90.0f; // -90 offset to face forward
             
-            // If the avatar is flipping, adjust the pitch to look in the direction of the flip
+            // If the avatar is flipping, create a rotating camera effect
             if (baseAvatar.IsFlipping()) {
                 float flipProgress = baseAvatar.GetFlipHeight() / baseAvatar.GetJumpHeight();
+                
                 if (flipProgress > 0.2f && flipProgress < 0.9f) {
                     // Map 0.2-0.9 range to 0-360 for rotation during flip
-                    float flipRotation = ((flipProgress - 0.2f) / 0.7f) * 360.0f;
-                    camera.Pitch = -flipRotation; // Negative because we're flipping forward
-                    // Clamp pitch to prevent camera from going upside down
-                    if (camera.Pitch < -89.0f) camera.Pitch = -89.0f;
+                    float flipRotationPercentage = (flipProgress - 0.2f) / 0.7f;
+                    float flipAngle = flipRotationPercentage * 360.0f;
+                    
+                    // Calculate offset position that rotates around the avatar
+                    // This creates the effect of the camera rotating with the avatar
+                    float radius = 0.2f; // Small radius to keep close to the avatar's head
+                    
+                    // Use sine and cosine for circular rotation path
+                    float offsetY = radius * sin(glm::radians(flipAngle));
+                    float offsetZ = radius * cos(glm::radians(flipAngle));
+                    
+                    // Position camera relative to avatar's position, considering flip rotation
+                    camera.Position = glm::vec3(
+                        avatarPos.x,
+                        avatarPos.y + 1.7f + extraHeight - offsetZ, // Height adjusted by rotation
+                        avatarPos.z + offsetY                      // Front/back adjusted by rotation
+                    );
+                    
+                    // Adjust camera pitch to follow the rotation
+                    camera.Pitch = -flipAngle; // Negative because we're flipping forward
+                    
+                    // Keep pitch in valid range
+                    if (camera.Pitch < -89.0f && camera.Pitch > -270.0f) camera.Pitch = -89.0f;
+                    if (camera.Pitch < -270.0f) camera.Pitch = camera.Pitch + 360.0f;
                     if (camera.Pitch > 89.0f) camera.Pitch = 89.0f;
+                } else {
+                    // Normal positioning when not in the middle of the flip
+                    camera.Position = glm::vec3(avatarPos.x, avatarPos.y + 2.0f + extraHeight, avatarPos.z);
                 }
+            } else {
+                // Normal positioning when not flipping
+                camera.Position = glm::vec3(avatarPos.x, avatarPos.y + 2.0f, avatarPos.z);
             }
             
             camera.updateCameraVectors();
