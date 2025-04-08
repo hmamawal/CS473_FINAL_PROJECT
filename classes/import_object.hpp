@@ -31,6 +31,9 @@ class ImportOBJ{
         unsigned int getTexture(int index = 0);
         std::vector<unsigned int> getAllTextures();
 
+        // Add method to calculate bounds for imported models
+        void CalculateModelBounds(BasicShape &shape);
+
     private:
         struct CompleteVertex {
             glm::vec3 Position;

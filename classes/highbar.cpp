@@ -31,6 +31,23 @@ float HighBar::GetHeight() const {
     return this->height;
 }
 
+float HighBar::GetLength() const {
+    return this->length;
+}
+
+float HighBar::GetRadius() const {
+    return this->radius;
+}
+
+glm::vec3 HighBar::GetDimensions() const {
+    return glm::vec3(this->length, this->radius * 2, this->radius * 2);
+}
+
+glm::vec3 HighBar::GetModelDimensions() const {
+    // Return the actual dimensions from the model if available
+    return this->bar.GetDimensions();
+}
+
 HighBar::~HighBar() {
     // The BasicShape will be deallocated in the main function
     // so we don't need to deallocate it here

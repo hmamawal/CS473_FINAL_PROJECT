@@ -3,6 +3,7 @@
 
 #include "vertex_attribute.hpp"
 #include "Shader.hpp"
+#include <limits>
 
 class BasicShape {
     protected:
@@ -13,6 +14,11 @@ class BasicShape {
         unsigned int ebo;
         int ebo_number_indices;
         int ebo_primitive;
+        
+        // Bounding box information
+        glm::vec3 min_bounds = glm::vec3(std::numeric_limits<float>::max());
+        glm::vec3 max_bounds = glm::vec3(-std::numeric_limits<float>::max());
+        glm::vec3 dimensions = glm::vec3(0.0f);
     
     public:
         //Constructor for a BasicShape object (no inputs)
@@ -41,6 +47,14 @@ class BasicShape {
 
         //Deletes the shape data
         void DeallocateShape();
+
+        // Calculates bounding box from vertex data
+        void CalculateBounds(float* vertices, int num_vertices, int stride);
+        
+        // Getter methods for dimensions
+        glm::vec3 GetDimensions() const;
+        glm::vec3 GetMinBounds() const;
+        glm::vec3 GetMaxBounds() const;
 };
 
 #endif //BASIC_SHAPE_HPP

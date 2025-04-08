@@ -160,16 +160,21 @@ void AvatarHighBar::UpdateRotation(float time_passed) {
     // Calculate new position based on rotation around the bar
     float angle_rad = glm::radians(this->rotation_angle);
     
-    // Get the high bar position
+    // Get the high bar position and dimensions
     glm::vec3 bar_pos = this->high_bar->GetPosition();
+    float bar_radius = this->high_bar->GetRadius();
     
-    // Calculate position relative to the bar
-    float bar_height = this->high_bar->GetHeight();
+    // Calculate position relative to the bar using the actual bar dimensions
+    // Get the model dimensions if available, otherwise use the predefined rotation radius
+    glm::vec3 model_dims = this->high_bar->GetModelDimensions();
+    float actual_bar_radius = (model_dims.y > 0) ? model_dims.y / 2.0f : bar_radius;
     
     // Calculate new position with the center of rotation at the high bar
+    // Use actual dimensions for more accurate positioning
+    float rotation_distance = this->rotation_radius + actual_bar_radius;
     float x = bar_pos.x; // x-coordinate of the high bar
     float y = bar_pos.y + sin(angle_rad) * 0.5f; // y-coordinate with slight swing
-    float z = bar_pos.z - this->rotation_radius * cos(angle_rad); // z-coordinate with rotation
+    float z = bar_pos.z - rotation_distance * cos(angle_rad); // z-coordinate with rotation
     
     // Update the avatar position
     this->position = glm::vec3(x, y, z);

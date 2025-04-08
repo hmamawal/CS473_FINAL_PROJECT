@@ -200,10 +200,50 @@ BasicShape ImportOBJ::genShape(VAOStruct vao) {
     new_shape.Initialize(vao,(float*)&this->combinedData[0],
                          this->combinedData.size()*sizeof(CompleteVertex),
                          this->combinedData.size(),GL_TRIANGLES);
-
+    
+    // Calculate model bounds
+    this->CalculateModelBounds(new_shape);
 
     return new_shape;
+}
 
+void ImportOBJ::CalculateModelBounds(BasicShape &shape) {
+    // Reset bounds to extreme values
+    glm::vec3 min_bounds(std::numeric_limits<float>::max());
+    glm::vec3 max_bounds(-std::numeric_limits<float>::max());
+    
+    // Iterate through all vertices in combinedData
+    for (const auto &vertex : combinedData) {
+        min_bounds.x = std::min(min_bounds.x, vertex.Position.x);
+        min_bounds.y = std::min(min_bounds.y, vertex.Position.y);
+        min_bounds.z = std::min(min_bounds.z, vertex.Position.z);
+        
+        max_bounds.x = std::max(max_bounds.x, vertex.Position.x);
+        max_bounds.y = std::max(max_bounds.y, vertex.Position.y);
+        max_bounds.z = std::max(max_bounds.z, vertex.Position.z);
+    }
+    
+    // If there are valid vertices, create a float array and call CalculateBounds on the shape
+    if (!combinedData.empty()) {
+        // Create temporary vertex array with just positions
+        std::vector<float> positions;
+        for (const auto &vertex : combinedData) {
+            positions.push_back(vertex.Position.x);
+            positions.push_back(vertex.Position.y);
+            positions.push_back(vertex.Position.z);
+        }
+        
+        // Calculate bounds
+        shape.CalculateBounds(positions.data(), positions.size() / 3, 3 * sizeof(float));
+        
+        if (debugOutput) {
+            glm::vec3 dimensions = shape.GetDimensions();
+            std::cout << "Model dimensions: " 
+                     << dimensions.x << " x " 
+                     << dimensions.y << " x " 
+                     << dimensions.z << std::endl;
+        }
+    }
 }
 
 /** Clears all internal data structures */

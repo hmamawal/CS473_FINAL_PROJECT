@@ -16,6 +16,13 @@ class HighBar {
         void Draw(Shader *shader, bool use_shader=false);
         glm::vec3 GetPosition() const;
         float GetHeight() const;
+        
+        // New dimensional accessor methods
+        float GetLength() const;
+        float GetRadius() const;
+        glm::vec3 GetDimensions() const;
+        glm::vec3 GetModelDimensions() const;
+        
         ~HighBar();
 };
 
