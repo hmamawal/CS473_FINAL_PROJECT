@@ -6,6 +6,7 @@
 #include "classes/Font.hpp"
 #include "classes/import_object.hpp"
 #include "classes/avatar.hpp"
+#include "classes/avatar_high_bar.hpp"
 
 //Enumeration Type: ObjectType
 //Determines how shaders will draw different objects:
@@ -325,9 +326,16 @@ int main()
         shader_program.setInt("shader_state", IMPORTED_BASIC);
         glm::mat4 high_bar_local(1.0);
         high_bar_local = glm::translate(high_bar_local, glm::vec3(-10.0, 0.0, 0.0));
+        high_bar_local = glm::scale(high_bar_local, glm::vec3(1.3f, 1.3f, 1.3f));
         shader_program.setMat4("model", identity);
         shader_program.setMat4("local", high_bar_local);
         high_bar.Draw();
+
+        // Create AvatarHighBar at the same position as the high bar
+        static AvatarHighBar high_bar_avatar(baseModel, 180.0f, glm::vec3(-10.0, 0.0, 0.0), IMPORTED_BASIC);
+        high_bar_avatar.Scale(glm::vec3(0.5f, 0.5f, 0.5f));
+        high_bar_avatar.ProcessInput(window, delta_time);
+        high_bar_avatar.Draw(&shader_program, false);
 
         if (camera.Position.y < 0.5) {
             camera.Position.y = 0.5;
