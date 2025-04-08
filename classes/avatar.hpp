@@ -23,6 +23,9 @@ class Avatar {
         void ProcessInput (GLFWwindow *window, float time_passed);
         void Scale (glm::vec3 new_scale);
         void Draw (Shader *shader, bool use_shader=false);
+        glm::vec3 GetPosition() const; 
+        float GetRotation() const; 
+        float GetDirection() const;
         ~Avatar();
 };;
 

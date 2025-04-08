@@ -41,6 +41,11 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 //Screen width and height
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
+bool avatar_camera_mode = false;
+glm::vec3 saved_camera_position;
+glm::vec3 saved_camera_front;
+float saved_camera_yaw;
+float saved_camera_pitch;
 
 //clear color
 glm::vec4 clear_color (0.0,0.0,0.0,1.0);
@@ -252,6 +257,21 @@ int main()
         shader_program.setMat4("view",view);
         shader_program.setVec4("view_position",glm::vec4(camera.Position,1.0));
 
+        if (avatar_camera_mode) {
+            // Position camera at avatar's position with appropriate height offset
+            glm::vec3 avatar_position = baseAvatar.GetPosition();
+            //glm::vec3 avatar_direction = baseAvatar.GetDirection();
+            
+            // Set camera position slightly above avatar's head
+            camera.Position = avatar_position + glm::vec3(0.0f, 1.5f, 0.0f);
+            
+            // Set camera to look in the direction the avatar is facing
+            float avatar_rotation = glm::radians(baseAvatar.GetRotation());
+            camera.Yaw = -avatar_rotation + 90.0f; // Convert avatar rotation to camera yaw
+            camera.Pitch = 0.0f; // Reset pitch
+            camera.updateCameraVectors();
+        }
+
         //draw and the baseAvatar, don't need to use the shader program here
         //   since we already did at the top of the render loop.
         baseAvatar.Draw(&shader_program, false);
@@ -418,7 +438,32 @@ void ProcessInput(GLFWwindow *window)
     if (glfwGetKey(window,GLFW_KEY_D)==GLFW_PRESS) {
         camera.ProcessKeyboard(RIGHT,delta_time);
     }
-
+    // Toggle camera mode when 'C' is pressed
+    static bool c_key_pressed = false;
+    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
+        if (!c_key_pressed) {
+            avatar_camera_mode = !avatar_camera_mode;
+            
+            if (avatar_camera_mode) {
+                // Switching to avatar view - save current camera state
+                saved_camera_position = camera.Position;
+                saved_camera_front = camera.Front;
+                saved_camera_yaw = camera.Yaw;
+                saved_camera_pitch = camera.Pitch;
+            } else {
+                // Switching back to normal view - restore camera state
+                camera.Position = saved_camera_position;
+                camera.Front = saved_camera_front;
+                camera.Yaw = saved_camera_yaw;
+                camera.Pitch = saved_camera_pitch;
+                camera.updateCameraVectors();
+            }
+            
+            c_key_pressed = true;
+        }
+    } else {
+        c_key_pressed = false;
+    }
 
 }
 

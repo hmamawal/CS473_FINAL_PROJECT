@@ -100,6 +100,17 @@ void Avatar::Draw(Shader *shader, bool use_shader) {
     this->body.Draw();
 }
 
+// Add to avatar.hpp inside public section:
+glm::vec3 Avatar::GetPosition() const {
+    return position;
+}
+float Avatar::GetRotation() const {
+    return current_rotation; 
+}
+float Avatar::GetDirection() const {
+    return initial_rotation; 
+}
+
 
 Avatar::~Avatar() {
     this->body.DeallocateShape();
