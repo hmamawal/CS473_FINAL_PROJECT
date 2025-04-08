@@ -6,6 +6,8 @@
 #include "classes/Font.hpp"
 #include "classes/import_object.hpp"
 #include "classes/avatar.hpp"
+#include "classes/highbar.hpp"
+#include "classes/avatar_high_bar.hpp"
 
 //Enumeration Type: ObjectType
 //Determines how shaders will draw different objects:
@@ -173,6 +175,16 @@ int main()
     BasicShape high_bar = importer.loadFiles("models/HighBar", import_vao);
     std::cout << "High Bar imported" << std::endl;
 
+    // Create the HighBar object from the imported model
+    HighBar gymnastics_bar(high_bar, glm::vec3(-10.0, 0.0, 4.0), IMPORTED_BASIC);
+    std::cout << "HighBar object created" << std::endl;
+    
+    // Create the AvatarHighBar character that will interact with the high bar
+    BasicShape gymnast_model = importer.loadFiles("models/baseModel", import_vao);
+    std::cout << "Gymnast model imported" << std::endl;
+    AvatarHighBar gymnast(gymnast_model, 180.0f, glm::vec3(-10.0, 2.0, 0.0), IMPORTED_BASIC, &gymnastics_bar);
+    std::cout << "AvatarHighBar (gymnast) created" << std::endl;
+    gymnast.Scale(glm::vec3(0.5f, 0.5f, 0.5f));
 
     arial_font.initialize(texture_vao);
     std::cout << "Font initialized" << std::endl;
@@ -236,6 +248,8 @@ int main()
         // -----
         ProcessInput(window);
         baseAvatar.ProcessInput(window, delta_time);
+        // Process input for the gymnast character
+        gymnast.ProcessInput(window, delta_time);
 
         // render
         // ------
@@ -321,13 +335,11 @@ int main()
         LouGrossBuilding.Draw();
         glActiveTexture(GL_TEXTURE0); // Reset active texture to default
 
-        // Draw the high bar
-        shader_program.setInt("shader_state", IMPORTED_BASIC);
-        glm::mat4 high_bar_local(1.0);
-        high_bar_local = glm::translate(high_bar_local, glm::vec3(-10.0, 0.0, 0.0));
-        shader_program.setMat4("model", identity);
-        shader_program.setMat4("local", high_bar_local);
-        high_bar.Draw();
+        // Draw the high bar using the HighBar class
+        gymnastics_bar.Draw(&shader_program, true);
+        
+        // Draw the gymnast character
+        gymnast.Draw(&shader_program, true);
 
         if (camera.Position.y < 0.5) {
             camera.Position.y = 0.5;

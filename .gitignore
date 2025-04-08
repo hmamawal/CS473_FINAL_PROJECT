@@ -32,3 +32,5 @@ textures/*.tmp
 /saved_chats
 /context
 #/models
+
+/python_examples
