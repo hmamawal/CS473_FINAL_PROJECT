@@ -26,6 +26,20 @@ class AvatarHighBar : public Avatar {
         void StartRotation();
         void StopRotation();
         void UpdateRotation(float time_passed);
+        
+        // New methods for getting state information
+        bool IsOnBar() const { return is_on_bar; }
+        bool IsRotating() const { return is_rotating; }
+        float GetRotationAngle() const { return rotation_angle; }
+        float GetRotationProgress() const { return rotation_progress; }
+        
+        // Add position access method
+        glm::vec3 GetPosition() const { return position; }
+
+        // methods for the height of the avatar
+        float GetModelHeight() const;
+        float GetApproximateHeight() const;
+        
         ~AvatarHighBar();
 };
 

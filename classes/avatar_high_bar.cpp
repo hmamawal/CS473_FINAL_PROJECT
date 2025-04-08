@@ -12,7 +12,9 @@ AvatarHighBar::AvatarHighBar(BasicShape shape, float orientation, glm::vec3 init
     
     // Calculate the bar position (under the bar)
     glm::vec3 bar_pos = high_bar->GetPosition();
-    this->bar_position = glm::vec3(bar_pos.x, bar_pos.y, bar_pos.z - 0.5f); // Position below the bar
+    // get high bar height
+    float bar_height = high_bar->GetHeight();
+    this->bar_position = glm::vec3(bar_pos.x, bar_pos.y + 0.2, bar_pos.z); // Position below the bar
     
     this->rotation_radius = 0.8f; // Distance from bar to avatar during rotation
     this->rotation_progress = 0.0f;
@@ -68,7 +70,11 @@ void AvatarHighBar::Draw(Shader *shader, bool use_shader) {
     
     // If on the bar and rotating, apply special transformations
     if (this->is_on_bar && this->is_rotating) {
-        // No need to reapply position here since it's already set in UpdateRotation
+        // Apply rotation to match gymnast's orientation to their position on the circle
+        float orientation_angle = this->rotation_angle;
+        
+        // Rotate gymnast to match their position in the circular path
+        local = glm::rotate(local, glm::radians(orientation_angle), glm::vec3(1.0f, 0.0f, 0.0f));
     } else if (this->is_on_bar) {
         // When on the bar but not rotating, adjust the orientation to look like hanging
         local = glm::rotate(local, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -88,6 +94,25 @@ void AvatarHighBar::JumpToHighBar() {
     if (!this->is_on_bar) {
         // Store the current position as the original position
         this->original_position = this->position;
+        
+        // Get gymnast and bar dimensions
+        float gymnast_height = this->GetModelHeight();
+        // print gymnast height for debugging
+        std::cout << "Gymnast height: " << gymnast_height << std::endl;
+        glm::vec3 bar_pos = this->high_bar->GetPosition();
+        glm::vec3 bar_dims = this->high_bar->GetModelDimensions();
+        float bar_thickness = (bar_dims.y > 0) ? bar_dims.y : (this->high_bar->GetRadius() * 2);
+        
+        // Calculate the position to place the gymnast's hands at the bar
+        // Estimate that arms reach is approximately 40% of height from the top of the head
+        float hanging_y_offset = -gymnast_height; //* 0.4f;
+        
+        // Calculate position (centered on x, hands at bar height, adjusted z)
+        this->bar_position = glm::vec3(
+            bar_pos.x,                        // Center on bar x-coordinate
+            bar_pos.y + hanging_y_offset,     // Position hands at bar height
+            bar_pos.z - bar_thickness * 0.6f  // Slightly in front of bar
+        );
         
         // Move to the bar position
         this->position = this->bar_position;
@@ -157,6 +182,12 @@ void AvatarHighBar::UpdateRotation(float time_passed) {
     // Update rotation progress
     this->rotation_progress += time_passed / this->rotation_duration;
     
+    // If reached full rotation, optionally stop or continue
+    if (this->rotation_progress >= 1.0f) {
+        // Reset progress but continue rotating
+        this->rotation_progress = 0.0f;
+    }
+    
     // Calculate new position based on rotation around the bar
     float angle_rad = glm::radians(this->rotation_angle);
     
@@ -164,20 +195,44 @@ void AvatarHighBar::UpdateRotation(float time_passed) {
     glm::vec3 bar_pos = this->high_bar->GetPosition();
     float bar_radius = this->high_bar->GetRadius();
     
-    // Calculate position relative to the bar using the actual bar dimensions
-    // Get the model dimensions if available, otherwise use the predefined rotation radius
+    // Get model dimensions if available
     glm::vec3 model_dims = this->high_bar->GetModelDimensions();
     float actual_bar_radius = (model_dims.y > 0) ? model_dims.y / 2.0f : bar_radius;
     
+    // Calculate gymnast's arm length based on actual gymnast height
+    float gymnast_height = this->GetModelHeight();
+    float arm_length = gymnast_height * 0.4f; // Arms are approximately 40% of total height
+    
     // Calculate new position with the center of rotation at the high bar
     // Use actual dimensions for more accurate positioning
-    float rotation_distance = this->rotation_radius + actual_bar_radius;
+    float rotation_distance = arm_length + actual_bar_radius;
     float x = bar_pos.x; // x-coordinate of the high bar
-    float y = bar_pos.y + sin(angle_rad) * 0.5f; // y-coordinate with slight swing
-    float z = bar_pos.z - rotation_distance * cos(angle_rad); // z-coordinate with rotation
+    
+    // Make the y-coordinate slightly higher at the top of the circle for realism
+    float height_offset = (sin(angle_rad) > 0) ? 0.1f * sin(angle_rad) : 0.0f;
+    float y = bar_pos.y + sin(angle_rad) * rotation_distance + height_offset;
+    
+    // Adjust z position based on cosine of angle
+    float z = bar_pos.z - rotation_distance * cos(angle_rad);
     
     // Update the avatar position
     this->position = glm::vec3(x, y, z);
+}
+
+float AvatarHighBar::GetModelHeight() const {
+    // Get dimensions from the BasicShape
+    glm::vec3 dimensions = this->body.GetDimensions();
+    
+    // Apply the scale factor to get actual rendered height
+    float scaled_height = dimensions.y * this->scale.y;
+    
+    return scaled_height;
+}
+
+float AvatarHighBar::GetApproximateHeight() const {
+    // Base height is roughly 2.0 units in model space
+    // Multiply by the y-scale to get approximate rendered height
+    return 2.0f * this->scale.y;
 }
 
 AvatarHighBar::~AvatarHighBar() {

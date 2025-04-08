@@ -182,7 +182,7 @@ int main()
     // Create the AvatarHighBar character that will interact with the high bar
     BasicShape gymnast_model = importer.loadFiles("models/baseModel", import_vao);
     std::cout << "Gymnast model imported" << std::endl;
-    AvatarHighBar gymnast(gymnast_model, 180.0f, glm::vec3(-10.0, 2.0, 0.0), IMPORTED_BASIC, &gymnastics_bar);
+    AvatarHighBar gymnast(gymnast_model, 180.0f, glm::vec3(-10.0, 0.0, 4.0), IMPORTED_BASIC, &gymnastics_bar);
     std::cout << "AvatarHighBar (gymnast) created" << std::endl;
     gymnast.Scale(glm::vec3(0.5f, 0.5f, 0.5f));
 
@@ -341,11 +341,10 @@ int main()
         // Draw the gymnast character
         gymnast.Draw(&shader_program, true);
 
-        if (camera.Position.y < 0.5) {
-            camera.Position.y = 0.5;
-        }
-        //Draw the text so that it stays with the camera
+        // Set up debug text for dimensions and positions
         font_program.use();
+        
+        // Display camera position
         std::string display_string = "Camera (";
         std::string cam_x = std::to_string(camera.Position.x);
         std::string cam_y = std::to_string(camera.Position.y);
@@ -355,7 +354,35 @@ int main()
         display_string += cam_y.substr(0,cam_y.find(".")+3) +",";
         display_string += cam_z.substr(0,cam_z.find(".")+3) +")";
         
-        arial_font.DrawText(display_string,glm::vec2(-0.1,0.75),font_program);
+        //arial_font.DrawText(display_string, glm::vec2(-0.1, 0.75), font_program);
+        
+        // Add high bar dimensions info
+        glm::vec3 bar_dims = gymnastics_bar.GetModelDimensions();
+        glm::vec3 bar_pos = gymnastics_bar.GetPosition();
+        std::string bar_info = "Bar: Pos(";
+        bar_info += std::to_string(bar_pos.x).substr(0, std::to_string(bar_pos.x).find(".")+3) + ",";
+        bar_info += std::to_string(bar_pos.y).substr(0, std::to_string(bar_pos.y).find(".")+3) + ",";
+        bar_info += std::to_string(bar_pos.z).substr(0, std::to_string(bar_pos.z).find(".")+3) + ")";
+        bar_info += " Dims(" + std::to_string(bar_dims.x).substr(0, std::to_string(bar_dims.x).find(".")+3) + ",";
+        bar_info += std::to_string(bar_dims.y).substr(0, std::to_string(bar_dims.y).find(".")+3) + ",";
+        bar_info += std::to_string(bar_dims.z).substr(0, std::to_string(bar_dims.z).find(".")+3) + ")";
+        
+        //arial_font.DrawText(bar_info, glm::vec2(-0.1, 0.65), font_program);
+        
+        // Add gymnast state info
+        std::string gymnast_info = "Gymnast: ";
+        gymnast_info += " On Bar: " + std::string(gymnast.IsOnBar() ? "Yes" : "No");
+        gymnast_info += " | Rotating: " + std::string(gymnast.IsRotating() ? "Yes" : "No");
+        if (gymnast.IsRotating()) {
+            gymnast_info += " | Angle: " + std::to_string(gymnast.GetRotationAngle()).substr(0, std::to_string(gymnast.GetRotationAngle()).find(".")+2);
+            gymnast_info += " | Progress: " + std::to_string(gymnast.GetRotationProgress() * 100).substr(0, std::to_string(gymnast.GetRotationProgress() * 100).find(".")+2) + "%";
+        }
+        
+        //arial_font.DrawText(gymnast_info, glm::vec2(-0.1, 0.55), font_program);
+
+        if (camera.Position.y < 0.5) {
+            camera.Position.y = 0.5;
+        }
 
         //std::cout << "Frame completed" << std::endl;
     
