@@ -9,7 +9,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd ./textures/usma_duty.png
+map_Kd C:/Users/hunter.mamawal/Classes/CS473_Computer_Graphics/CS473_PROJECT2/textures/usma_duty.png
 
 newmtl Country
 Ns 250.000000
@@ -84,12 +84,12 @@ map_Kd C:/Users/hunter.mamawal/Classes/CS473_Computer_Graphics/CS473_PROJECT2/te
 newmtl White.012
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd C:/Users/hunter.mamawal/Classes/CS473_Computer_Graphics/CS473_PROJECT2/textures/white_brick_wall.jpg
 
 newmtl WoodFloor
 Ns 250.000000

@@ -24,7 +24,7 @@ flat in int fragment_shader_state;
 uniform vec4 set_color;
 
 //if it -is- textured, assume this 2D texture is mapped.
-#define NR_TEXTURES 6
+#define NR_TEXTURES 19
 uniform sampler2D textures[NR_TEXTURES];
 
 uniform vec4 view_position;
@@ -74,6 +74,32 @@ void main()
             FragColor = texture(textures[4],texture_coordinates);
         } else if (index_for_texture == 5) {
             FragColor = texture(textures[5],texture_coordinates);
+        } else if (index_for_texture == 6) {
+            FragColor = texture(textures[6],texture_coordinates);
+        } else if (index_for_texture == 7) {
+            FragColor = texture(textures[7],texture_coordinates);
+        } else if (index_for_texture == 8) {
+            FragColor = texture(textures[8],texture_coordinates);
+        } else if (index_for_texture == 9) {
+            FragColor = texture(textures[9],texture_coordinates);
+        } else if (index_for_texture == 10) {
+            FragColor = texture(textures[10],texture_coordinates);
+        } else if (index_for_texture == 11) {
+            FragColor = texture(textures[11],texture_coordinates);
+        } else if (index_for_texture == 12) {
+            FragColor = texture(textures[12],texture_coordinates);
+        } else if (index_for_texture == 13) {
+            FragColor = texture(textures[13],texture_coordinates);
+        } else if (index_for_texture == 14) {
+            FragColor = texture(textures[14],texture_coordinates);
+        } else if (index_for_texture == 15) {
+            FragColor = texture(textures[15],texture_coordinates);
+        } else if (index_for_texture == 16) {
+            FragColor = texture(textures[16],texture_coordinates);
+        } else if (index_for_texture == 17) {
+            FragColor = texture(textures[17],texture_coordinates);
+        } else if (index_for_texture == 18) {
+            FragColor = texture(textures[18],texture_coordinates);
         }
         if (index_for_texture == 99) {
             FragColor = point_light_color;
