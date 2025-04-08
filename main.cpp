@@ -337,6 +337,12 @@ int main()
         high_bar_avatar.ProcessInput(window, delta_time);
         high_bar_avatar.Draw(&shader_program, false);
 
+        // Add camera view tracking for first-person mode
+        if (camera.firstPersonMode) {
+            // Update camera position and orientation to match avatar view
+            camera.SetToAvatarView(high_bar_avatar.GetPosition(), high_bar_avatar.GetRotationAngle());
+        }
+
         if (camera.Position.y < 0.5) {
             camera.Position.y = 0.5;
         }
@@ -419,7 +425,9 @@ void ProcessInput(GLFWwindow *window)
         camera.ProcessKeyboard(RIGHT,delta_time);
     }
 
-
+    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
+        camera.ToggleFirstPersonMode();
+    }
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)

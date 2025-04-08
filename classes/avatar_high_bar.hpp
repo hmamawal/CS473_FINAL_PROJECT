@@ -23,6 +23,12 @@ class AvatarHighBar : public Avatar {
         
         void ProcessInput(GLFWwindow *window, float time_passed);
         void Draw(Shader *shader, bool use_shader);
+        
+        // Getter methods for camera positioning
+        glm::vec3 GetPosition() const { return position; }
+        float GetRotationAngle() const { 
+            return is_rotating ? rotation_angle : current_rotation; 
+        }
 };
 
 #endif //AVATAR_HIGH_BAR_HPP

@@ -1,4 +1,3 @@
-
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
@@ -47,6 +46,16 @@ public:
     float MovementSpeed;
     float MouseSensitivity;
     float Zoom;
+    // First-person mode
+    bool firstPersonMode;
+    // Store the initial position for reset
+    glm::vec3 defaultPosition;
+    float defaultYaw;
+    float defaultPitch;
+    // Store the position before entering first-person mode
+    glm::vec3 lastPosition;
+    float lastYaw;
+    float lastPitch;
 
     // Constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
@@ -65,9 +74,20 @@ public:
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
 
-
     // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
     void ProcessMouseScroll(float yoffset);
+
+    // Toggle first-person mode
+    void ToggleFirstPersonMode();
+
+    // Set the camera position and orientation to match avatar
+    void SetToAvatarView(const glm::vec3& avatarPosition, float avatarRotation);
+
+    // Restore the last camera position and orientation from before entering first-person mode
+    void RestoreLastView();
+
+    // Restore the default camera position and orientation (for complete reset)
+    void RestoreDefaultView();
 
 private:
     // Calculates the front vector from the Camera's (updated) Euler Angles
