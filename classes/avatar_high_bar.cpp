@@ -69,40 +69,40 @@ void AvatarHighBar::ProcessInput(GLFWwindow *window, float time_passed) {
         time_since_move += time_passed;
         
         // Move every 0.2 seconds
-        if (time_since_move >= 0.1f) {
+        if (time_since_move >= 0.01f) {
             // Reset timer
             time_since_move = 0.0f;
             
             // Perform movement based on current rotation quadrant
             if (rotation_angle < 90.0f) {
                 // First quadrant: move z by -0.4, move y by 0.4, rotate by 10.0 around X
-                position.z -= 0.4f;
-                position.y += 0.3f;
-                rotation_angle += 10.0f;
+                position.z -= 0.2f;
+                position.y += 0.15f;
+                rotation_angle += 5.0f;
                 // Set rotation around X-axis instead of Y
                 current_rotation = rotation_angle;
             } 
             else if (rotation_angle < 180.0f) {
                 // Second quadrant: move z by 0.4, move y by 0.4, rotate by 10.0 around X
-                position.z += 0.4f;
-                position.y += 0.3f;
-                rotation_angle += 10.0f;
+                position.z += 0.2f;
+                position.y += 0.15f;
+                rotation_angle += 5.0f;
                 // Set rotation around X-axis instead of Y
                 current_rotation = rotation_angle;
             } 
             else if (rotation_angle < 270.0f) {
                 // Third quadrant: move z by 0.4, move y by -0.4, rotate by 10.0 around X
-                position.z += 0.4f;
-                position.y -= 0.3f;
-                rotation_angle += 10.0f;
+                position.z += 0.2f;
+                position.y -= 0.15f;
+                rotation_angle += 5.0f;
                 // Set rotation around X-axis instead of Y
                 current_rotation = rotation_angle;
             } 
             else if (rotation_angle < 360.0f) {
                 // Fourth quadrant: move z by -0.4, move y by -0.4, rotate by 10.0 around X
-                position.z -= 0.4f;
-                position.y -= 0.3f;
-                rotation_angle += 10.0f;
+                position.z -= 0.2f;
+                position.y -= 0.15f;
+                rotation_angle += 5.0f;
                 // Set rotation around X-axis instead of Y
                 current_rotation = rotation_angle;
             }
