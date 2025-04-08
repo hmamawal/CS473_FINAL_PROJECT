@@ -22,14 +22,20 @@ void AvatarHighBar::ProcessInput(GLFWwindow *window, float time_passed) {
     if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
         if (!m_key_pressed) {
             m_key_pressed = true;
-            is_rotating = !is_rotating;
             
+            // If we're stopping rotation, reset position to default
             if (is_rotating) {
+                position = default_position;
+                rotation_angle = 0.0f;
+            } else {
                 // Store initial position when starting rotation
                 original_position = position;
                 rotation_angle = 0.0f;
                 time_since_move = 0.0f;
             }
+            
+            // Toggle rotation state
+            is_rotating = !is_rotating;
         }
     } else {
         m_key_pressed = false;
@@ -40,19 +46,18 @@ void AvatarHighBar::ProcessInput(GLFWwindow *window, float time_passed) {
         if (!key_pressed) {
             key_pressed = true;
             
-            // Stop rotation if it's active
-            if (is_rotating) {
-                is_rotating = false;
+            // Only allow J key functionality if not rotating
+            if (!is_rotating) {
+                // Original J key toggle functionality
+                if (!is_raised) {
+                    this->position.y += 1.0f;
+                    is_raised = true;
+                } else {
+                    this->position.y = original_position.y;
+                    is_raised = false;
+                }
             }
-            
-            // Original J key toggle functionality
-            if (!is_raised) {
-                this->position.y += 1.0f;
-                is_raised = true;
-            } else {
-                this->position.y = original_position.y;
-                is_raised = false;
-            }
+            // Note: Removed the code that stops rotation when J is pressed
         }
     } else {
         key_pressed = false;
