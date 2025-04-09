@@ -28,7 +28,8 @@ textures/*.tmp
 .aider*
 .aider.chat.history.md
 
-/Blender_files
-/saved_chats
-/context
+**/Blender_files
+#/saved_chats
+#/context
 #/models
+archive/context/LearnOpenGL - Cubemaps_files
