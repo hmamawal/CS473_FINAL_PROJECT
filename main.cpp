@@ -229,14 +229,18 @@ int main()
     shader_program_ptr->setVec4("spot_light.direction", glm::vec4(camera.Front, 0.0f));
 
     // Light colors - you can make these different from your point light for contrast
-    shader_program_ptr->setVec4("spot_light.ambient", glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));  
-    shader_program_ptr->setVec4("spot_light.diffuse", glm::vec4(1.0f, 0.9f, 0.7f, 1.0f)); // Warm light
-    shader_program_ptr->setVec4("spot_light.specular", glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
+    shader_program_ptr->setVec4("spot_light.ambient", glm::vec4(0.05f, 0.05f, 0.05f, 1.0f));  
+    shader_program_ptr->setVec4("spot_light.diffuse", glm::vec4(1.0f, 0.95f, 0.8f, 1.0f)); // Brighter warm light
+    shader_program_ptr->setVec4("spot_light.specular", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)); // Stronger specular
 
     // Spotlight properties - cutoff angles in cosine values
-    shader_program_ptr->setFloat("spot_light.cutOff", glm::cos(glm::radians(12.5f)));      // Inner cone
-    shader_program_ptr->setFloat("spot_light.outerCutOff", glm::cos(glm::radians(17.5f))); // Outer cone
+    shader_program_ptr->setFloat("spot_light.cutOff", glm::cos(glm::radians(10.0f)));      // Inner cone (was 12.5)
+    shader_program_ptr->setFloat("spot_light.outerCutOff", glm::cos(glm::radians(15.0f))); // Outer cone (was 17.5)
     shader_program_ptr->setBool("spot_light.on", true);
+
+    shader_program_ptr->setFloat("spot_light.constant", 1.0f); // Constant attenuation
+    shader_program_ptr->setFloat("spot_light.linear", 0.09f);   // Linear attenuation
+    shader_program_ptr->setFloat("spot_light.quadratic", 0.032f); // Quadratic attenuation
 
     //font shader settings
     font_program.use();
@@ -526,6 +530,13 @@ void ProcessInput(GLFWwindow *window)
             l_key_pressed = true;
             spotlight_on = !spotlight_on;
             shader_program_ptr->setBool("spot_light.on", spotlight_on);
+
+            // print feedback
+            if (spotlight_on) {
+                std::cout << "Spotlight ON" << std::endl;
+            } else {
+                std::cout << "Spotlight OFF" << std::endl;
+            }
         }
     } else {
         l_key_pressed = false;
