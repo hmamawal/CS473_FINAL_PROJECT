@@ -65,6 +65,14 @@ Font arial_font ("fonts/ArialBlackLarge.bmp","fonts/ArialBlack.csv",0.1,0.15);
 //shader state (determines how to draw items)
 ObjectType shader_state = BASIC;
 
+//AvatarHighBar high_bar_avatar(BasicShape(), 180.0f, glm::vec3(-10.0, 0.0, 0.0), IMPORTED_BASIC);
+AvatarHighBar* high_bar_avatar = nullptr;
+
+// global variables to store the original camera state
+glm::vec3 original_camera_position = camera.Position;
+float original_camera_yaw = camera.Yaw;
+float original_camera_pitch = camera.Pitch;
+
 int main()
 {
     //Initialize the environment, if it fails, return -1 (exit)
@@ -146,6 +154,10 @@ int main()
     Avatar baseAvatar(baseModel, 180.0f, glm::vec3(0.0, 0.4, 0.0), IMPORTED_BASIC);
     std::cout << "BaseAvatar created" << std::endl;
     baseAvatar.Scale(glm::vec3(0.5f, 0.5f, 0.5f)); 
+
+    // Create AvatarHighBar at the same position as the high bar
+    high_bar_avatar = new AvatarHighBar(baseModel, 180.0f, glm::vec3(-10.0, 0.0, 0.0), IMPORTED_BASIC);
+    high_bar_avatar->Scale(glm::vec3(0.5f, 0.5f, 0.5f));
 
     
     BasicShape tumbling_floor = importer.loadFiles("models/tumbling_floor", import_vao);
@@ -237,6 +249,7 @@ int main()
         // -----
         ProcessInput(window);
         baseAvatar.ProcessInput(window, delta_time);
+        high_bar_avatar->ProcessInput(window, delta_time);
 
         // render
         // ------
@@ -331,11 +344,8 @@ int main()
         shader_program.setMat4("local", high_bar_local);
         high_bar.Draw();
 
-        // Create AvatarHighBar at the same position as the high bar
-        static AvatarHighBar high_bar_avatar(baseModel, 180.0f, glm::vec3(-10.0, 0.0, 0.0), IMPORTED_BASIC);
-        high_bar_avatar.Scale(glm::vec3(0.5f, 0.5f, 0.5f));
-        high_bar_avatar.ProcessInput(window, delta_time);
-        high_bar_avatar.Draw(&shader_program, false);
+        
+        high_bar_avatar->Draw(&shader_program, false);
 
         if (camera.Position.y < 0.5) {
             camera.Position.y = 0.5;
@@ -400,26 +410,78 @@ int main()
 // ---------------------------------------------------------------------------------------------------------
 void ProcessInput(GLFWwindow *window)
 {
+    static bool c_key_pressed = false;
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    if (glfwGetKey(window,GLFW_KEY_W)==GLFW_PRESS) {
-        camera.ProcessKeyboard(FORWARD,delta_time);
+    // Process 'C' key to toggle first-person view
+    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
+        if (!c_key_pressed) {
+            c_key_pressed = true;
+
+            if (!camera.first_person_view) {
+                // Save the original camera state before entering first-person view
+                original_camera_position = camera.Position;
+                original_camera_yaw = camera.Yaw;
+                original_camera_pitch = camera.Pitch;
+            }
+
+            // Toggle first-person view
+            camera.first_person_view = !camera.first_person_view;
+
+            if (!camera.first_person_view) {
+                // Restore the original camera state when exiting first-person view
+                camera.Position = original_camera_position;
+                camera.Yaw = original_camera_yaw;
+                camera.Pitch = original_camera_pitch;
+                camera.updateCameraVectors();
+            }
+        }
+    } else {
+        c_key_pressed = false;
     }
 
-    if (glfwGetKey(window,GLFW_KEY_S)==GLFW_PRESS) {
-        camera.ProcessKeyboard(BACKWARD,delta_time);
+    // Update camera position and orientation if in first-person view
+    if (camera.first_person_view) {
+        // Get the position and rotation angle from high_bar_avatar
+        glm::vec3 avatar_pos;
+        high_bar_avatar->GetPosition(avatar_pos);
+
+        // Position the camera at the avatar's position but slightly higher (eye level)
+        camera.Position = avatar_pos + glm::vec3(0.0f, 2.0f, 0.0f);
+
+        // Get the X rotation angle (pitch) from avatar
+        float x_rotation_angle;
+        high_bar_avatar->GetXRotationAngle(x_rotation_angle);
+
+        // Update camera pitch based on avatar's X rotation
+        camera.Pitch = x_rotation_angle;
+
+        // Don't change Yaw - keep looking in the same direction
+
+        // Update camera vectors with the new pitch
+        camera.updateCameraVectors();
+
+        return; // Skip regular camera controls when in first-person
     }
 
-    if (glfwGetKey(window,GLFW_KEY_A)==GLFW_PRESS) {
-        camera.ProcessKeyboard(LEFT,delta_time);
+    // Regular camera controls (only when not in first-person view)
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        camera.ProcessKeyboard(FORWARD, delta_time);
     }
 
-    if (glfwGetKey(window,GLFW_KEY_D)==GLFW_PRESS) {
-        camera.ProcessKeyboard(RIGHT,delta_time);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        camera.ProcessKeyboard(BACKWARD, delta_time);
     }
 
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        camera.ProcessKeyboard(LEFT, delta_time);
+    }
 
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        camera.ProcessKeyboard(RIGHT, delta_time);
+    }
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
