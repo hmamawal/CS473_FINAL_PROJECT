@@ -47,6 +47,7 @@ public:
     float MovementSpeed;
     float MouseSensitivity;
     float Zoom;
+    bool first_person_view;
 
     // Constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
@@ -73,4 +74,4 @@ private:
     // Calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors();
 };
-#endif
+#endif // CAMERA_HPP
