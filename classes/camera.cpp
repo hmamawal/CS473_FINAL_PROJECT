@@ -1,10 +1,11 @@
 
 #include "camera.hpp"
+#include <iostream>
 
 // Constructor with vectors
 Camera::Camera(glm::vec3 position, glm::vec3 up,float yaw, float pitch):
     Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED),
-    MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+    MouseSensitivity(SENSITIVITY), Zoom(ZOOM), first_person_view(false)
     {
         Position = position;
         WorldUp = up;
@@ -16,7 +17,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 up,float yaw, float pitch):
 Camera::Camera(float posX, float posY, float posZ, float upX, float upY,
                float upZ, float yaw, float pitch) :
                    Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED),
-                   MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+                   MouseSensitivity(SENSITIVITY), Zoom(ZOOM), first_person_view(false)
     {
         Position = glm::vec3(posX, posY, posZ);
         WorldUp = glm::vec3(upX, upY, upZ);
@@ -28,12 +29,23 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY,
     // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
 glm::mat4 Camera::GetViewMatrix()
     {
-        return glm::lookAt(Position, Position + Front, Up);
+        if (first_person_view) {
+            // In first person view, the camera is looking at the front vector
+            // print the camera position and front vector
+            //std::cout << "Camera Position: " << Position.x << ", " << Position.y << ", " << Position.z << std::endl;
+            return glm::lookAt(Position, Position + Front, Up);
+        }
+        else {
+            // Normal third-person camera mode
+            return glm::lookAt(Position, Position + Front, Up);
+        }
     }
 
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
 void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
     {
+        // if the camera is in first person view, then none of the following movement will be allowed
+        if (first_person_view) return;
         float velocity = MovementSpeed * deltaTime;
         glm::vec3 forward = Front;
         forward.y = 0.0f; // prevent upward movement
@@ -54,6 +66,7 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
 void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch)
     {
+        if (first_person_view) return; // prevent movement in first person view
         xoffset *= MouseSensitivity;
         yoffset *= MouseSensitivity;
 
@@ -97,3 +110,4 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constr
         Right = glm::normalize(glm::cross(Front, WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
         Up    = glm::normalize(glm::cross(Right, Front));
     }
+
