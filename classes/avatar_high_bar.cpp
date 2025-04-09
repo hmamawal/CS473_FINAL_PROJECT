@@ -148,3 +148,7 @@ void AvatarHighBar::GetXRotationAngle(float &angle) {
 void AvatarHighBar::GetPosition(glm::vec3 &pos) {
     pos = this->position;
 }
+
+glm::vec3 AvatarHighBar::GetDefaultPosition() {
+    return this->default_position;
+}
