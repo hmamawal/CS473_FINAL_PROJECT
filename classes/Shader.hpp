@@ -33,6 +33,9 @@ public:
     //Given the name of a uniform (std::string) and a float value,
     // sets the uniform to the provided value.
     void setFloat (const std::string &name, float value) const;
+    //Given the name of a uniform (std::string) and a vector with three float values,
+    // sets the uniform to the vector.
+    void setVec3 (const std::string &name, glm::vec3 v) const;
     //Given the name of a uniform (std::string) and a vector with four float values,
     // sets the uniform to the vector.
     void setVec4 (const std::string &name, glm::vec4 v) const;

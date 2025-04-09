@@ -157,6 +157,8 @@ vec4 CalcPointLight (PointLight light,vec3 norm,vec3 frag,vec3 eye) {
 
     vec3 view_direction = normalize(view_position.xyz-frag);
     vec3 reflect_direction = reflect(-light_direction,normal);
+    
+    // Use the material-specific shininess value instead of the hardcoded 256.0
     float spec_coeff = pow(max(dot(view_direction,reflect_direction),0.0),shininess);
 
     //handle materials
@@ -170,10 +172,6 @@ vec4 CalcPointLight (PointLight light,vec3 norm,vec3 frag,vec3 eye) {
             + diffuse_coeff * light.diffuse 
             + spec_coeff * light.specular);
     }
-
-
-
-
 }
 
 vec4 CalcSpotLight(SpotLight light, vec3 norm, vec3 frag, vec3 eye) {
