@@ -18,6 +18,8 @@ layout (location = 5) in vec3 sColor;
 layout (location = 6) in float opacity_value;
 //index for the texture (for multiple textures on an imported object)
 layout (location = 7) in float texture_index;
+//shininess value for the material
+layout (location = 8) in float shininess_value;
 
 
 //note: "flat" is a key word that indicates this value stays the same 
@@ -36,6 +38,8 @@ out vec3 norm;
 out vec3 ambient_color;
 out vec3 diffuse_color;
 out vec3 specular_color;
+//shininess value
+flat out float shininess;
 //fragment position
 out vec3 fragment_position;
 
@@ -74,12 +78,14 @@ void main()
     diffuse_color = dColor;
     specular_color = sColor;
     opacity = opacity_value;
+    shininess = shininess_value;
   } else if (shader_state == 3) {
     //Imported object using materials and textures
     ambient_color = aColor;
     diffuse_color = dColor;
     specular_color = sColor;
     opacity = opacity_value;
+    shininess = shininess_value;
     index_for_texture = int(texture_index);
   } else {
     //shader state is 0 so set_color is used in the 

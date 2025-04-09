@@ -14,6 +14,7 @@ in vec3 ambient_color;
 in vec3 diffuse_color;
 in vec3 specular_color;
 flat in float opacity;
+flat in float shininess;
 
 //bring in the index for the texture
 flat in int index_for_texture;
@@ -156,7 +157,7 @@ vec4 CalcPointLight (PointLight light,vec3 norm,vec3 frag,vec3 eye) {
 
     vec3 view_direction = normalize(view_position.xyz-frag);
     vec3 reflect_direction = reflect(-light_direction,normal);
-    float spec_coeff = pow(max(dot(view_direction,reflect_direction),0.0),256.0);
+    float spec_coeff = pow(max(dot(view_direction,reflect_direction),0.0),shininess);
 
     //handle materials
     if ((fragment_shader_state == 2) || (fragment_shader_state == 3)) {
@@ -203,7 +204,7 @@ vec4 CalcSpotLight(SpotLight light, vec3 norm, vec3 frag, vec3 eye) {
     // Calculate specular lighting
     vec3 view_direction = normalize(eye - frag);
     vec3 reflect_direction = reflect(-light_direction, normal);
-    float spec_coeff = pow(max(dot(view_direction, reflect_direction), 0.0), 256.0);
+    float spec_coeff = pow(max(dot(view_direction, reflect_direction), 0.0), shininess);
 
     // Apply intensity and attenuation to diffuse and specular (not ambient)
     vec4 ambient, diffuse, specular;

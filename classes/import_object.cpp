@@ -84,6 +84,14 @@ void ImportOBJ::readMTLFile(std::string fName) {
             current_material->specular = color;
         }
 
+        //Shininess
+        else if (linePrefix == "Ns") {
+            current_material = &(this->material_map.find(current_material_name)->second);
+            float shininess_value = getFloat(curLine);
+            current_material->shininess = shininess_value;
+            std::cout << "Material: " << current_material_name << " has shininess value: " << shininess_value << std::endl;
+        }
+
         //Opacity
         else if (linePrefix == "d") {
             current_material = &(this->material_map.find(current_material_name)->second);
@@ -119,10 +127,10 @@ void ImportOBJ::PrintMaterials() {
         std::cout<<"  ambient: " << GetVecStr(material.ambient)<<std::endl;
         std::cout<<"  diffuse: " << GetVecStr(material.diffuse)<<std::endl;
         std::cout<<"  specular: " << GetVecStr(material.specular)<<std::endl;
+        std::cout<<"  shininess: " << material.shininess << std::endl;
         std::cout<<"  texture_index: " << material.texture_index << std::endl;
         std::cout<<"  textured? " << material.textured << std::endl;
     }
-
 }
 
 /** Loads .OBJ file into the ImportOBJ data structures */
@@ -245,11 +253,19 @@ void ImportOBJ::readFace(std::string lineSegment) {
     newVert.Color = this->curMat->diffuse;
     newVert.sColor = this->curMat->specular;
     newVert.opacity = this->curMat->opacity;
+    newVert.shininess = this->curMat->shininess;
+    
+    // Debug only first 5 vertices to avoid flooding console
+    static int count = 0;
+    if (count < 5 && this->curMat) {
+        std::cout << "Vertex shininess set to: " << newVert.shininess << " from material: " << this->curMat->material_name << std::endl;
+        count++;
+    }
+    
     if (this->curMat->textured) {
         newVert.texture_index = 1.0f*this->curMat->texture_index;
     }
     this->combinedData.push_back(newVert);
-
 }
 
 float ImportOBJ::getFloat (std::string line) {

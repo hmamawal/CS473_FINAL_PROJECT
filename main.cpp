@@ -135,8 +135,9 @@ int main()
     //  specular color (r,g,b)
     //  opacity 0-1.0
     //  index for the texture associated with the vertex
+    //  shininess
     glGenVertexArrays(1,&(import_vao.id));
-    int stride_size = 19*sizeof(float);
+    int stride_size = 20*sizeof(float); // Increased to include shininess
     import_vao.attributes.push_back(BuildAttribute(3,GL_FLOAT,false,stride_size,0));
     import_vao.attributes.push_back(BuildAttribute(3,GL_FLOAT,false,stride_size,3*sizeof(float)));
     import_vao.attributes.push_back(BuildAttribute(2,GL_FLOAT,false,stride_size,6*sizeof(float)));
@@ -145,6 +146,7 @@ int main()
     import_vao.attributes.push_back(BuildAttribute(3,GL_FLOAT,false,stride_size,14*sizeof(float)));
     import_vao.attributes.push_back(BuildAttribute(1,GL_FLOAT,false,stride_size,17*sizeof(float)));
     import_vao.attributes.push_back(BuildAttribute(1,GL_FLOAT,false,stride_size,18*sizeof(float)));
+    import_vao.attributes.push_back(BuildAttribute(1,GL_FLOAT,false,stride_size,19*sizeof(float))); // Shininess
     
     std::cout << "VAOs created and attributes set up successfully." << std::endl;
     std::cout << "Now about to load the models..." << std::endl;

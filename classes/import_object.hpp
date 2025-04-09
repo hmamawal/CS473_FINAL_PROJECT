@@ -41,6 +41,7 @@ class ImportOBJ{
             glm::vec3 sColor;
             float opacity = 1.0;
             float texture_index=99.0;
+            float shininess = 256.0;
         };
 
         struct Material {
@@ -49,6 +50,7 @@ class ImportOBJ{
             glm::vec3 diffuse = glm::vec3(1.0);
             glm::vec3 specular = glm::vec3(1.0);
             float opacity = 1.0;
+            float shininess = 256.0; // Default shininess value
             int illumination_model = -1;
             bool textured = false;
             int texture_index = 99;
