@@ -193,6 +193,12 @@ int main()
     BasicShape high_bar = importer.loadFiles("models/HighBar", import_vao);
     std::cout << "High Bar imported" << std::endl;
 
+    // Import the PommelHorse models which have no textures
+    BasicShape pommel_horse = importer.loadFiles("models/PommelHorse", import_vao);
+    std::cout << "PommelHorse imported" << std::endl;
+    
+    BasicShape pommel_horse2 = importer.loadFiles("models/PommelHorse2", import_vao);
+    std::cout << "PommelHorse2 imported" << std::endl;
 
     arial_font.initialize(texture_vao);
     std::cout << "Font initialized" << std::endl;
@@ -382,6 +388,25 @@ int main()
         shader_program_ptr->setMat4("local", high_bar_local);
         high_bar.Draw();
 
+        // Draw the first pommel horse
+        shader_program_ptr->setInt("shader_state", IMPORTED_BASIC);
+        glm::mat4 pommel_horse_local(1.0);
+        pommel_horse_local = glm::translate(pommel_horse_local, glm::vec3(-5.0, 0.0, -10.0));
+        // Rotate it to face the center
+        pommel_horse_local = glm::rotate(pommel_horse_local, glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
+        shader_program_ptr->setMat4("model", identity);
+        shader_program_ptr->setMat4("local", pommel_horse_local);
+        pommel_horse.Draw();
+
+        // Draw the second pommel horse
+        shader_program_ptr->setInt("shader_state", IMPORTED_BASIC);
+        glm::mat4 pommel_horse2_local(1.0);
+        pommel_horse2_local = glm::translate(pommel_horse2_local, glm::vec3(5.0, 0.0, -10.0));
+        // Rotate it to face the center
+        pommel_horse2_local = glm::rotate(pommel_horse2_local, glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
+        shader_program_ptr->setMat4("model", identity);
+        shader_program_ptr->setMat4("local", pommel_horse2_local);
+        pommel_horse2.Draw();
         
         high_bar_avatar->Draw(shader_program_ptr, false);
 
@@ -433,6 +458,10 @@ int main()
     vault_table.DeallocateShape();
     std::cout << "About to deallocate high_bar" << std::endl;
     high_bar.DeallocateShape();
+    std::cout << "About to deallocate pommel_horse" << std::endl;
+    pommel_horse.DeallocateShape();
+    std::cout << "About to deallocate pommel_horse2" << std::endl;
+    pommel_horse2.DeallocateShape();
     std::cout << "About to deallocate floor" << std::endl;
     floor.DeallocateShape();
 
