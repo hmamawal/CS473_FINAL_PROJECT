@@ -15,6 +15,8 @@ AvatarHighBar::AvatarHighBar(BasicShape shape, float orientation,
     this->time_since_move = 0.0f;
     this->m_key_pressed = false;
     this->default_position = initial_position;
+    this->orientation = orientation;
+
 }
 
 void AvatarHighBar::ProcessInput(GLFWwindow *window, float time_passed) {
@@ -134,9 +136,22 @@ void AvatarHighBar::Draw(Shader *shader, bool use_shader) {
     }
     
     // Always apply the initial rotation
-    local = glm::rotate(local, glm::radians(this->initial_rotation), glm::vec3(0.0, 1.0, 0.0));
+    //local = glm::rotate(local, glm::radians(this->orientation), glm::vec3(0.0, 1.0, 0.0));
     local = glm::scale(local, this->scale);
     shader->setMat4("local", local);
     shader->setInt("shader_state", this->shader_state);
     this->body.Draw();
+}
+
+float AvatarHighBar::GetRotationAngle() const { 
+    if (is_rotating) {
+        return orientation;//rotation_angle; 
+    }
+    else {
+        return orientation;//current_rotation; 
+    }
+}
+
+glm::vec3 AvatarHighBar::GetPosition() const { 
+    return position; 
 }

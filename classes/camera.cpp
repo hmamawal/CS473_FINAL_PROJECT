@@ -123,7 +123,7 @@ void Camera::SetToAvatarView(const glm::vec3& avatarPosition, float avatarRotati
     
     // Set camera orientation based on avatar rotation
     // Convert avatar's Y-axis rotation to camera's yaw (with 180 degree adjustment)
-    Yaw = -avatarRotation + 180.0f;
+    Yaw = avatarRotation;//-avatarRotation + 180.0f;
     
     // Update camera vectors to reflect new orientation
     updateCameraVectors();
@@ -146,15 +146,14 @@ void Camera::RestoreDefaultView() {
 }
 
 // Calculates the front vector from the Camera's (updated) Euler Angles
-void Camera::updateCameraVectors()
-    {
-        // Calculate the new Front vector
-        glm::vec3 front;
-        front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-        front.y = sin(glm::radians(Pitch));
-        front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-        Front = glm::normalize(front);
-        // Also re-calculate the Right and Up vector
-        Right = glm::normalize(glm::cross(Front, WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-        Up    = glm::normalize(glm::cross(Right, Front));
-    }
+void Camera::updateCameraVectors(){
+    // Calculate the new Front vector
+    glm::vec3 front;
+    front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+    front.y = sin(glm::radians(Pitch));
+    front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+    Front = glm::normalize(front);
+    // Also re-calculate the Right and Up vector
+    Right = glm::normalize(glm::cross(Front, WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+    Up    = glm::normalize(glm::cross(Right, Front));
+}

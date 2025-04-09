@@ -16,6 +16,7 @@ class AvatarHighBar : public Avatar {
         float time_since_move;    // Time accumulator for movement timing
         bool m_key_pressed;       // Track M key state to prevent multiple toggles
         glm::vec3 default_position; // Default position of the avatar
+        float orientation;        // Orientation of the avatar (rotation angle)
         
     public:
         // Constructor that passes parameters to the parent Avatar class
@@ -25,10 +26,8 @@ class AvatarHighBar : public Avatar {
         void Draw(Shader *shader, bool use_shader);
         
         // Getter methods for camera positioning
-        glm::vec3 GetPosition() const { return position; }
-        float GetRotationAngle() const { 
-            return is_rotating ? rotation_angle : current_rotation; 
-        }
+        glm::vec3 GetPosition() const;
+        float GetRotationAngle() const; 
 };
 
 #endif //AVATAR_HIGH_BAR_HPP
