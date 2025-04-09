@@ -33,3 +33,4 @@ textures/*.tmp
 #/context
 #/models
 archive/context/LearnOpenGL - Cubemaps_files
+.zip*
