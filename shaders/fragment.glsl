@@ -41,6 +41,23 @@ struct PointLight {
 
 uniform PointLight point_light;
 
+struct SpotLight {
+    vec4 position;
+    vec4 direction;
+    vec4 ambient;
+    vec4 diffuse;
+    vec4 specular;
+    
+    float cutOff;      // Inner cutoff (cosine of angle)
+    float outerCutOff; // Outer cutoff (cosine of angle)
+    
+    bool on;
+};
+
+uniform SpotLight spot_light;
+
+vec4 CalcSpotLight(SpotLight light, vec3 norm, vec3 frag, vec3 eye);
+
 vec4 CalcPointLight (PointLight light,vec3 norm,vec3 frag,vec3 eye);
 
 //  0: BasicShape objects that just have a set color (basic)
@@ -57,6 +74,16 @@ void main()
         FragColor = point_light_color;
         return;
     }
+
+     // Calculate spotlight contribution
+    vec4 spot_light_color = vec4(0.0);
+    if (spot_light.on) {
+        spot_light_color = CalcSpotLight(spot_light, norm, 
+                                       fragment_position, view_position.xyz);
+    }
+    
+    // Combine light contributions
+    vec4 combined_light = point_light_color + spot_light_color;
 
     //Object is textured
     if ((fragment_shader_state == 1) || (fragment_shader_state == 3)) {
@@ -102,16 +129,16 @@ void main()
             FragColor = texture(textures[18],texture_coordinates);
         }
         if (index_for_texture == 99) {
-            FragColor = point_light_color;
+            FragColor = combined_light;
             return;
         }
-        FragColor = point_light_color * FragColor;
+        FragColor = combined_light * FragColor;
         return;
 
     }
 
     //otherwise fragment state is 0 (use the set color)
-    FragColor = point_light_color * set_color;
+    FragColor = combined_light * set_color;
     
 };
 
@@ -144,4 +171,47 @@ vec4 CalcPointLight (PointLight light,vec3 norm,vec3 frag,vec3 eye) {
 
 
 
+}
+
+vec4 CalcSpotLight(SpotLight light, vec3 norm, vec3 frag, vec3 eye) {
+    if (!light.on) {
+        return vec4(0.0, 0.0, 0.0, 1.0);
+    }
+    
+    vec3 light_direction = normalize(light.position.xyz - frag);
+    vec3 normal = normalize(norm);
+    
+    // Calculate spotlight effect
+    float theta = dot(light_direction, normalize(-light.direction.xyz));
+    float epsilon = light.cutOff - light.outerCutOff;
+    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+    
+    // If outside the outer cone, return only ambient or nothing
+    if (intensity <= 0.0) {
+        return vec4(0.0, 0.0, 0.0, 1.0); // Or minimal ambient light
+    }
+    
+    // Calculate diffuse lighting
+    float diffuse_coeff = max(dot(normal, light_direction), 0.0);
+    
+    // Calculate specular lighting
+    vec3 view_direction = normalize(eye - frag);
+    vec3 reflect_direction = reflect(-light_direction, normal);
+    float spec_coeff = pow(max(dot(view_direction, reflect_direction), 0.0), 256.0);
+    
+    // Apply intensity to diffuse and specular (not ambient)
+    vec4 ambient, diffuse, specular;
+    
+    // Handle materials
+    if ((fragment_shader_state == 2) || (fragment_shader_state == 3)) {
+        ambient = light.ambient * vec4(ambient_color, opacity);
+        diffuse = intensity * diffuse_coeff * light.diffuse * vec4(diffuse_color, opacity);
+        specular = intensity * spec_coeff * light.specular * vec4(specular_color, opacity);
+    } else {
+        ambient = light.ambient;
+        diffuse = intensity * diffuse_coeff * light.diffuse;
+        specular = intensity * spec_coeff * light.specular;
+    }
+    
+    return (ambient + diffuse + specular);
 }

@@ -73,6 +73,8 @@ glm::vec3 original_camera_position = camera.Position;
 float original_camera_yaw = camera.Yaw;
 float original_camera_pitch = camera.Pitch;
 
+Shader* shader_program_ptr = nullptr;  // Global pointer to shader program
+
 int main()
 {
     //Initialize the environment, if it fails, return -1 (exit)
@@ -96,7 +98,9 @@ int main()
     //Create the shader programs for the shapes and the font
     // (you *could* combine these into one program)
     //-------------------------
-    Shader shader_program(".//shaders//vertex.glsl",".//shaders//fragment.glsl");
+    //Shader shader_program(".//shaders//vertex.glsl",".//shaders//fragment.glsl");
+    //shader_program = Shader("path/to/vertex.glsl", "path/to/fragment.glsl");
+    shader_program_ptr = new Shader(".//shaders//vertex.glsl", ".//shaders//fragment.glsl");
     Shader font_program(".//shaders//vertex.glsl",".//shaders//fontFragmentShader.glsl");
 
     //Create the VAOs
@@ -197,28 +201,42 @@ int main()
     BasicShape floor = GetTexturedRectangle(texture_vao,glm::vec3(-25.0,-25.0,0.0),50.0,50.0,20.0,false);
 
     //set up the shader program    
-    shader_program.use();
+    shader_program_ptr->use();
     glm::mat4 identity (1.0);
     
     glm::mat4 model = glm::rotate(identity,glm::radians(-90.0f),glm::vec3(1.0,0.0,0.0));
-    shader_program.setMat4("model",model);
+    shader_program_ptr->setMat4("model",model);
     glm::mat4 view = glm::translate(identity,glm::vec3(0.0,10.0,0.0));
     view = glm::rotate(view,glm::radians(-90.0f),glm::vec3(1.0,0.0,0.0));
-    shader_program.setMat4("view",view);
+    shader_program_ptr->setMat4("view",view);
     glm::mat4 projection = glm::perspective(glm::radians(45.0f),(1.0f*SCR_WIDTH)/(1.0f*SCR_HEIGHT),0.1f,100.0f);
-    shader_program.setMat4("projection",projection);
+    shader_program_ptr->setMat4("projection",projection);
 
     //lighting 
     glm::vec3 light_color (1.0);
     glm::vec3 ambient_color = 0.1f*light_color;
     
-    shader_program.setVec4("point_light.ambient",glm::vec4(0.5f*light_color,1.0));
-    shader_program.setVec4("point_light.diffuse",glm::vec4(light_color,1.0f));
-    shader_program.setVec4("point_light.specular",glm::vec4(0.5f*light_color,1.0f));
-    shader_program.setVec4("point_light.position",light_position);
-    shader_program.setBool("point_light.on",true);
+    shader_program_ptr->setVec4("point_light.ambient",glm::vec4(0.5f*light_color,1.0));
+    shader_program_ptr->setVec4("point_light.diffuse",glm::vec4(light_color,1.0f));
+    shader_program_ptr->setVec4("point_light.specular",glm::vec4(0.5f*light_color,1.0f));
+    shader_program_ptr->setVec4("point_light.position",light_position);
+    shader_program_ptr->setBool("point_light.on",true);
 
-    shader_program.setVec4("view_position",glm::vec4(camera.Position,1.0));
+    shader_program_ptr->setVec4("view_position",glm::vec4(camera.Position,1.0));
+
+    // Spotlight setup - this could be a flashlight following the camera
+    shader_program_ptr->setVec4("spot_light.position", glm::vec4(camera.Position, 1.0f));
+    shader_program_ptr->setVec4("spot_light.direction", glm::vec4(camera.Front, 0.0f));
+
+    // Light colors - you can make these different from your point light for contrast
+    shader_program_ptr->setVec4("spot_light.ambient", glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));  
+    shader_program_ptr->setVec4("spot_light.diffuse", glm::vec4(1.0f, 0.9f, 0.7f, 1.0f)); // Warm light
+    shader_program_ptr->setVec4("spot_light.specular", glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
+
+    // Spotlight properties - cutoff angles in cosine values
+    shader_program_ptr->setFloat("spot_light.cutOff", glm::cos(glm::radians(12.5f)));      // Inner cone
+    shader_program_ptr->setFloat("spot_light.outerCutOff", glm::cos(glm::radians(17.5f))); // Outer cone
+    shader_program_ptr->setBool("spot_light.on", true);
 
     //font shader settings
     font_program.use();
@@ -258,25 +276,28 @@ int main()
 
         //use the shader program (this is necessary because we 
         // use the font shader program at the end of the render loop)
-        shader_program.use();
+        shader_program_ptr->use();
 
         //set up the view matrix (camera)
         view = camera.GetViewMatrix();
-        shader_program.setMat4("view",view);
-        shader_program.setVec4("view_position",glm::vec4(camera.Position,1.0));
+        shader_program_ptr->setMat4("view",view);
+        shader_program_ptr->setVec4("view_position",glm::vec4(camera.Position,1.0));
+
+        shader_program_ptr->setVec4("spot_light.position", glm::vec4(camera.Position, 1.0f));
+        shader_program_ptr->setVec4("spot_light.direction", glm::vec4(camera.Front, 0.0f));
 
         //draw and the baseAvatar, don't need to use the shader program here
         //   since we already did at the top of the render loop.
-        baseAvatar.Draw(&shader_program, false);
+        baseAvatar.Draw(shader_program_ptr, false);
 
         //Draw the floor
-        shader_program.setInt("shader_state",TEXTURED);
-        shader_program.setMat4("model",model);
-        shader_program.setMat4("local",identity);
+        shader_program_ptr->setInt("shader_state",TEXTURED);
+        shader_program_ptr->setMat4("model",model);
+        shader_program_ptr->setMat4("local",identity);
         
         glm::mat4 floor_local(1.0);
         floor_local = glm::translate(floor_local,glm::vec3(0.0,0.0,-0.01));
-        shader_program.setMat4("local",floor_local);
+        shader_program_ptr->setMat4("local",floor_local);
         //note that if you change the active texture to account for multiple
         
         glBindTexture(GL_TEXTURE_2D,floor_texture);
@@ -287,65 +308,65 @@ int main()
         // // for (int i = 0; i < die_textures.size(); i++) {
         // //     glActiveTexture(GL_TEXTURE0+i);
         // //     std::string texture_string = "textures["+std::to_string(i)+"]";
-        // //     shader_program.setInt(texture_string,i);
+        // //     shader_program_ptr->setInt(texture_string,i);
         // //     glBindTexture(GL_TEXTURE_2D,die_textures[i]);
         // // }
 
         // Draw the gymnastics tumbling floor
-        shader_program.setInt("shader_state", IMPORTED_TEXTURED);
+        shader_program_ptr->setInt("shader_state", IMPORTED_TEXTURED);
         glm::mat4 tumbling_floor_local(1.0);
         tumbling_floor_local = glm::translate(tumbling_floor_local, glm::vec3(0.0, 0.4, 0.0));
-        shader_program.setMat4("model", identity);
-        shader_program.setMat4("local", tumbling_floor_local);
+        shader_program_ptr->setMat4("model", identity);
+        shader_program_ptr->setMat4("local", tumbling_floor_local);
         glBindTexture(GL_TEXTURE_2D, tumbling_floor_texture);
         tumbling_floor.Draw();
 
         // Draw the vault table
-        shader_program.setInt("shader_state", IMPORTED_TEXTURED);
+        shader_program_ptr->setInt("shader_state", IMPORTED_TEXTURED);
         glm::mat4 vault_table_local(1.0);
         vault_table_local = glm::translate(vault_table_local, glm::vec3(8.0, 0.0, 0.0));
-        shader_program.setMat4("model", identity);
-        shader_program.setMat4("local", vault_table_local);
+        shader_program_ptr->setMat4("model", identity);
+        shader_program_ptr->setMat4("local", vault_table_local);
 
         // Bind and set all textures for the VaultTable
         for (int i = 0; i < vault_table_textures.size(); i++) {
             glActiveTexture(GL_TEXTURE0 + i);
             std::string texture_string = "textures[" + std::to_string(i) + "]";
-            shader_program.setInt(texture_string, i);
+            shader_program_ptr->setInt(texture_string, i);
             glBindTexture(GL_TEXTURE_2D, vault_table_textures[i]);
         }
         vault_table.Draw();
         glActiveTexture(GL_TEXTURE0); // Reset active texture to default
 
         // Draw the Lou Gross Building
-        shader_program.setInt("shader_state", IMPORTED_TEXTURED);
+        shader_program_ptr->setInt("shader_state", IMPORTED_TEXTURED);
         glm::mat4 building_local(1.0);
         building_local = glm::translate(building_local, glm::vec3(0.0, 0.0, 0.0));
         // scale the building to fit the scene
         building_local = glm::scale(building_local, glm::vec3(2, 2, 2));
-        shader_program.setMat4("model", identity);
-        shader_program.setMat4("local", building_local);
+        shader_program_ptr->setMat4("model", identity);
+        shader_program_ptr->setMat4("local", building_local);
         // Bind and set all textures for the Lou Gross Building
         for (int i = 0; i < building_textures.size(); i++) {
             glActiveTexture(GL_TEXTURE0 + i);
             std::string texture_string = "textures[" + std::to_string(i) + "]";
-            shader_program.setInt(texture_string, i);
+            shader_program_ptr->setInt(texture_string, i);
             glBindTexture(GL_TEXTURE_2D, building_textures[i]);
         }
         LouGrossBuilding.Draw();
         glActiveTexture(GL_TEXTURE0); // Reset active texture to default
 
         // Draw the high bar
-        shader_program.setInt("shader_state", IMPORTED_BASIC);
+        shader_program_ptr->setInt("shader_state", IMPORTED_BASIC);
         glm::mat4 high_bar_local(1.0);
         high_bar_local = glm::translate(high_bar_local, glm::vec3(-10.0, 0.0, 0.0));
         high_bar_local = glm::scale(high_bar_local, glm::vec3(1.3f, 1.3f, 1.3f));
-        shader_program.setMat4("model", identity);
-        shader_program.setMat4("local", high_bar_local);
+        shader_program_ptr->setMat4("model", identity);
+        shader_program_ptr->setMat4("local", high_bar_local);
         high_bar.Draw();
 
         
-        high_bar_avatar->Draw(&shader_program, false);
+        high_bar_avatar->Draw(shader_program_ptr, false);
 
         if (camera.Position.y < 0.5) {
             camera.Position.y = 0.5;
@@ -399,6 +420,20 @@ int main()
     floor.DeallocateShape();
 
     std::cout << "Cleanup complete" << std::endl;
+
+    // Delete the shader program
+    if (shader_program_ptr != nullptr) {
+        delete shader_program_ptr;
+        shader_program_ptr = nullptr;
+    }
+    std::cout << "Shader program deleted" << std::endl;
+
+    // Delete the high_bar_avatar object
+    if (high_bar_avatar != nullptr) {
+        delete high_bar_avatar;
+        high_bar_avatar = nullptr;
+    }
+    std::cout << "High bar avatar deleted" << std::endl;
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
@@ -481,6 +516,19 @@ void ProcessInput(GLFWwindow *window)
 
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         camera.ProcessKeyboard(RIGHT, delta_time);
+    }
+
+    static bool l_key_pressed = false;
+    static bool spotlight_on = true;
+
+    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+        if (!l_key_pressed) {
+            l_key_pressed = true;
+            spotlight_on = !spotlight_on;
+            shader_program_ptr->setBool("spot_light.on", spotlight_on);
+        }
+    } else {
+        l_key_pressed = false;
     }
 }
 
