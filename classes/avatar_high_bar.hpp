@@ -24,6 +24,7 @@ class AvatarHighBar : public Avatar {
         void ProcessInput(GLFWwindow *window, float time_passed);
         void Draw(Shader *shader, bool use_shader);
         void GetXRotationAngle(float &angle);
+        void GetPosition(glm::vec3 &pos);
 };
 
 #endif //AVATAR_HIGH_BAR_HPP
