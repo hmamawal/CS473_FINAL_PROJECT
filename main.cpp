@@ -242,7 +242,7 @@ int main()
     // Light colors - you can make these different from your point light for contrast
     shader_program_ptr->setVec4("spot_light.ambient", glm::vec4(0.05f, 0.05f, 0.05f, 1.0f));  
     shader_program_ptr->setVec4("spot_light.diffuse", glm::vec4(1.0f, 0.95f, 0.8f, 1.0f)); // Brighter warm light
-    shader_program_ptr->setVec4("spot_light.specular", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)); // Stronger specular
+    shader_program_ptr->setVec4("spot_light.specular", glm::vec4(1.5f, 1.5f, 1.5f, 1.0f)); // Stronger specular for spotlight
 
     // Spotlight properties - cutoff angles in cosine values
     shader_program_ptr->setFloat("spot_light.cutOff", glm::cos(glm::radians(10.0f)));      // Inner cone (was 12.5)

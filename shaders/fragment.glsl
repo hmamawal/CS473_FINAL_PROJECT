@@ -156,21 +156,38 @@ vec4 CalcPointLight (PointLight light,vec3 norm,vec3 frag,vec3 eye) {
     float diffuse_coeff = max(dot(normal,light_direction),0.0);
 
     vec3 view_direction = normalize(view_position.xyz-frag);
-    vec3 reflect_direction = reflect(-light_direction,normal);
     
-    // Use the material-specific shininess value instead of the hardcoded 256.0
-    float spec_coeff = pow(max(dot(view_direction,reflect_direction),0.0),shininess);
+    // Calculate specular lighting - use Blinn-Phong for stronger specular highlights
+    float spec_coeff;
+    if (shininess > 200.0) {
+        // Traditional Phong for shiny objects (more concentrated highlights)
+        vec3 reflect_direction = reflect(-light_direction, normal);
+        spec_coeff = pow(max(dot(view_direction, reflect_direction), 0.0), shininess);
+    } else {
+        // Blinn-Phong for less shiny objects (softer, easier to see highlights)
+        vec3 halfway_dir = normalize(light_direction + view_direction);
+        spec_coeff = pow(max(dot(normal, halfway_dir), 0.0), shininess);
+    }
+    
+    // Enhance specular effect based on material shininess
+    // Higher shininess = brighter specular highlights
+    float specular_intensity = 1.0;
+    if (shininess > 500.0) {
+        specular_intensity = 2.5; // Super shiny materials get enhanced specular
+    } else if (shininess > 200.0) {
+        specular_intensity = 1.5; // Medium shiny materials get slightly enhanced specular
+    }
 
     //handle materials
     if ((fragment_shader_state == 2) || (fragment_shader_state == 3)) {
         //need to use the different material components in the calculation
         return (light.ambient * vec4(ambient_color,opacity) 
                 + diffuse_coeff * light.diffuse * vec4(diffuse_color,opacity)
-                + spec_coeff * light.specular * vec4(specular_color,opacity));
+                + spec_coeff * specular_intensity * light.specular * vec4(specular_color,opacity));
     } else {
         return (light.ambient 
             + diffuse_coeff * light.diffuse 
-            + spec_coeff * light.specular);
+            + spec_coeff * specular_intensity * light.specular);
     }
 }
 
@@ -199,10 +216,29 @@ vec4 CalcSpotLight(SpotLight light, vec3 norm, vec3 frag, vec3 eye) {
     // Calculate diffuse lighting
     float diffuse_coeff = max(dot(normal, light_direction), 0.0);
 
-    // Calculate specular lighting
+    // Calculate specular lighting - use Blinn-Phong for stronger specular highlights
     vec3 view_direction = normalize(eye - frag);
-    vec3 reflect_direction = reflect(-light_direction, normal);
-    float spec_coeff = pow(max(dot(view_direction, reflect_direction), 0.0), shininess);
+    
+    // For very shiny objects (high shininess), use traditional Phong
+    float spec_coeff;
+    if (shininess > 200.0) {
+        // Traditional Phong for shiny objects (more concentrated highlights)
+        vec3 reflect_direction = reflect(-light_direction, normal);
+        spec_coeff = pow(max(dot(view_direction, reflect_direction), 0.0), shininess);
+    } else {
+        // Blinn-Phong for less shiny objects (softer, easier to see highlights)
+        vec3 halfway_dir = normalize(light_direction + view_direction);
+        spec_coeff = pow(max(dot(normal, halfway_dir), 0.0), shininess);
+    }
+    
+    // Enhance specular effect based on material shininess
+    // Higher shininess = brighter specular highlights
+    float specular_intensity = 1.0;
+    if (shininess > 500.0) {
+        specular_intensity = 2.5; // Super shiny materials get enhanced specular
+    } else if (shininess > 200.0) {
+        specular_intensity = 1.5; // Medium shiny materials get slightly enhanced specular
+    }
 
     // Apply intensity and attenuation to diffuse and specular (not ambient)
     vec4 ambient, diffuse, specular;
@@ -211,11 +247,11 @@ vec4 CalcSpotLight(SpotLight light, vec3 norm, vec3 frag, vec3 eye) {
     if ((fragment_shader_state == 2) || (fragment_shader_state == 3)) {
         ambient = light.ambient * vec4(ambient_color, opacity);
         diffuse = attenuation * intensity * diffuse_coeff * light.diffuse * vec4(diffuse_color, opacity);
-        specular = attenuation * intensity * spec_coeff * light.specular * vec4(specular_color, opacity);
+        specular = attenuation * intensity * spec_coeff * specular_intensity * light.specular * vec4(specular_color, opacity);
     } else {
         ambient = light.ambient;
         diffuse = attenuation * intensity * diffuse_coeff * light.diffuse;
-        specular = attenuation * intensity * spec_coeff * light.specular;
+        specular = attenuation * intensity * spec_coeff * specular_intensity * light.specular;
     }
 
     return (ambient + diffuse + specular);
