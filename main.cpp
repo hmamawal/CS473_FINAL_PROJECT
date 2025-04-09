@@ -427,14 +427,14 @@ void ProcessInput(GLFWwindow *window)
         high_bar_avatar->GetPosition(avatar_pos);
         
         // Position the camera at the avatar's position but slightly higher (eye level)
-        camera.Position = avatar_pos + glm::vec3(0.0f, 1.0f, 0.0f);
+        camera.Position = avatar_pos + glm::vec3(0.0f, 4.0f, 0.0f);
         
         // Get the X rotation angle (pitch) from avatar
         float x_rotation_angle;
         high_bar_avatar->GetXRotationAngle(x_rotation_angle);
         
         // Update camera pitch based on avatar's X rotation
-        camera.Pitch = -x_rotation_angle; // Negate because camera pitch works opposite to model rotation
+        camera.Pitch = x_rotation_angle; // Negate because camera pitch works opposite to model rotation
         
         // Don't change Yaw - keep looking in the same direction
         
