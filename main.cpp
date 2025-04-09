@@ -50,6 +50,9 @@ bool first_mouse{true};
 float last_x{0.0};
 float last_y{0.0};
 
+// Point light color (modified by R key)
+glm::vec3 point_light_color(1.0f, 1.0f, 1.0f); // Default to white
+
 //Camera Object
 //set up the camera
 Camera camera(glm::vec3(0.0f,1.0f,25.0f),glm::vec3(0.0f,1.0f,0.0f),-90.0f,0.0f);
@@ -213,14 +216,14 @@ int main()
     shader_program_ptr->setMat4("projection",projection);
 
     //lighting 
-    glm::vec3 light_color (1.0);
-    glm::vec3 ambient_color = 0.1f*light_color;
+    glm::vec3 light_color = point_light_color; // Use the global point light color
+    glm::vec3 ambient_color = 0.1f * light_color;
     
-    shader_program_ptr->setVec4("point_light.ambient",glm::vec4(0.5f*light_color,1.0));
-    shader_program_ptr->setVec4("point_light.diffuse",glm::vec4(light_color,1.0f));
-    shader_program_ptr->setVec4("point_light.specular",glm::vec4(0.5f*light_color,1.0f));
-    shader_program_ptr->setVec4("point_light.position",light_position);
-    shader_program_ptr->setBool("point_light.on",true);
+    shader_program_ptr->setVec4("point_light.ambient", glm::vec4(0.5f*light_color, 1.0));
+    shader_program_ptr->setVec4("point_light.diffuse", glm::vec4(light_color, 1.0f));
+    shader_program_ptr->setVec4("point_light.specular", glm::vec4(0.5f*light_color, 1.0f));
+    shader_program_ptr->setVec4("point_light.position", light_position);
+    shader_program_ptr->setBool("point_light.on", true);
 
     shader_program_ptr->setVec4("view_position",glm::vec4(camera.Position,1.0));
 
@@ -289,6 +292,16 @@ int main()
 
         shader_program_ptr->setVec4("spot_light.position", glm::vec4(camera.Position, 1.0f));
         shader_program_ptr->setVec4("spot_light.direction", glm::vec4(camera.Front, 0.0f));
+
+        //lighting 
+        glm::vec3 light_color = point_light_color; // Use the global point light color
+        glm::vec3 ambient_color = 0.1f * light_color;
+        
+        shader_program_ptr->setVec4("point_light.ambient", glm::vec4(0.5f*light_color, 1.0));
+        shader_program_ptr->setVec4("point_light.diffuse", glm::vec4(light_color, 1.0f));
+        shader_program_ptr->setVec4("point_light.specular", glm::vec4(0.5f*light_color, 1.0f));
+        shader_program_ptr->setVec4("point_light.position", light_position);
+        shader_program_ptr->setBool("point_light.on", true);
 
         //draw and the baseAvatar, don't need to use the shader program here
         //   since we already did at the top of the render loop.
@@ -450,9 +463,35 @@ int main()
 void ProcessInput(GLFWwindow *window)
 {
     static bool c_key_pressed = false;
+    static bool r_key_pressed = false;
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    // Process 'R' key to change point light color to red
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+        if (!r_key_pressed) {
+            r_key_pressed = true;
+            
+            // Toggle between red and white
+            if (point_light_color.r == 1.0f && point_light_color.g == 0.0f && point_light_color.b == 0.0f) {
+                // Change back to white
+                point_light_color = glm::vec3(1.0f, 1.0f, 1.0f);
+                std::cout << "Point light color changed to white" << std::endl;
+            } else {
+                // Change to red
+                point_light_color = glm::vec3(1.0f, 0.0f, 0.0f);
+                std::cout << "Point light color changed to red" << std::endl;
+            }
+            
+            // Update the light color in the shader
+            shader_program_ptr->setVec4("point_light.ambient", glm::vec4(0.5f * point_light_color, 1.0f));
+            shader_program_ptr->setVec4("point_light.diffuse", glm::vec4(point_light_color, 1.0f));
+            shader_program_ptr->setVec4("point_light.specular", glm::vec4(0.5f * point_light_color, 1.0f));
+        }
+    } else {
+        r_key_pressed = false;
+    }
 
     // Process 'C' key to toggle first-person view
     if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
