@@ -300,3 +300,173 @@ Now the spotlight toggling functionality with the 'L' key should work correctly.
 - Every frame, the shader is updated with the current spotlight state
 
 You should now be able to run the application and toggle the spotlight on and off by pressing the 'L' key. The spotlight will follow your camera position and direction when it's enabled.
+
+hmamawal: now implement functionality to turn off the point light by pressing "P"
+
+GitHub Copilot: I'll implement functionality to turn off the point light by pressing the 'P' key. Similar to how we implemented toggling the spotlight, we'll need to modify various files.
+
+Let's begin with updating the input_handling.cpp file to handle the 'P' key press:Now I'll implement the functionality to turn off the point light by pressing the 'P' key. I'll need to modify several files similarly to how we implemented the spotlight toggle.
+
+First, let's update the input handling code to add the point light toggle functionality:
+````
+#include "input_handling.hpp"
+#include <iostream>
+
+// Make spotlight_on and point_light_on global variables accessible from other files
+bool spotlight_on = true;  // Initialize to true
+bool point_light_on = true;  // Initialize to true
+
+void ProcessInput(GLFWwindow *window) {
+    static bool c_key_pressed = false;
+    static bool r_key_pressed = false;
+    static bool l_key_pressed = false;
+    static bool p_key_pressed = false;
+
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+
+    // Process 'R' key to change point light color
+    // ...existing code...
+
+    // Process 'C' key to toggle first-person view
+    // ...existing code...
+
+    // Update camera position and orientation if in first-person view
+    // ...existing code...
+
+    // Regular camera controls (only when not in first-person view)
+    // ...existing code...
+
+    // Process 'L' key to toggle spotlight
+    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+        if (!l_key_pressed) {
+            l_key_pressed = true;
+            spotlight_on = !spotlight_on;
+            
+            // Make sure we update the shader with the current state
+            if (shader_program_ptr) {
+                shader_program_ptr->use();
+                shader_program_ptr->setBool("spot_light.on", spotlight_on);
+            }
+
+            // Print feedback
+            if (spotlight_on) {
+                std::cout << "Spotlight ON" << std::endl;
+            } else {
+                std::cout << "Spotlight OFF" << std::endl;
+            }
+        }
+    } else {
+        l_key_pressed = false;
+    }
+
+    // Process 'P' key to toggle point light
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+        if (!p_key_pressed) {
+            p_key_pressed = true;
+            point_light_on = !point_light_on;
+            
+            // Make sure we update the shader with the current state
+            if (shader_program_ptr) {
+                shader_program_ptr->use();
+                shader_program_ptr->setBool("point_light.on", point_light_on);
+            }
+
+            // Print feedback
+            if (point_light_on) {
+                std::cout << "Point Light ON" << std::endl;
+            } else {
+                std::cout << "Point Light OFF" << std::endl;
+            }
+        }
+    } else {
+        p_key_pressed = false;
+    }
+}
+
+// ...existing code...
+````
+
+
+Made changes.
+
+Now I need to update the input_handling.hpp file to declare our new `point_light_on` variable as extern so it can be accessed from other files:
+````
+#ifndef INPUT_HANDLING_HPP
+#define INPUT_HANDLING_HPP
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include "../classes/camera.hpp"
+#include "../classes/avatar_high_bar.hpp"
+#include "../classes/Shader.hpp"
+
+// Function declarations
+void ProcessInput(GLFWwindow *window);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+
+// External variables used by input handling
+extern Camera camera;
+extern float delta_time;
+extern glm::vec3 point_light_color;
+extern Shader* shader_program_ptr;
+extern AvatarHighBar* high_bar_avatar;
+extern bool first_mouse;
+extern float last_x;
+extern float last_y;
+extern glm::vec3 original_camera_position;
+extern float original_camera_yaw;
+extern float original_camera_pitch;
+extern bool spotlight_on; // Declaration for spotlight toggle state
+extern bool point_light_on; // Declaration for point light toggle state
+
+#endif // INPUT_HANDLING_HPP
+````
+
+
+Made changes.
+
+Now I need to update the rendering code to ensure that the point light state is properly maintained during each frame, similar to how we did for the spotlight.
+````
+void renderScene(Shader* shader_program, 
+                GameModels& models, 
+                Avatar& baseAvatar,
+                AvatarHighBar* high_bar_avatar,
+                const Camera& camera,
+                const glm::vec3& point_light_color,
+                const glm::vec4& light_position) {
+    
+    shader_program->use();
+    
+    // Update view matrix based on camera
+    // Create a non-const copy of the camera to call GetViewMatrix()
+    Camera camera_copy = camera;
+    glm::mat4 view = camera_copy.GetViewMatrix();
+    shader_program->setMat4("view", view);
+    shader_program->setVec4("view_position", glm::vec4(camera.Position, 1.0));
+    
+    // Update spotlight position and direction
+    shader_program->setVec4("spot_light.position", glm::vec4(camera.Position, 1.0f));
+    shader_program->setVec4("spot_light.direction", glm::vec4(camera.Front, 0.0f));
+    
+    // Ensure spotlight state is correctly set every frame
+    shader_program->setBool("spot_light.on", spotlight_on);
+    
+    // Update point light and ensure its state is correctly set every frame
+    shader_program->setVec4("point_light.ambient", glm::vec4(0.5f * point_light_color, 1.0));
+    shader_program->setVec4("point_light.diffuse", glm::vec4(point_light_color, 1.0f));
+    shader_program->setVec4("point_light.specular", glm::vec4(0.5f * point_light_color, 1.0f));
+    shader_program->setVec4("point_light.position", light_position);
+    shader_program->setBool("point_light.on", point_light_on);
+    
+    // Draw base avatar
+    baseAvatar.Draw(shader_program, false);
+    
+    // Rest of the rendering code remains the same
+    // ...existing code...
+````
+
+
+Made changes.
+
+I've successfully added the ability to toggle the point light by pressing the 'P' key. Let's build the project to make sure everything works properly:

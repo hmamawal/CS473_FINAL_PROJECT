@@ -151,11 +151,12 @@ void renderScene(Shader* shader_program,
     // Ensure spotlight state is correctly set every frame
     shader_program->setBool("spot_light.on", spotlight_on);
     
-    // Update point light
+    // Update point light and ensure its state is correctly set every frame
     shader_program->setVec4("point_light.ambient", glm::vec4(0.5f * point_light_color, 1.0));
     shader_program->setVec4("point_light.diffuse", glm::vec4(point_light_color, 1.0f));
     shader_program->setVec4("point_light.specular", glm::vec4(0.5f * point_light_color, 1.0f));
     shader_program->setVec4("point_light.position", light_position);
+    shader_program->setBool("point_light.on", point_light_on);
     
     // Draw base avatar
     baseAvatar.Draw(shader_program, false);
