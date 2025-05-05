@@ -244,8 +244,8 @@ void renderScene(Shader* shader_program,
     high_bar_avatar->Draw(shader_program, false);
 }
 
-void renderText(Shader& font_program, Font& arial_font, const Camera& camera) {
-    font_program.use();
+void renderText(Shader* font_program, Font& arial_font, const Camera& camera) {
+    font_program->use();
     
     std::string display_string = "Camera (";
     std::string cam_x = std::to_string(camera.Position.x);
@@ -256,7 +256,7 @@ void renderText(Shader& font_program, Font& arial_font, const Camera& camera) {
     display_string += cam_y.substr(0, cam_y.find(".") + 3) + ",";
     display_string += cam_z.substr(0, cam_z.find(".") + 3) + ")";
     
-    arial_font.DrawText(display_string, glm::vec2(-0.1, 0.75), font_program);
+    arial_font.DrawText(display_string, glm::vec2(-0.1, 0.75), *font_program);
 }
 
 void cleanupResources(RenderingVAOs& vaos, GameModels& models) {

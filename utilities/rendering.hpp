@@ -56,7 +56,8 @@ void renderScene(Shader* shader_program,
                 const glm::vec3& point_light_color,
                 const glm::vec4& light_position);
 
-void renderText(Shader& font_program, Font& arial_font, const Camera& camera);
+// Updated to use Shader pointer instead of reference
+void renderText(Shader* font_program, Font& arial_font, const Camera& camera);
 
 // Cleanup functions
 void cleanupResources(RenderingVAOs& vaos, GameModels& models);
