@@ -131,7 +131,7 @@ int main() {
         glfwPollEvents();
         
         // Limit frame rate to prevent excessive GPU usage
-        std::this_thread::sleep_for(std::chrono::milliseconds(16)); // ~60 FPS
+        std::this_thread::sleep_for(std::chrono::milliseconds(1)); // ~60 FPS
         
         // Debug frame count to help track potential issues
         if (frame_count % 100 == 0) {
