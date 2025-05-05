@@ -1,5 +1,6 @@
 #include "rendering.hpp"
 #include "build_shapes.hpp"
+#include "input_handling.hpp" // Added to access spotlight_on variable
 #include <iostream>
 #include "../classes/object_types.hpp"
 
@@ -146,6 +147,9 @@ void renderScene(Shader* shader_program,
     // Update spotlight position and direction
     shader_program->setVec4("spot_light.position", glm::vec4(camera.Position, 1.0f));
     shader_program->setVec4("spot_light.direction", glm::vec4(camera.Front, 0.0f));
+    
+    // Ensure spotlight state is correctly set every frame
+    shader_program->setBool("spot_light.on", spotlight_on);
     
     // Update point light
     shader_program->setVec4("point_light.ambient", glm::vec4(0.5f * point_light_color, 1.0));

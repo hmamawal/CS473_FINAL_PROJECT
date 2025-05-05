@@ -1,11 +1,13 @@
 #include "input_handling.hpp"
 #include <iostream>
 
+// Make spotlight_on a global variable accessible from other files
+bool spotlight_on = true;  // Initialize to true
+
 void ProcessInput(GLFWwindow *window) {
     static bool c_key_pressed = false;
     static bool r_key_pressed = false;
     static bool l_key_pressed = false;
-    static bool spotlight_on = true;
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -106,7 +108,12 @@ void ProcessInput(GLFWwindow *window) {
         if (!l_key_pressed) {
             l_key_pressed = true;
             spotlight_on = !spotlight_on;
-            shader_program_ptr->setBool("spot_light.on", spotlight_on);
+            
+            // Make sure we update the shader with the current state
+            if (shader_program_ptr) {
+                shader_program_ptr->use();
+                shader_program_ptr->setBool("spot_light.on", spotlight_on);
+            }
 
             // Print feedback
             if (spotlight_on) {

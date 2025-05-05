@@ -23,5 +23,6 @@ extern float last_y;
 extern glm::vec3 original_camera_position;
 extern float original_camera_yaw;
 extern float original_camera_pitch;
+extern bool spotlight_on; // Add declaration for spotlight toggle state
 
 #endif // INPUT_HANDLING_HPP
