@@ -29,8 +29,8 @@ uniform sampler2D textures[NR_TEXTURES];
 
 uniform vec4 view_position;
 
-struct PointLight {
-    vec4 position;
+struct DirectionalLight {
+    vec4 direction;
     vec4 ambient;
     vec4 diffuse;
     vec4 specular;
@@ -39,7 +39,7 @@ struct PointLight {
     bool on;
 };
 
-uniform PointLight point_light;
+uniform DirectionalLight directional_light;
 
 struct SpotLight {
     vec4 position;
@@ -59,7 +59,7 @@ uniform SpotLight spot_light;
 
 vec4 CalcSpotLight(SpotLight light, vec3 norm, vec3 frag, vec3 eye);
 
-vec4 CalcPointLight (PointLight light,vec3 norm,vec3 frag,vec3 eye);
+vec4 CalcDirectionalLight (DirectionalLight light,vec3 norm,vec3 frag,vec3 eye);
 
 //  0: BasicShape objects that just have a set color (basic)
 //  1: BasicShape objects that have a texture
@@ -68,11 +68,11 @@ vec4 CalcPointLight (PointLight light,vec3 norm,vec3 frag,vec3 eye);
 
 void main()
 {
-    vec4 point_light_color = CalcPointLight(point_light,norm,
-                                            fragment_position,view_position.xyz);
-    //Material colors are integrated into the point light calculation
+    vec4 directional_light_color = CalcDirectionalLight(directional_light, norm,
+                                            fragment_position, view_position.xyz);
+    //Material colors are integrated into the directional light calculation
     if (fragment_shader_state == 2) {
-        FragColor = point_light_color;
+        FragColor = directional_light_color;
         return;
     }
 
@@ -85,7 +85,7 @@ void main()
     
     
     // Combine light contributions
-    vec4 combined_light = point_light_color + spot_light_color;
+    vec4 combined_light = directional_light_color + spot_light_color;
 
     //Object is textured
     if ((fragment_shader_state == 1) || (fragment_shader_state == 3)) {
@@ -144,13 +144,12 @@ void main()
     
 };
 
-vec4 CalcPointLight (PointLight light,vec3 norm,vec3 frag,vec3 eye) {
+vec4 CalcDirectionalLight (DirectionalLight light,vec3 norm,vec3 frag,vec3 eye) {
 
     if (!light.on) {
         return vec4(0.0,0.0,0.0,1.0);
     }
-    vec3 light_direction = light.position.xyz - frag.xyz;
-    light_direction = normalize(light_direction);
+    vec3 light_direction = normalize(-light.direction.xyz);
     vec3 normal = normalize(norm);
     float diffuse_coeff = max(dot(normal,light_direction),0.0);
 

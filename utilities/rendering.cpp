@@ -97,14 +97,14 @@ void setupShaders(Shader* shader_program, Font& arial_font, const RenderingVAOs&
     std::cout << "Font initialized" << std::endl;
 }
 
-void setupLighting(Shader* shader_program, const glm::vec3& point_light_color, 
-                  const glm::vec4& light_position, const Camera& camera) {
-    // Point light setup
-    shader_program->setVec4("point_light.ambient", glm::vec4(0.5f * point_light_color, 1.0));
-    shader_program->setVec4("point_light.diffuse", glm::vec4(point_light_color, 1.0f));
-    shader_program->setVec4("point_light.specular", glm::vec4(0.5f * point_light_color, 1.0f));
-    shader_program->setVec4("point_light.position", light_position);
-    shader_program->setBool("point_light.on", true);
+void setupLighting(Shader* shader_program, const glm::vec3& light_color, 
+                  const glm::vec4& light_direction, const Camera& camera) {
+    // Directional light setup (previously point light)
+    shader_program->setVec4("directional_light.ambient", glm::vec4(0.5f * light_color, 1.0));
+    shader_program->setVec4("directional_light.diffuse", glm::vec4(light_color, 1.0f));
+    shader_program->setVec4("directional_light.specular", glm::vec4(0.5f * light_color, 1.0f));
+    shader_program->setVec4("directional_light.direction", light_direction);
+    shader_program->setBool("directional_light.on", true);
 
     shader_program->setVec4("view_position", glm::vec4(camera.Position, 1.0));
 
@@ -132,8 +132,8 @@ void renderScene(Shader* shader_program,
                 Avatar& baseAvatar,
                 AvatarHighBar* high_bar_avatar,
                 const Camera& camera,
-                const glm::vec3& point_light_color,
-                const glm::vec4& light_position) {
+                const glm::vec3& light_color,
+                const glm::vec4& light_direction) {
     
     shader_program->use();
     
@@ -151,12 +151,12 @@ void renderScene(Shader* shader_program,
     // Ensure spotlight state is correctly set every frame
     shader_program->setBool("spot_light.on", spotlight_on);
     
-    // Update point light and ensure its state is correctly set every frame
-    shader_program->setVec4("point_light.ambient", glm::vec4(0.5f * point_light_color, 1.0));
-    shader_program->setVec4("point_light.diffuse", glm::vec4(point_light_color, 1.0f));
-    shader_program->setVec4("point_light.specular", glm::vec4(0.5f * point_light_color, 1.0f));
-    shader_program->setVec4("point_light.position", light_position);
-    shader_program->setBool("point_light.on", point_light_on);
+    // Update directional light and ensure its state is correctly set every frame
+    shader_program->setVec4("directional_light.ambient", glm::vec4(0.5f * light_color, 1.0));
+    shader_program->setVec4("directional_light.diffuse", glm::vec4(light_color, 1.0f));
+    shader_program->setVec4("directional_light.specular", glm::vec4(0.5f * light_color, 1.0f));
+    shader_program->setVec4("directional_light.direction", light_direction);
+    shader_program->setBool("directional_light.on", point_light_on); // Using existing point_light_on toggle
     
     // Draw base avatar
     baseAvatar.Draw(shader_program, false);

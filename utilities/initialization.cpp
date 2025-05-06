@@ -8,7 +8,7 @@
 extern Font arial_font;
 extern Camera camera;
 extern glm::vec3 point_light_color;
-extern glm::vec4 light_position;
+extern glm::vec4 light_direction; // Changed from light_position to light_direction
 extern float last_x;
 extern float last_y;
 extern bool first_mouse;
@@ -46,8 +46,8 @@ void SetupCameraAndProjection(Shader* shader_program_ptr, unsigned int scr_width
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (1.0f * scr_width) / (1.0f * scr_height), 0.1f, 100.0f);
     shader_program_ptr->setMat4("projection", projection);
     
-    // Setup lighting
-    setupLighting(shader_program_ptr, point_light_color, light_position, camera);
+    // Setup lighting - passing light_direction instead of light_position
+    setupLighting(shader_program_ptr, point_light_color, light_direction, camera);
     
     std::cout << "Camera and projection setup complete" << std::endl;
 }

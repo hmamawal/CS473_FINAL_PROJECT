@@ -36,8 +36,8 @@ Camera camera(glm::vec3(0.0f, 1.0f, 25.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f,
 float delta_time{0.001};
 float last_frame{0.0};
 
-// Light position
-glm::vec4 light_position(0.0, 5.0, 0.0, 1.0);
+// Light direction (replacing light position)
+glm::vec4 light_direction(-1.0, -1.0, 0.0, 0.0);
 
 // Font for text display
 Font arial_font("fonts/ArialBlackLarge.bmp", "fonts/ArialBlack.csv", 0.1, 0.15);
@@ -115,7 +115,7 @@ int main() {
             high_bar_avatar,
             camera,
             point_light_color,
-            light_position
+            light_direction
         );
         
         // Enforce minimum camera height
