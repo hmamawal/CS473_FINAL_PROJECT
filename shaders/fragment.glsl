@@ -63,6 +63,9 @@ uniform sampler2D shadow_map;
 // Add to fragment shader
 uniform bool debug_shadows = false;
 
+// Add post-processing uniform
+uniform int post_process_selection;
+
 vec4 CalcSpotLight(SpotLight light, vec3 norm, vec3 frag, vec3 eye);
 
 vec4 CalcDirectionalLight (DirectionalLight light,vec3 norm,vec3 frag,vec3 eye);
@@ -93,6 +96,192 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
         shadow = 0.0;
         
     return shadow;
+}
+
+// Post-processing functions
+vec4 inverseColor(vec4 color) {
+    return vec4(1.0 - color.rgb, color.a);
+}
+
+vec4 grayscale(vec4 color) {
+    float average = (color.r + color.g + color.b) / 3.0;
+    return vec4(average, average, average, color.a);
+}
+
+vec4 redChannel(vec4 color) {
+    return vec4(color.r, 0.0, 0.0, color.a);
+}
+
+vec4 greenChannel(vec4 color) {
+    return vec4(0.0, color.g, 0.0, color.a);
+}
+
+vec4 blueChannel(vec4 color) {
+    return vec4(0.0, 0.0, color.b, color.a);
+}
+
+vec4 sepiaEffect(vec4 color) {
+    vec3 sepia;
+    sepia.r = color.r * 0.393 + color.g * 0.769 + color.b * 0.189;
+    sepia.g = color.r * 0.349 + color.g * 0.686 + color.b * 0.168;
+    sepia.b = color.r * 0.272 + color.g * 0.534 + color.b * 0.131;
+    return vec4(sepia, color.a);
+}
+
+// Kernel effects
+vec4 blurEffect(vec4 color) {
+    // Simple 3x3 box blur kernel
+    float offset = 1.0 / 300.0;
+    
+    vec2 offsets[9] = vec2[](
+        vec2(-offset,  offset), // top-left
+        vec2( 0.0f,    offset), // top-center
+        vec2( offset,  offset), // top-right
+        vec2(-offset,  0.0f),   // center-left
+        vec2( 0.0f,    0.0f),   // center-center
+        vec2( offset,  0.0f),   // center-right
+        vec2(-offset, -offset), // bottom-left
+        vec2( 0.0f,   -offset), // bottom-center
+        vec2( offset, -offset)  // bottom-right    
+    );
+
+    float kernel[9] = float[](
+        1.0/9.0, 1.0/9.0, 1.0/9.0,
+        1.0/9.0, 1.0/9.0, 1.0/9.0,
+        1.0/9.0, 1.0/9.0, 1.0/9.0
+    );
+    
+    vec3 sampleTex[9];
+    for(int i = 0; i < 9; i++) {
+        if (fragment_shader_state == 1 || fragment_shader_state == 3) {
+            int tex_idx = index_for_texture;
+            if(tex_idx == 0) sampleTex[i] = vec3(texture(textures[0], texture_coordinates + offsets[i]));
+            else if(tex_idx == 1) sampleTex[i] = vec3(texture(textures[1], texture_coordinates + offsets[i]));
+            else if(tex_idx == 2) sampleTex[i] = vec3(texture(textures[2], texture_coordinates + offsets[i]));
+            // ... add more texture indices as needed
+            else sampleTex[i] = color.rgb; // Fallback
+        } else {
+            sampleTex[i] = color.rgb; // Use the original color for non-textured objects
+        }
+    }
+    
+    vec3 col = vec3(0.0);
+    for(int i = 0; i < 9; i++)
+        col += sampleTex[i] * kernel[i];
+    
+    return vec4(col, color.a);
+}
+
+vec4 sharpenEffect(vec4 color) {
+    // Sharpen kernel
+    float offset = 1.0 / 300.0;
+    
+    vec2 offsets[9] = vec2[](
+        vec2(-offset,  offset), // top-left
+        vec2( 0.0f,    offset), // top-center
+        vec2( offset,  offset), // top-right
+        vec2(-offset,  0.0f),   // center-left
+        vec2( 0.0f,    0.0f),   // center-center
+        vec2( offset,  0.0f),   // center-right
+        vec2(-offset, -offset), // bottom-left
+        vec2( 0.0f,   -offset), // bottom-center
+        vec2( offset, -offset)  // bottom-right    
+    );
+
+    float kernel[9] = float[](
+        -1, -1, -1,
+        -1,  9, -1,
+        -1, -1, -1
+    );
+    
+    vec3 sampleTex[9];
+    for(int i = 0; i < 9; i++) {
+        if (fragment_shader_state == 1 || fragment_shader_state == 3) {
+            int tex_idx = index_for_texture;
+            if(tex_idx == 0) sampleTex[i] = vec3(texture(textures[0], texture_coordinates + offsets[i]));
+            else if(tex_idx == 1) sampleTex[i] = vec3(texture(textures[1], texture_coordinates + offsets[i]));
+            else if(tex_idx == 2) sampleTex[i] = vec3(texture(textures[2], texture_coordinates + offsets[i]));
+            // ... add more texture indices as needed
+            else sampleTex[i] = color.rgb; // Fallback
+        } else {
+            sampleTex[i] = color.rgb; // Use the original color for non-textured objects
+        }
+    }
+    
+    vec3 col = vec3(0.0);
+    for(int i = 0; i < 9; i++)
+        col += sampleTex[i] * kernel[i];
+    
+    return vec4(col, color.a);
+}
+
+vec4 edgeDetectionEffect(vec4 color) {
+    // Edge detection kernel
+    float offset = 1.0 / 300.0;
+    
+    vec2 offsets[9] = vec2[](
+        vec2(-offset,  offset), // top-left
+        vec2( 0.0f,    offset), // top-center
+        vec2( offset,  offset), // top-right
+        vec2(-offset,  0.0f),   // center-left
+        vec2( 0.0f,    0.0f),   // center-center
+        vec2( offset,  0.0f),   // center-right
+        vec2(-offset, -offset), // bottom-left
+        vec2( 0.0f,   -offset), // bottom-center
+        vec2( offset, -offset)  // bottom-right    
+    );
+
+    float kernel[9] = float[](
+        1,  1, 1,
+        1, -8, 1,
+        1,  1, 1
+    );
+    
+    vec3 sampleTex[9];
+    for(int i = 0; i < 9; i++) {
+        if (fragment_shader_state == 1 || fragment_shader_state == 3) {
+            int tex_idx = index_for_texture;
+            if(tex_idx == 0) sampleTex[i] = vec3(texture(textures[0], texture_coordinates + offsets[i]));
+            else if(tex_idx == 1) sampleTex[i] = vec3(texture(textures[1], texture_coordinates + offsets[i]));
+            else if(tex_idx == 2) sampleTex[i] = vec3(texture(textures[2], texture_coordinates + offsets[i]));
+            // ... add more texture indices as needed
+            else sampleTex[i] = color.rgb; // Fallback
+        } else {
+            sampleTex[i] = color.rgb; // Use the original color for non-textured objects
+        }
+    }
+    
+    vec3 col = vec3(0.0);
+    for(int i = 0; i < 9; i++)
+        col += sampleTex[i] * kernel[i];
+    
+    return vec4(col, color.a);
+}
+
+// Apply post-processing based on selection
+vec4 applyPostProcessing(vec4 originalColor) {
+    if (post_process_selection == 1) {
+        return inverseColor(originalColor);
+    } else if (post_process_selection == 2) {
+        return grayscale(originalColor);
+    } else if (post_process_selection == 3) {
+        return redChannel(originalColor);
+    } else if (post_process_selection == 4) {
+        return greenChannel(originalColor);
+    } else if (post_process_selection == 5) {
+        return blueChannel(originalColor);
+    } else if (post_process_selection == 6) {
+        return sepiaEffect(originalColor);
+    } else if (post_process_selection == 7) {
+        return blurEffect(originalColor);
+    } else if (post_process_selection == 8) {
+        return sharpenEffect(originalColor);
+    } else if (post_process_selection == 9) {
+        return edgeDetectionEffect(originalColor);
+    }
+    
+    // Default: no effect
+    return originalColor;
 }
 
 //  0: BasicShape objects that just have a set color (basic)
@@ -178,12 +367,14 @@ void main()
             return;
         }
         FragColor = combined_light * FragColor;
+        FragColor = applyPostProcessing(FragColor);
         return;
 
     }
 
     //otherwise fragment state is 0 (use the set color)
     FragColor = combined_light * set_color;
+    FragColor = applyPostProcessing(FragColor);
     
 };
 

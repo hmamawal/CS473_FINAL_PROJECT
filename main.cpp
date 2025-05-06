@@ -200,6 +200,11 @@ int main() {
         delta_time = current_frame - last_frame;
         last_frame = current_frame; 
 
+        // Handle input (moved before rendering for immediate effect)
+        ProcessInput(window);
+        baseAvatar.ProcessInput(window, delta_time);
+        high_bar_avatar->ProcessInput(window, delta_time);
+
         // Create light space transformation matrix
         // 1. Create a position for the light source based on the negative direction vector
         glm::vec3 lightPos = -100.0f * glm::vec3(light_direction.x, light_direction.y, light_direction.z);
@@ -227,59 +232,44 @@ int main() {
         depth_shader_ptr->use();
         depth_shader_ptr->setMat4("lightSpaceMatrix", lightSpaceMatrix);
         
-        // FIRST PASS - Render to depth map
-        // Set viewport to shadow map dimensions
+        // FIRST PASS - Render to depth map for shadows
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        // Use depth shader for shadow mapping
-        // depth_shader_ptr->use();
-        // depth_shader_ptr->setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
         // Render the scene for depth map
         renderScene(
-            depth_shader_ptr, // Use depth shader instead of regular shader
+            depth_shader_ptr,
             models,
             baseAvatar,
             high_bar_avatar,
             camera,
             point_light_color,
             light_direction,
-            true // Set is_depth_pass to true for depth rendering
+            true // is_depth_pass
         );
 
-        // SECOND PASS - Regular rendering to screen
-        // Reset viewport to screen dimensions
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // SECOND PASS - Render to post-processing framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER, postProcessingFBO);
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+        glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Make sure you're using the main shader program
+        // Set up the main shader
         shader_program_ptr->use();
         shader_program_ptr->setBool("debug_shadows", false);
-
-        // Set the lightSpaceMatrix uniform in the shader
         shader_program_ptr->setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-        // Assign the shadow map to texture unit 1
-        // IMPORTANT: Don't use texture unit 0 as it's likely used by your model textures
+        
+        // Apply post-processing effect
+        shader_program_ptr->setInt("post_process_selection", current_effect);
+        
+        // Assign shadow map to texture unit 1
         shader_program_ptr->setInt("shadow_map", 1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, depthMap);
-
-        // Your model textures will use GL_TEXTURE0 by default
-        // No need to explicitly set that here if your renderScene function handles it properly
-
-        // Handle input
-        ProcessInput(window);
-        baseAvatar.ProcessInput(window, delta_time);
-        high_bar_avatar->ProcessInput(window, delta_time);
-
-        // THIRD PASS - Render to post-processing framebuffer
-        glBindFramebuffer(GL_FRAMEBUFFER, postProcessingFBO);
-        glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        // Reset to texture unit 0 for other textures
+        glActiveTexture(GL_TEXTURE0);
 
         // Render the scene normally
         renderScene(
@@ -290,40 +280,46 @@ int main() {
             camera,
             point_light_color,
             light_direction,
-            false // Set is_depth_pass to false for normal rendering
+            false // is_depth_pass
         );
 
-        // Display text (if you want text to be affected by post-processing)
+        // Enforce minimum camera height
+        if (camera.Position.y < 0.5) {
+            camera.Position.y = 0.5;
+        }
+        
+        // Display text (HUD)
         renderText(font_program_ptr, arial_font, camera);
 
-        // FOURTH PASS - Apply post-processing effect and render to screen
+        // THIRD PASS - Render the framebuffer texture to the screen
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // White background
-        glClear(GL_COLOR_BUFFER_BIT);
+        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        // Use post-processing shader
+        // Use the post-processing shader for the final pass
         post_processing_shader_ptr->use();
         post_processing_shader_ptr->setInt("screenTexture", 0);
         post_processing_shader_ptr->setInt("effect", current_effect);
         
-        // Bind the texture from the post-processing framebuffer
+        // Bind the texture from our framebuffer
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
         
-        // Render the quad with the post-processing effect
+        // Render the quad
         glBindVertexArray(quadVAO);
-        glDisable(GL_DEPTH_TEST); // We don't need depth testing for our full-screen quad
+        glDisable(GL_DEPTH_TEST);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        glEnable(GL_DEPTH_TEST); // Re-enable depth testing for the next frame
+        glEnable(GL_DEPTH_TEST);
         
         // Swap buffers and poll events
         glfwSwapBuffers(window);
         glfwPollEvents();
         
-        // Limit frame rate to prevent excessive GPU usage
-        std::this_thread::sleep_for(std::chrono::milliseconds(1)); // ~60 FPS
+        // Limit frame rate
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
         
-        // Debug frame count to help track potential issues
+        // Debug frame count
         if (frame_count % 100 == 0) {
             std::cout << "Frame: " << frame_count << std::endl;
         }
