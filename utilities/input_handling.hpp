@@ -26,6 +26,7 @@ extern float original_camera_yaw;
 extern float original_camera_pitch;
 extern bool spotlight_on; // Declaration for spotlight toggle state
 extern bool point_light_on; // Declaration for point light toggle state
+extern bool hud_visible;
 
 // External variables for post-processing
 extern int current_effect;

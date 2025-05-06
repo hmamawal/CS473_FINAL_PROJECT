@@ -63,6 +63,8 @@ void renderScene(Shader* shader_program,
 // Render the skybox using a specific shader
 void renderSkybox(Shader* skybox_shader, GameModels& models, const Camera& camera, unsigned int scr_width, unsigned int scr_height);
 
+void renderHUDBackground(Shader* shader_program, float x1, float y1, float x2, float y2, glm::vec4 color);
+
 // Updated to use Shader pointer instead of reference
 void renderText(Shader* font_program, Font& arial_font, const Camera& camera);
 

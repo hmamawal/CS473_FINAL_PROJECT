@@ -66,6 +66,9 @@ uniform bool debug_shadows = false;
 // Add post-processing uniform
 uniform int post_process_selection;
 
+// Add near the top of fragment.glsl, with other uniforms
+uniform vec4 color;
+
 vec4 CalcSpotLight(SpotLight light, vec3 norm, vec3 frag, vec3 eye);
 
 vec4 CalcDirectionalLight (DirectionalLight light,vec3 norm,vec3 frag,vec3 eye);
@@ -373,7 +376,11 @@ void main()
     }
 
     //otherwise fragment state is 0 (use the set color)
-    FragColor = combined_light * set_color;
+    if (fragment_shader_state == 0) { // BASIC
+        FragColor = color;  // Use the color directly for basic rendering
+    } else {
+        FragColor = combined_light * set_color;
+    }
     FragColor = applyPostProcessing(FragColor);
     
 };

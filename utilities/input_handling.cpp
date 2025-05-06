@@ -4,6 +4,7 @@
 // Make spotlight_on and point_light_on global variables accessible from other files
 bool spotlight_on = true;  // Initialize to true
 bool point_light_on = true;  // Initialize to true
+bool hud_visible = true; // HUD is visible by default
 
 // Variables to track arrow key states
 static bool up_key_pressed = false;
@@ -17,6 +18,7 @@ void ProcessInput(GLFWwindow *window) {
     static bool l_key_pressed = false;
     static bool p_key_pressed = false;
     static bool effect_key_pressed = false;
+    static bool h_key_pressed = false;
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -272,6 +274,16 @@ void ProcessInput(GLFWwindow *window) {
     }
     else {
         effect_key_pressed = false;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {
+        if (!h_key_pressed) {
+            h_key_pressed = true;
+            hud_visible = !hud_visible;  // Toggle the state
+            std::cout << "HUD toggled " << (hud_visible ? "ON" : "OFF") << std::endl;
+        }
+    } else {
+        h_key_pressed = false;
     }
 }
 

@@ -306,9 +306,90 @@ void renderScene(Shader* shader_program,
     high_bar_avatar->Draw(shader_program, false);
 }
 
+
+void renderHUDBackground(Shader* shader_program, float x1, float y1, float x2, float y2, glm::vec4 color) {
+    // Save current OpenGL state
+    GLboolean depth_test_enabled;
+    glGetBooleanv(GL_DEPTH_TEST, &depth_test_enabled);
+    
+    // Set up blending for transparency
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    // Disable depth testing temporarily
+    glDisable(GL_DEPTH_TEST);
+    
+    // Use the shader
+    shader_program->use();
+    
+    // Set up simple orthographic view
+    glm::mat4 identity(1.0f);
+    shader_program->setMat4("model", identity);
+    shader_program->setMat4("view", identity);
+    shader_program->setMat4("projection", glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f));
+    
+    // Set color - make sure to set both uniforms
+    shader_program->setVec4("color", color);
+    shader_program->setVec4("set_color", color);
+    shader_program->setInt("shader_state", 0); // BASIC = 0, ensure this matches your enum
+    
+    // Create quad
+    unsigned int VBO, VAO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    
+    // Define the rectangle vertices
+    float vertices[] = {
+        x1, y1, 0.0f,  // Bottom left
+        x2, y1, 0.0f,  // Bottom right
+        x2, y2, 0.0f,  // Top right
+        x1, y2, 0.0f   // Top left
+    };
+    
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    
+    // Draw
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    
+    // Clean up
+    glBindVertexArray(0);
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    
+    // Restore previous state
+    if (depth_test_enabled) {
+        glEnable(GL_DEPTH_TEST);
+    }
+}
+
 void renderText(Shader* font_program, Font& arial_font, const Camera& camera) {
+    // If HUD is toggled off, don't render any text
+    if (!hud_visible) {
+        return;
+    }
+
+    // Use more visible colors for the backgrounds
+    glm::vec4 bgColor = glm::vec4(0.1f, 0.1f, 0.3f, 0.7f); // More blue, more visible
+    glm::vec4 accentColor = glm::vec4(0.2f, 0.2f, 0.4f, 0.7f); // Slightly different for contrast
+    
+    // Background for camera position info (positioned precisely)
+    renderHUDBackground(font_program, -0.15f, 0.70f, 0.4f, 0.85f, bgColor);
+    
+    // Background for light direction info
+    renderHUDBackground(font_program, -0.15f, 0.60f, 0.4f, 0.70f, accentColor);
+    
+    // Background for HUD toggle hint
+    renderHUDBackground(font_program, -0.99f, -0.99f, -0.65f, -0.90f, bgColor);
+    
+    // Now draw the text
     font_program->use();
     
+    // Camera position
     std::string display_string = "Camera (";
     std::string cam_x = std::to_string(camera.Position.x);
     std::string cam_y = std::to_string(camera.Position.y);
@@ -319,6 +400,21 @@ void renderText(Shader* font_program, Font& arial_font, const Camera& camera) {
     display_string += cam_z.substr(0, cam_z.find(".") + 3) + ")";
     
     arial_font.DrawText(display_string, glm::vec2(-0.1, 0.75), *font_program);
+
+    // Light direction text
+    std::string light_string = "Light Dir (";
+    std::string light_x = std::to_string(light_direction.x);
+    std::string light_y = std::to_string(light_direction.y);
+    std::string light_z = std::to_string(light_direction.z);
+
+    light_string += light_x.substr(0, light_x.find(".") + 3) + ",";
+    light_string += light_y.substr(0, light_y.find(".") + 3) + ",";
+    light_string += light_z.substr(0, light_z.find(".") + 3) + ")";
+    
+    arial_font.DrawText(light_string, glm::vec2(-0.1, 0.65), *font_program);
+
+    // Add a hint about toggling the HUD
+    arial_font.DrawText("Press 'H' to toggle HUD", glm::vec2(-0.95, -0.95), *font_program);
 }
 
 void renderSkybox(Shader* skybox_shader, GameModels& models, const Camera& camera, unsigned int scr_width, unsigned int scr_height) {

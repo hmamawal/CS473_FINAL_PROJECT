@@ -88,7 +88,7 @@ void SetupFontShader(Shader* font_program_ptr) {
     font_program_ptr->setMat4("view", identity);
     font_program_ptr->setMat4("projection", glm::ortho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0));
     font_program_ptr->setVec4("transparentColor", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-    font_program_ptr->setFloat("alpha", 0.3);
+    font_program_ptr->setFloat("alpha", 1.0); // Make sure alpha is set to 1.0 for full opacity
     font_program_ptr->setInt("texture1", 0);
     
     std::cout << "Font shader setup complete" << std::endl;
