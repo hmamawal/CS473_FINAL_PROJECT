@@ -161,7 +161,7 @@ vec4 blurEffect(vec4 color) {
             if(tex_idx == 0) sampleTex[i] = vec3(texture(textures[0], texture_coordinates + offsets[i]));
             else if(tex_idx == 1) sampleTex[i] = vec3(texture(textures[1], texture_coordinates + offsets[i]));
             else if(tex_idx == 2) sampleTex[i] = vec3(texture(textures[2], texture_coordinates + offsets[i]));
-            // ... add more texture indices as needed
+            // can add more texture indices as needed
             else sampleTex[i] = color.rgb; // Fallback
         } else {
             sampleTex[i] = color.rgb; // Use the original color for non-textured objects
@@ -204,7 +204,7 @@ vec4 sharpenEffect(vec4 color) {
             if(tex_idx == 0) sampleTex[i] = vec3(texture(textures[0], texture_coordinates + offsets[i]));
             else if(tex_idx == 1) sampleTex[i] = vec3(texture(textures[1], texture_coordinates + offsets[i]));
             else if(tex_idx == 2) sampleTex[i] = vec3(texture(textures[2], texture_coordinates + offsets[i]));
-            // ... add more texture indices as needed
+            // can add more texture indices as needed
             else sampleTex[i] = color.rgb; // Fallback
         } else {
             sampleTex[i] = color.rgb; // Use the original color for non-textured objects
@@ -247,7 +247,7 @@ vec4 edgeDetectionEffect(vec4 color) {
             if(tex_idx == 0) sampleTex[i] = vec3(texture(textures[0], texture_coordinates + offsets[i]));
             else if(tex_idx == 1) sampleTex[i] = vec3(texture(textures[1], texture_coordinates + offsets[i]));
             else if(tex_idx == 2) sampleTex[i] = vec3(texture(textures[2], texture_coordinates + offsets[i]));
-            // ... add more texture indices as needed
+            // can add more texture indices as needed
             else sampleTex[i] = color.rgb; // Fallback
         } else {
             sampleTex[i] = color.rgb; // Use the original color for non-textured objects
@@ -324,8 +324,8 @@ void main()
 
     //Object is textured
     if ((fragment_shader_state == 1) || (fragment_shader_state == 3)) {
-        //unfortunately you can't index an array with a variable in GLSL
-        //  so you have to use a set of if statements.
+        // can't index an array with a variable in GLSL
+        //  so we have to use a set of if statements.
         if (index_for_texture == 0) {
             FragColor = texture(textures[0],texture_coordinates);
         } else if (index_for_texture == 1) {
@@ -393,7 +393,7 @@ vec4 CalcDirectionalLight (DirectionalLight light,vec3 norm,vec3 frag,vec3 eye) 
     // Calculate shadow
     float shadow = ShadowCalculation(FragPosLightSpace, norm, normalize(-light.direction.xyz));
     
-    // Rest of your existing directional light calculation code
+    // Rest of directional light calculation 
     vec3 light_direction = normalize(-light.direction.xyz);
     vec3 normal = normalize(norm);
     float diffuse_coeff = max(dot(normal,light_direction),0.0);

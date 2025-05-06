@@ -55,7 +55,7 @@ Shader* shader_program_ptr = nullptr;
 Shader* font_program_ptr = nullptr;
 Shader* depth_shader_ptr = nullptr;
 Shader* post_processing_shader_ptr = nullptr;
-Shader* skybox_shader_ptr = nullptr; // Add skybox shader pointer
+Shader* skybox_shader_ptr = nullptr; 
 
 // Post-processing effect selection
 int current_effect = 0; // 0 = no effect
@@ -77,8 +77,8 @@ int main() {
     // Initialize shaders
     CreateShaders(shader_program_ptr, font_program_ptr);
     CreateDepthShader(depth_shader_ptr);
-    CreatePostProcessingShader(post_processing_shader_ptr);  // Initialize post-processing shader
-    CreateSkyboxShader(skybox_shader_ptr);  // Initialize skybox shader
+    CreatePostProcessingShader(post_processing_shader_ptr);  
+    CreateSkyboxShader(skybox_shader_ptr);  
     
     // Setup VAOs and models
     RenderingVAOs vaos = setupVAOs();
@@ -98,16 +98,15 @@ int main() {
     SetupFontShader(font_program_ptr);
     SetupRendering();
 
-    // Just before the render loop, after SetupRendering()
     // Define constants for the shadow map resolution
     const unsigned int SHADOW_WIDTH = 2048; 
     const unsigned int SHADOW_HEIGHT = 2048;
 
-    // a. Define and generate the framebuffer
+    // Define and generate the framebuffer
     unsigned int depthMapFBO;
     glGenFramebuffers(1, &depthMapFBO);
 
-    // b. Define and generate a 2D texture for depth information
+    // Define and generate a 2D texture for depth information
     unsigned int depthMap;
     glGenTextures(1, &depthMap);
     glBindTexture(GL_TEXTURE_2D, depthMap);
@@ -120,11 +119,11 @@ int main() {
     float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
-    // c. Bind the framebuffer and attach the texture
+    // Bind the framebuffer and attach the texture
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
 
-    // d. Set draw and read buffers to none since we only need depth
+    // Set draw and read buffers to none since we only need depth
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
 
@@ -141,7 +140,9 @@ int main() {
     std::cout << "Entering render loop..." << std::endl;
     static int frame_count = 0;
 
-    // For post-processing
+    /////////////////////////
+    // For post-processing //
+    /////////////////////////
     // Create a framebuffer object for post-processing
     unsigned int postProcessingFBO;
     glGenFramebuffers(1, &postProcessingFBO);
@@ -156,13 +157,13 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
 
-    // c. Create a renderbuffer object for depth and stencil testing
+    // Create a renderbuffer object for depth and stencil testing
     unsigned int rbo;
     glGenRenderbuffers(1, &rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT); // 24 bits for depth, 8 for stencil
     
-    // d. Attach the renderbuffer to the framebuffer's depth and stencil attachment
+    // Attach the renderbuffer to the framebuffer's depth and stencil attachment
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -197,28 +198,29 @@ int main() {
 
     // Render loop
     while (!glfwWindowShouldClose(window)) {
-        // Adjust for real time
+        // Get the time elapsed since the last frame
         float current_frame = glfwGetTime();
         delta_time = current_frame - last_frame;
         last_frame = current_frame; 
 
-        // Handle input (moved before rendering for immediate effect)
+        // Handle input 
         ProcessInput(window);
         baseAvatar.ProcessInput(window, delta_time);
         high_bar_avatar->ProcessInput(window, delta_time);
 
-        // Create light space transformation matrix
-        // 1. Create a position for the light source based on the negative direction vector
+        // Light space transformation matrix
+
+        // Create a position for the light source based on the negative direction vector
         glm::vec3 lightPos = -100.0f * glm::vec3(light_direction.x, light_direction.y, light_direction.z);
 
-        // 2. Create the light view matrix - looking from light position toward the scene origin
+        // Create the light view matrix - looking from light position toward the scene origin
         glm::mat4 lightView = glm::lookAt(
             lightPos,              // Light position
             glm::vec3(0.0f),       // Look at scene center
             glm::vec3(0.0f, 1.0f, 0.0f)  // Up vector
         );
 
-        // 3. Create the orthographic projection matrix with your specified dimensions
+        // Create the orthographic projection matrix with your specified dimensions
         float near_plane = -10.0f;
         float far_plane = 150.0f;
         glm::mat4 lightProjection = glm::ortho(
@@ -227,10 +229,10 @@ int main() {
             near_plane, far_plane  // Near, far
         );
 
-        // 4. Create the combined light space matrix
+        // Create the combined light space matrix
         glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
-        // 5. Set the light space matrix uniform in your depth shader
+        // Set the light space matrix uniform in your depth shader
         depth_shader_ptr->use();
         depth_shader_ptr->setMat4("lightSpaceMatrix", lightSpaceMatrix);
         

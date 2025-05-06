@@ -1,6 +1,6 @@
 #include "rendering.hpp"
 #include "build_shapes.hpp"
-#include "input_handling.hpp" // Added to access spotlight_on variable
+#include "input_handling.hpp" 
 #include <iostream>
 #include "../classes/object_types.hpp"
 
@@ -118,7 +118,7 @@ void setupShaders(Shader* shader_program, Font& arial_font, const RenderingVAOs&
 
 void setupLighting(Shader* shader_program, const glm::vec3& light_color, 
                   const glm::vec4& light_direction, const Camera& camera) {
-    // Directional light setup (previously point light)
+    // Directional light setup
     shader_program->setVec4("directional_light.ambient", glm::vec4(0.5f * light_color, 1.0));
     shader_program->setVec4("directional_light.diffuse", glm::vec4(light_color, 1.0f));
     shader_program->setVec4("directional_light.specular", glm::vec4(0.5f * light_color, 1.0f));
@@ -127,7 +127,7 @@ void setupLighting(Shader* shader_program, const glm::vec3& light_color,
 
     shader_program->setVec4("view_position", glm::vec4(camera.Position, 1.0));
 
-    // Spotlight setup - this could be a flashlight following the camera
+    // Spotlight setup 
     shader_program->setVec4("spot_light.position", glm::vec4(camera.Position, 1.0f));
     shader_program->setVec4("spot_light.direction", glm::vec4(camera.Front, 0.0f));
 
@@ -373,9 +373,8 @@ void renderText(Shader* font_program, Font& arial_font, const Camera& camera) {
         return;
     }
 
-    // Use more visible colors for the backgrounds
-    glm::vec4 bgColor = glm::vec4(0.1f, 0.1f, 0.3f, 0.7f); // More blue, more visible
-    glm::vec4 accentColor = glm::vec4(0.2f, 0.2f, 0.4f, 0.7f); // Slightly different for contrast
+    glm::vec4 bgColor = glm::vec4(0.1f, 0.1f, 0.3f, 0.7f);
+    glm::vec4 accentColor = glm::vec4(0.2f, 0.2f, 0.4f, 0.7f); 
     
     // Background for camera position info (positioned precisely)
     renderHUDBackground(font_program, -0.15f, 0.70f, 0.4f, 0.85f, bgColor);
@@ -413,7 +412,7 @@ void renderText(Shader* font_program, Font& arial_font, const Camera& camera) {
     
     arial_font.DrawText(light_string, glm::vec2(-0.1, 0.65), *font_program);
 
-    // Add a hint about toggling the HUD
+    // Add a directive about toggling the HUD
     arial_font.DrawText("Press 'H' to toggle HUD", glm::vec2(-0.95, -0.95), *font_program);
 }
 
@@ -433,7 +432,7 @@ void renderSkybox(Shader* skybox_shader, GameModels& models, const Camera& camer
     skybox_shader->use();
     
     // Create a view matrix that removes the translation (only rotation)
-    // This ensures the skybox is always centered at the camera position
+    // ensuring the skybox is always centered at the camera position
     Camera camera_copy = camera;
     glm::mat4 view = glm::mat4(glm::mat3(camera_copy.GetViewMatrix())); // Remove translation
     skybox_shader->setMat4("view", view);

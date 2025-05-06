@@ -8,15 +8,15 @@
 extern Font arial_font;
 extern Camera camera;
 extern glm::vec3 point_light_color;
-extern glm::vec4 light_direction; // Changed from light_position to light_direction
+extern glm::vec4 light_direction; 
 extern float last_x;
 extern float last_y;
 extern bool first_mouse;
 
 void InitializeMouseSettings(GLFWwindow* window) {
     // Initialize mouse settings
-    last_x = 800 / 2.0f; // Using default width, consider passing as parameters
-    last_y = 800 / 2.0f; // Using default height, consider passing as parameters
+    last_x = 800 / 2.0f; // Using default width
+    last_y = 800 / 2.0f; // Using default height
     glfwSetCursorPosCallback(window, mouse_callback); 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     
@@ -59,9 +59,6 @@ void CreateSkyboxShader(Shader*& skybox_shader) {
 }
 
 void SetupAvatars(Avatar& baseAvatar, AvatarHighBar*& high_bar_avatar, GameModels& models) {
-    // baseAvatar is now already initialized in main.cpp, so we don't modify it here
-
-    // Only initialize the high_bar_avatar
     high_bar_avatar = new AvatarHighBar(models.baseModel, 180.0f, glm::vec3(-10.0, 0.0, 0.0), IMPORTED_BASIC);
     high_bar_avatar->Scale(glm::vec3(0.5f, 0.5f, 0.5f));
     
@@ -73,7 +70,7 @@ void SetupCameraAndProjection(Shader* shader_program_ptr, unsigned int scr_width
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (1.0f * scr_width) / (1.0f * scr_height), 0.1f, 100.0f);
     shader_program_ptr->setMat4("projection", projection);
     
-    // Setup lighting - passing light_direction instead of light_position
+    // Setup lighting 
     setupLighting(shader_program_ptr, point_light_color, light_direction, camera);
     
     std::cout << "Camera and projection setup complete" << std::endl;

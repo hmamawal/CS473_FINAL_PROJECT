@@ -128,10 +128,6 @@ void AvatarHighBar::Draw(Shader *shader, bool use_shader) {
         // Apply X-axis rotation based on the x_rotation_angle
         local = glm::rotate(local, glm::radians(x_rotation_angle), glm::vec3(1.0f, 0.0f, 0.0f));
     }
-    // Print the current X-axis rotation angle
-    //std::cout << "Current X-axis rotation angle: " << x_rotation_angle << " degrees" << std::endl;
-    // print the this-initial rotation
-    //std::cout << "Initial rotation: " << this->initial_rotation << " degrees" << std::endl;
 
     // Always apply the initial rotation around Y (from parent class)
     local = glm::rotate(local, glm::radians(this->initial_rotation), glm::vec3(0.0, 1.0, 0.0));
