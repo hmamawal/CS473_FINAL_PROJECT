@@ -21,18 +21,18 @@ Avatar::Avatar(BasicShape shape, float orientation, glm::vec3 initial_position, 
 
 
 void Avatar::ProcessInput(GLFWwindow *window, float time_passed) {
-    if (glfwGetKey(window,GLFW_KEY_UP) == GLFW_PRESS) {
-        float change_x = this->speed * time_passed * cos(glm::radians(this->current_rotation));
-        float change_z = this->speed * time_passed * (-sin(glm::radians(this->current_rotation)));
-        this->position += glm::vec3(change_x,0.0, change_z);
-        if(glfwGetKey(window,GLFW_KEY_LEFT)==GLFW_PRESS) {
-            this->current_rotation += this->rotate_speed * time_passed;
-        }
-        if(glfwGetKey(window,GLFW_KEY_RIGHT)==GLFW_PRESS) {
-            this->current_rotation += -(this->rotate_speed) * time_passed;
-        }
+    // if (glfwGetKey(window,GLFW_KEY_UP) == GLFW_PRESS) {
+    //     float change_x = this->speed * time_passed * cos(glm::radians(this->current_rotation));
+    //     float change_z = this->speed * time_passed * (-sin(glm::radians(this->current_rotation)));
+    //     this->position += glm::vec3(change_x,0.0, change_z);
+    //     if(glfwGetKey(window,GLFW_KEY_LEFT)==GLFW_PRESS) {
+    //         this->current_rotation += this->rotate_speed * time_passed;
+    //     }
+    //     if(glfwGetKey(window,GLFW_KEY_RIGHT)==GLFW_PRESS) {
+    //         this->current_rotation += -(this->rotate_speed) * time_passed;
+    //     }
         
-    }
+    // }
     if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && !is_flipping) {
         is_flipping = true;
         flip_progress = 0.0f;
