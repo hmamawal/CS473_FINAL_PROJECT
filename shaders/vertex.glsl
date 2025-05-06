@@ -59,53 +59,34 @@ flat out int fragment_shader_state;
 //  transform (local).  
 uniform mat4 projection, view, model, local;
 
-uniform mat4 lightSpaceMatrix; // Add this
-
-out VS_OUT {
-    vec3 FragPos;
-    vec3 Normal;
-    vec2 TexCoords;
-    vec4 FragPosLightSpace; // Add this
-} vs_out;
-
 void main()
 {
-  // Calculate fragment position first
-  fragment_position = (model * local * vec4(aPos.x, aPos.y, aPos.z, 1.0)).xyz;
-  
-  // Initialize the vs_out structure properly
-  vs_out.FragPos = fragment_position;
-  vs_out.Normal = mat3(transpose(inverse(model*local))) * aNorm;
-  vs_out.TexCoords = aCoord;
-  
-  // Now use the initialized vs_out.FragPos
-  vs_out.FragPosLightSpace = lightSpaceMatrix * vec4(vs_out.FragPos, 1.0);
-  
-  // Rest of your code
+  //See chapter 6.2.2 for this operation
   norm = mat3(transpose(inverse(model*local))) * aNorm;
   fragment_shader_state = shader_state;
-  
   if (shader_state == 1) {
-    // Basic shape with texture (pass s, t and index = 0)
+    //Basic shape with texture (pass s, t and index = 0)
     texture_coordinates = aCoord;
     index_for_texture = 0;
   } else if (shader_state == 2) {
-    // Imported object using materials (no textures)
+    //Imported object using materials (no textures)
     ambient_color = aColor;
     diffuse_color = dColor;
     specular_color = sColor;
     opacity = opacity_value;
   } else if (shader_state == 3) {
-    // Imported object using materials and textures
+    //Imported object using materials and textures
     ambient_color = aColor;
     diffuse_color = dColor;
     specular_color = sColor;
     opacity = opacity_value;
     index_for_texture = int(texture_index);
   } else {
-    // Shader state is 0 so set_color is used in the fragment shader.
+    //shader state is 0 so set_color is used in the 
+    //  fragment shader.
   }
 
-  // Figure out this vertex's location after applying the necessary matrices.
-  gl_Position = projection * view * vec4(fragment_position, 1.0);
+  fragment_position = (model * local * vec4(aPos.x, aPos.y, aPos.z,1.0)).xyz;
+  //figure out this vertex's location after applying the necessary matrices.
+  gl_Position = projection * view * vec4(fragment_position,1.0);
 };

@@ -61,43 +61,6 @@ vec4 CalcSpotLight(SpotLight light, vec3 norm, vec3 frag, vec3 eye);
 
 vec4 CalcPointLight (PointLight light,vec3 norm,vec3 frag,vec3 eye);
 
-uniform sampler2D shadowMap;
-
-in VS_OUT {
-    vec3 FragPos;
-    vec3 Normal;
-    vec2 TexCoords;
-    vec4 FragPosLightSpace; 
-} fs_in;
-
-// MOVED HERE: Define ShadowCalculation function before it's used
-float ShadowCalculation(vec4 fragPosLightSpace)
-{
-    // Perform perspective divide
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    
-    // Transform to [0,1] range
-    projCoords = projCoords * 0.5 + 0.5;
-    
-    // Get closest depth value from light's perspective
-    float closestDepth = texture(shadowMap, projCoords.xy).r; 
-    
-    // Get current depth of fragment from light's perspective
-    float currentDepth = projCoords.z;
-    
-    // Apply bias to avoid shadow acne
-    float bias = 0.005;
-    
-    // Check whether current frag pos is in shadow
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
-    
-    // Keep fragments outside light frustum lit
-    if(projCoords.z > 1.0)
-        shadow = 0.0;
-    
-    return shadow;
-}
-
 //  0: BasicShape objects that just have a set color (basic)
 //  1: BasicShape objects that have a texture
 //  2: Imported BasicShape objects that use materials from Blender
@@ -105,72 +68,67 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 
 void main()
 {
-    vec4 point_light_color = CalcPointLight(point_light, norm,
-                                            fragment_position, view_position.xyz);
-    // Material colors are integrated into the point light calculation
+    vec4 point_light_color = CalcPointLight(point_light,norm,
+                                            fragment_position,view_position.xyz);
+    //Material colors are integrated into the point light calculation
     if (fragment_shader_state == 2) {
         FragColor = point_light_color;
         return;
     }
 
-    // Calculate spotlight contribution
+     // Calculate spotlight contribution
     vec4 spot_light_color = vec4(0.0);
     if (spot_light.on) {
         spot_light_color = CalcSpotLight(spot_light, norm, 
-                                         fragment_position, view_position.xyz);
+                                       fragment_position, view_position.xyz);
     }
+    
     
     // Combine light contributions
     vec4 combined_light = point_light_color + spot_light_color;
 
-    // Calculate shadow
-    float shadow = ShadowCalculation(fs_in.FragPosLightSpace);
-
-    // Apply shadow to lighting
-    combined_light.rgb *= (1.0 - shadow);
-
-    // Object is textured
+    //Object is textured
     if ((fragment_shader_state == 1) || (fragment_shader_state == 3)) {
-        // Unfortunately you can't index an array with a variable in GLSL
-        // so you have to use a set of if statements.
+        //unfortunately you can't index an array with a variable in GLSL
+        //  so you have to use a set of if statements.
         if (index_for_texture == 0) {
-            FragColor = texture(textures[0], texture_coordinates);
+            FragColor = texture(textures[0],texture_coordinates);
         } else if (index_for_texture == 1) {
-            FragColor = texture(textures[1], texture_coordinates);
+            FragColor = texture(textures[1],texture_coordinates);
         } else if (index_for_texture == 2) {
-            FragColor = texture(textures[2], texture_coordinates);
+            FragColor = texture(textures[2],texture_coordinates);
         } else if (index_for_texture == 3) {
-            FragColor = texture(textures[3], texture_coordinates);
+            FragColor = texture(textures[3],texture_coordinates);
         } else if (index_for_texture == 4) {
-            FragColor = texture(textures[4], texture_coordinates);
+            FragColor = texture(textures[4],texture_coordinates);
         } else if (index_for_texture == 5) {
-            FragColor = texture(textures[5], texture_coordinates);
+            FragColor = texture(textures[5],texture_coordinates);
         } else if (index_for_texture == 6) {
-            FragColor = texture(textures[6], texture_coordinates);
+            FragColor = texture(textures[6],texture_coordinates);
         } else if (index_for_texture == 7) {
-            FragColor = texture(textures[7], texture_coordinates);
+            FragColor = texture(textures[7],texture_coordinates);
         } else if (index_for_texture == 8) {
-            FragColor = texture(textures[8], texture_coordinates);
+            FragColor = texture(textures[8],texture_coordinates);
         } else if (index_for_texture == 9) {
-            FragColor = texture(textures[9], texture_coordinates);
+            FragColor = texture(textures[9],texture_coordinates);
         } else if (index_for_texture == 10) {
-            FragColor = texture(textures[10], texture_coordinates);
+            FragColor = texture(textures[10],texture_coordinates);
         } else if (index_for_texture == 11) {
-            FragColor = texture(textures[11], texture_coordinates);
+            FragColor = texture(textures[11],texture_coordinates);
         } else if (index_for_texture == 12) {
-            FragColor = texture(textures[12], texture_coordinates);
+            FragColor = texture(textures[12],texture_coordinates);
         } else if (index_for_texture == 13) {
-            FragColor = texture(textures[13], texture_coordinates);
+            FragColor = texture(textures[13],texture_coordinates);
         } else if (index_for_texture == 14) {
-            FragColor = texture(textures[14], texture_coordinates);
+            FragColor = texture(textures[14],texture_coordinates);
         } else if (index_for_texture == 15) {
-            FragColor = texture(textures[15], texture_coordinates);
+            FragColor = texture(textures[15],texture_coordinates);
         } else if (index_for_texture == 16) {
-            FragColor = texture(textures[16], texture_coordinates);
+            FragColor = texture(textures[16],texture_coordinates);
         } else if (index_for_texture == 17) {
-            FragColor = texture(textures[17], texture_coordinates);
+            FragColor = texture(textures[17],texture_coordinates);
         } else if (index_for_texture == 18) {
-            FragColor = texture(textures[18], texture_coordinates);
+            FragColor = texture(textures[18],texture_coordinates);
         }
         if (index_for_texture == 99) {
             FragColor = combined_light;
@@ -178,11 +136,13 @@ void main()
         }
         FragColor = combined_light * FragColor;
         return;
+
     }
 
-    // Otherwise fragment state is 0 (use the set color)
+    //otherwise fragment state is 0 (use the set color)
     FragColor = combined_light * set_color;
-}
+    
+};
 
 vec4 CalcPointLight (PointLight light,vec3 norm,vec3 frag,vec3 eye) {
 
