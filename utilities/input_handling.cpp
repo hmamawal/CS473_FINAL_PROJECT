@@ -5,6 +5,12 @@
 bool spotlight_on = true;  // Initialize to true
 bool point_light_on = true;  // Initialize to true
 
+// Variables to track arrow key states
+static bool up_key_pressed = false;
+static bool down_key_pressed = false;
+static bool left_key_pressed = false;
+static bool right_key_pressed = false;
+
 void ProcessInput(GLFWwindow *window) {
     static bool c_key_pressed = false;
     static bool r_key_pressed = false;
@@ -31,12 +37,74 @@ void ProcessInput(GLFWwindow *window) {
             }
             
             // Update the light color in the shader
-            shader_program_ptr->setVec4("point_light.ambient", glm::vec4(0.5f * point_light_color, 1.0f));
-            shader_program_ptr->setVec4("point_light.diffuse", glm::vec4(point_light_color, 1.0f));
-            shader_program_ptr->setVec4("point_light.specular", glm::vec4(0.5f * point_light_color, 1.0f));
+            shader_program_ptr->setVec4("directional_light.ambient", glm::vec4(0.5f * point_light_color, 1.0f));
+            shader_program_ptr->setVec4("directional_light.diffuse", glm::vec4(point_light_color, 1.0f));
+            shader_program_ptr->setVec4("directional_light.specular", glm::vec4(0.5f * point_light_color, 1.0f));
         }
     } else {
         r_key_pressed = false;
+    }
+
+    // Process arrow keys to control directional light direction
+    float light_change_speed = 0.1f;
+    bool light_direction_changed = false;
+    
+    // Up arrow key - change Y component
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+        if (!up_key_pressed) {
+            up_key_pressed = true;
+            light_direction.y -= light_change_speed;
+            light_direction_changed = true;
+            std::cout << "Light direction Y: " << light_direction.y << std::endl;
+        }
+    } else {
+        up_key_pressed = false;
+    }
+    
+    // Down arrow key - change Y component
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        if (!down_key_pressed) {
+            down_key_pressed = true;
+            light_direction.y += light_change_speed;
+            light_direction_changed = true;
+            std::cout << "Light direction Y: " << light_direction.y << std::endl;
+        }
+    } else {
+        down_key_pressed = false;
+    }
+    
+    // Left arrow key - change X component
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+        if (!left_key_pressed) {
+            left_key_pressed = true;
+            light_direction.x -= light_change_speed;
+            light_direction_changed = true;
+            std::cout << "Light direction X: " << light_direction.x << std::endl;
+        }
+    } else {
+        left_key_pressed = false;
+    }
+    
+    // Right arrow key - change X component
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+        if (!right_key_pressed) {
+            right_key_pressed = true;
+            light_direction.x += light_change_speed;
+            light_direction_changed = true;
+            std::cout << "Light direction X: " << light_direction.x << std::endl;
+        }
+    } else {
+        right_key_pressed = false;
+    }
+    
+    // Update the light direction in the shader if it changed
+    if (light_direction_changed && shader_program_ptr) {
+        shader_program_ptr->use();
+        shader_program_ptr->setVec4("directional_light.direction", light_direction);
+        std::cout << "Light direction updated to: (" << 
+            light_direction.x << ", " << 
+            light_direction.y << ", " << 
+            light_direction.z << ")" << std::endl;
     }
 
     // Process 'C' key to toggle first-person view

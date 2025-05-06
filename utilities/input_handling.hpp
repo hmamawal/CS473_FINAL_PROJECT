@@ -15,6 +15,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 extern Camera camera;
 extern float delta_time;
 extern glm::vec3 point_light_color;
+extern glm::vec4 light_direction; // Added reference to the directional light's direction
 extern Shader* shader_program_ptr;
 extern AvatarHighBar* high_bar_avatar;
 extern bool first_mouse;
@@ -23,7 +24,7 @@ extern float last_y;
 extern glm::vec3 original_camera_position;
 extern float original_camera_yaw;
 extern float original_camera_pitch;
-extern bool spotlight_on; // Add declaration for spotlight toggle state
+extern bool spotlight_on; // Declaration for spotlight toggle state
 extern bool point_light_on; // Declaration for point light toggle state
 
 #endif // INPUT_HANDLING_HPP
