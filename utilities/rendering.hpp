@@ -15,6 +15,7 @@
 #include "../classes/camera.hpp"
 #include "../classes/Font.hpp"
 #include "../classes/import_object.hpp"
+#include "shadow_mapping.hpp"
 
 // Structure to hold all VAO objects
 struct RenderingVAOs {
@@ -49,6 +50,7 @@ void setupLighting(Shader* shader_program, const glm::vec3& point_light_color, c
 
 // Rendering functions
 void renderScene(Shader* shader_program, 
+                Shader* shadow_shader,
                 GameModels& models, 
                 Avatar& baseAvatar,
                 AvatarHighBar* high_bar_avatar,
@@ -56,10 +58,18 @@ void renderScene(Shader* shader_program,
                 const glm::vec3& point_light_color,
                 const glm::vec4& light_position);
 
+void renderSceneForShadowMap(Shader* shadow_shader, 
+                             GameModels& models, 
+                             Avatar& baseAvatar,
+                             AvatarHighBar* high_bar_avatar);
+
 // Updated to use Shader pointer instead of reference
 void renderText(Shader* font_program, Font& arial_font, const Camera& camera);
 
 // Cleanup functions
 void cleanupResources(RenderingVAOs& vaos, GameModels& models);
+
+void initializeShadowMap();
+void cleanupShadowMap();
 
 #endif // RENDERING_HPP

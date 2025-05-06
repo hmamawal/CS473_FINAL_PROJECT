@@ -4,6 +4,10 @@
 #include <iostream>
 #include "../classes/object_types.hpp"
 
+ShadowMap* shadowMap = nullptr;
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 800;
+
 RenderingVAOs setupVAOs() {
     RenderingVAOs vaos;
     
@@ -128,6 +132,7 @@ void setupLighting(Shader* shader_program, const glm::vec3& point_light_color,
 }
 
 void renderScene(Shader* shader_program, 
+                Shader* shadow_shader,
                 GameModels& models, 
                 Avatar& baseAvatar,
                 AvatarHighBar* high_bar_avatar,
@@ -135,33 +140,67 @@ void renderScene(Shader* shader_program,
                 const glm::vec3& point_light_color,
                 const glm::vec4& light_position) {
     
+    // 1. First render pass: render to depth map
+    shadowMap->updateLightSpaceMatrix(light_position, glm::vec3(0.0f));
+    
+    shadow_shader->use();
+    shadow_shader->setMat4("lightSpaceMatrix", shadowMap->lightSpaceMatrix);
+    
+    glViewport(0, 0, shadowMap->SHADOW_WIDTH, shadowMap->SHADOW_HEIGHT);
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowMap->depthMapFBO);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    // In ShadowMap constructor after framebuffer setup
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+        std::cout << "Framebuffer not complete: " << status << std::endl;
+    }
+    
+    // Enable front face culling for shadow mapping (optional - helps with peter panning)
+    glCullFace(GL_FRONT);
+    
+    // Render scene geometry to the depth map
+    renderSceneForShadowMap(shadow_shader, models, baseAvatar, high_bar_avatar);
+    
+    // Reset face culling to back faces
+    glCullFace(GL_BACK);
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    
+    // 2. Second render pass: regular rendering with shadow mapping
+    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT); // Reset viewport
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
     shader_program->use();
     
-    // Update view matrix based on camera
+    // Update camera and lighting as before
     // Create a non-const copy of the camera to call GetViewMatrix()
     Camera camera_copy = camera;
     glm::mat4 view = camera_copy.GetViewMatrix();
     shader_program->setMat4("view", view);
     shader_program->setVec4("view_position", glm::vec4(camera.Position, 1.0));
     
-    // Update spotlight position and direction
+    // Update spotlight and point light parameters as before
     shader_program->setVec4("spot_light.position", glm::vec4(camera.Position, 1.0f));
     shader_program->setVec4("spot_light.direction", glm::vec4(camera.Front, 0.0f));
-    
-    // Ensure spotlight state is correctly set every frame
     shader_program->setBool("spot_light.on", spotlight_on);
     
-    // Update point light and ensure its state is correctly set every frame
     shader_program->setVec4("point_light.ambient", glm::vec4(0.5f * point_light_color, 1.0));
     shader_program->setVec4("point_light.diffuse", glm::vec4(point_light_color, 1.0f));
     shader_program->setVec4("point_light.specular", glm::vec4(0.5f * point_light_color, 1.0f));
     shader_program->setVec4("point_light.position", light_position);
     shader_program->setBool("point_light.on", point_light_on);
     
-    // Draw base avatar
+    // Add shadow map and light space matrix
+    shader_program->setMat4("lightSpaceMatrix", shadowMap->lightSpaceMatrix);
+    glActiveTexture(GL_TEXTURE1); // Use a different texture unit than your diffuse textures
+    glBindTexture(GL_TEXTURE_2D, shadowMap->depthMap);
+    shader_program->setInt("shadowMap", 1);
+    
+    // Draw scene as before
     baseAvatar.Draw(shader_program, false);
     
-    // Draw floor
+    // Continue with your existing rendering code
     glm::mat4 identity(1.0);
     glm::mat4 model = glm::rotate(identity, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
     
@@ -247,6 +286,79 @@ void renderScene(Shader* shader_program,
     
     // Draw high bar avatar
     high_bar_avatar->Draw(shader_program, false);
+}
+
+void renderSceneForShadowMap(Shader* shadow_shader, 
+    GameModels& models, 
+    Avatar& baseAvatar,
+    AvatarHighBar* high_bar_avatar) {
+    // Identity matrix for model
+    glm::mat4 identity(1.0);
+    shadow_shader->setMat4("model", identity);
+
+    // Render all objects that should cast shadows
+    // Avatars
+    baseAvatar.Draw(shadow_shader, false);
+    high_bar_avatar->Draw(shadow_shader, false);
+
+    // Models
+    glm::mat4 local(1.0);
+
+    // High bar
+    shadow_shader->setMat4("local", local);
+    models.high_bar.Draw();
+
+    // Floor
+    glm::mat4 floor_local(1.0);
+    floor_local = glm::translate(floor_local, glm::vec3(0.0, 0.0, -0.01));
+    shadow_shader->setMat4("local", floor_local);
+    models.floor.Draw();
+
+    // Tumbling floor
+    glm::mat4 tumbling_floor_local(1.0);
+    tumbling_floor_local = glm::translate(tumbling_floor_local, glm::vec3(0.0, 0.4, 0.0));
+    shadow_shader->setMat4("local", tumbling_floor_local);
+    models.tumbling_floor.Draw();
+
+    // Vault table
+    glm::mat4 vault_table_local(1.0);
+    vault_table_local = glm::translate(vault_table_local, glm::vec3(8.0, 0.0, 0.0));
+    shadow_shader->setMat4("local", vault_table_local);
+    models.vault_table.Draw();
+
+    // Lou Gross Building
+    glm::mat4 building_local(1.0);
+    building_local = glm::translate(building_local, glm::vec3(0.0, 0.0, 0.0));
+    building_local = glm::scale(building_local, glm::vec3(2, 2, 2));
+    shadow_shader->setMat4("local", building_local);
+    models.LouGrossBuilding.Draw();
+
+    // First pommel horse
+    glm::mat4 pommel_horse_local(1.0);
+    pommel_horse_local = glm::translate(pommel_horse_local, glm::vec3(-5.0, 0.0, -10.0));
+    pommel_horse_local = glm::rotate(pommel_horse_local, glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
+    shadow_shader->setMat4("local", pommel_horse_local);
+    models.pommel_horse.Draw();
+
+    // Second pommel horse
+    glm::mat4 pommel_horse2_local(1.0);
+    pommel_horse2_local = glm::translate(pommel_horse2_local, glm::vec3(5.0, 0.0, -10.0));
+    pommel_horse2_local = glm::rotate(pommel_horse2_local, glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
+    shadow_shader->setMat4("local", pommel_horse2_local);
+    models.pommel_horse2.Draw();
+}
+
+void initializeShadowMap() {
+    std::cout << "Initializing shadow map..." << std::endl;
+    shadowMap = new ShadowMap();
+    std::cout << "Shadow map initialized successfully" << std::endl;
+}
+
+void cleanupShadowMap() {
+    if (shadowMap) {
+        delete shadowMap;
+        shadowMap = nullptr;
+    }
 }
 
 void renderText(Shader* font_program, Font& arial_font, const Camera& camera) {

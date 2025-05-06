@@ -53,14 +53,21 @@ float original_camera_pitch = camera.Pitch;
 // Shader program pointers
 Shader* shader_program_ptr = nullptr;
 Shader* font_program_ptr = nullptr;
+Shader* shadow_shader_ptr = nullptr;
 
 int main() {
+    std::cout << "Starting initialization..." << std::endl;
     // Initialize the environment
     GLFWwindow *window = InitializeEnvironment("CS473", SCR_WIDTH, SCR_HEIGHT);
     if (window == NULL) {
         std::cout << "Failed to initialize GLFWwindow" << std::endl;
         return -1;
     }
+
+    std::cout << "Initializing environment..." << std::endl;
+
+    // Add this line AFTER OpenGL is initialized 
+    initializeShadowMap();
 
     std::cout << "Program starting..." << std::endl;
 
@@ -69,6 +76,12 @@ int main() {
     
     // Initialize shaders
     CreateShaders(shader_program_ptr, font_program_ptr);
+    shadow_shader_ptr = new Shader(".//shaders//shadow_mapping.vert", ".//shaders//shadow_mapping.frag");
+    // After creating your shadow_shader_ptr
+    if (shadow_shader_ptr->ID == 0) {
+        std::cout << "Failed to compile shadow shader" << std::endl;
+        return -1;
+    }
     
     // Setup VAOs and models
     RenderingVAOs vaos = setupVAOs();
@@ -110,6 +123,7 @@ int main() {
         // Render the scene
         renderScene(
             shader_program_ptr,
+            shadow_shader_ptr,
             models,
             baseAvatar,
             high_bar_avatar,
@@ -145,6 +159,9 @@ int main() {
     // Cleanup resources
     cleanupResources(vaos, models);
 
+    // Add this before terminating
+    cleanupShadowMap();
+
     // Delete the shader programs
     if (shader_program_ptr != nullptr) {
         delete shader_program_ptr;
@@ -155,6 +172,10 @@ int main() {
         font_program_ptr = nullptr;
     }
     std::cout << "Shader programs deleted" << std::endl;
+    if (shadow_shader_ptr != nullptr) {
+        delete shadow_shader_ptr;
+        shadow_shader_ptr = nullptr;
+    }
 
     // Delete the high_bar_avatar object
     if (high_bar_avatar != nullptr) {
