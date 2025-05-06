@@ -53,7 +53,12 @@ float original_camera_pitch = camera.Pitch;
 // Shader program pointers
 Shader* shader_program_ptr = nullptr;
 Shader* font_program_ptr = nullptr;
-Shader * depth_shader_ptr = nullptr;
+Shader* depth_shader_ptr = nullptr;
+Shader* post_processing_shader_ptr = nullptr;
+
+// Post-processing effect selection
+int current_effect = 0; // 0 = no effect
+bool effect_key_pressed = false; // To prevent multiple toggles in one key press
 
 int main() {
     // Initialize the environment
@@ -71,6 +76,7 @@ int main() {
     // Initialize shaders
     CreateShaders(shader_program_ptr, font_program_ptr);
     CreateDepthShader(depth_shader_ptr);
+    CreatePostProcessingShader(post_processing_shader_ptr);  // Initialize post-processing shader
     
     // Setup VAOs and models
     RenderingVAOs vaos = setupVAOs();
@@ -132,6 +138,60 @@ int main() {
 
     std::cout << "Entering render loop..." << std::endl;
     static int frame_count = 0;
+
+    // For post-processing
+    // Create a framebuffer object for post-processing
+    unsigned int postProcessingFBO;
+    glGenFramebuffers(1, &postProcessingFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, postProcessingFBO);
+
+    // Create a texture attachment for the framebuffer
+    unsigned int textureColorBuffer;
+    glGenTextures(1, &textureColorBuffer);
+    glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
+
+    // c. Create a renderbuffer object for depth and stencil testing
+    unsigned int rbo;
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT); // 24 bits for depth, 8 for stencil
+    
+    // d. Attach the renderbuffer to the framebuffer's depth and stencil attachment
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        std::cout << "Post-processing framebuffer is not complete!" << std::endl;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // Create a texture rectangle that fills the screen in NDC (-1,-1) to (1,1)
+    float quadVertices[] = {
+        // positions   // texture coords
+        -1.0f,  1.0f,  0.0f, 1.0f,
+        -1.0f, -1.0f,  0.0f, 0.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+
+        -1.0f,  1.0f,  0.0f, 1.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+         1.0f,  1.0f,  1.0f, 1.0f
+    };
+
+    // Screen quad VAO/VBO
+    unsigned int quadVAO, quadVBO;
+    glGenVertexArrays(1, &quadVAO);
+    glGenBuffers(1, &quadVBO);
+    glBindVertexArray(quadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 *sizeof(float), (void*)(2 * sizeof(float)));
+    glBindVertexArray(0);
 
     // Render loop
     while (!glfwWindowShouldClose(window)) {
@@ -216,6 +276,11 @@ int main() {
         baseAvatar.ProcessInput(window, delta_time);
         high_bar_avatar->ProcessInput(window, delta_time);
 
+        // THIRD PASS - Render to post-processing framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER, postProcessingFBO);
+        glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         // Render the scene normally
         renderScene(
             shader_program_ptr,
@@ -228,16 +293,28 @@ int main() {
             false // Set is_depth_pass to false for normal rendering
         );
 
-        // Reset active texture
-        glActiveTexture(GL_TEXTURE0);
-
-        // Enforce minimum camera height
-        if (camera.Position.y < 0.5) {
-            camera.Position.y = 0.5;
-        }
-        
-        // Display text
+        // Display text (if you want text to be affected by post-processing)
         renderText(font_program_ptr, arial_font, camera);
+
+        // FOURTH PASS - Apply post-processing effect and render to screen
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // White background
+        glClear(GL_COLOR_BUFFER_BIT);
+        
+        // Use post-processing shader
+        post_processing_shader_ptr->use();
+        post_processing_shader_ptr->setInt("screenTexture", 0);
+        post_processing_shader_ptr->setInt("effect", current_effect);
+        
+        // Bind the texture from the post-processing framebuffer
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
+        
+        // Render the quad with the post-processing effect
+        glBindVertexArray(quadVAO);
+        glDisable(GL_DEPTH_TEST); // We don't need depth testing for our full-screen quad
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glEnable(GL_DEPTH_TEST); // Re-enable depth testing for the next frame
         
         // Swap buffers and poll events
         glfwSwapBuffers(window);

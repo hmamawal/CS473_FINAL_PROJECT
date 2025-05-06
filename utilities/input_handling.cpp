@@ -16,6 +16,7 @@ void ProcessInput(GLFWwindow *window) {
     static bool r_key_pressed = false;
     static bool l_key_pressed = false;
     static bool p_key_pressed = false;
+    static bool effect_key_pressed = false;
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -217,6 +218,60 @@ void ProcessInput(GLFWwindow *window) {
         }
     } else {
         p_key_pressed = false;
+    }
+
+    // Check for post-processing effects toggle
+    if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) {
+        if (!effect_key_pressed) {
+            effect_key_pressed = true;
+            current_effect = 0; // No effect
+            std::cout << "Post-processing effect: None" << std::endl;
+        }
+    } 
+    else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+        if (!effect_key_pressed) {
+            effect_key_pressed = true;
+            current_effect = 1; // Invert colors
+            std::cout << "Post-processing effect: Invert colors" << std::endl;
+        }
+    }
+    else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+        if (!effect_key_pressed) {
+            effect_key_pressed = true;
+            current_effect = 2; // Grayscale
+            std::cout << "Post-processing effect: Grayscale" << std::endl;
+        }
+    }
+    else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+        if (!effect_key_pressed) {
+            effect_key_pressed = true;
+            current_effect = 3; // Edge detection
+            std::cout << "Post-processing effect: Edge detection" << std::endl;
+        }
+    }
+    else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) {
+        if (!effect_key_pressed) {
+            effect_key_pressed = true;
+            current_effect = 4; // Box blur
+            std::cout << "Post-processing effect: Blur" << std::endl;
+        }
+    }
+    else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) {
+        if (!effect_key_pressed) {
+            effect_key_pressed = true;
+            current_effect = 5; // Sharpen
+            std::cout << "Post-processing effect: Sharpen" << std::endl;
+        }
+    }
+    else if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) {
+        if (!effect_key_pressed) {
+            effect_key_pressed = true;
+            current_effect = 6; // Sepia tone
+            std::cout << "Post-processing effect: Sepia" << std::endl;
+        }
+    }
+    else {
+        effect_key_pressed = false;
     }
 }
 

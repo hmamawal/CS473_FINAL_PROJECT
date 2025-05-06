@@ -67,7 +67,7 @@ vec4 CalcSpotLight(SpotLight light, vec3 norm, vec3 frag, vec3 eye);
 
 vec4 CalcDirectionalLight (DirectionalLight light,vec3 norm,vec3 frag,vec3 eye);
 
-float ShadowCalculation(vec4 fragPosLightSpace, float bias)
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
 {
     // Perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -80,6 +80,10 @@ float ShadowCalculation(vec4 fragPosLightSpace, float bias)
     
     // Get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
+    
+    // Calculate bias based on the angle between surface normal and light direction
+    // The steeper the angle, the larger the bias needs to be
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
     
     // Check whether current fragment is in shadow
     float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
@@ -189,8 +193,7 @@ vec4 CalcDirectionalLight (DirectionalLight light,vec3 norm,vec3 frag,vec3 eye) 
     }
     
     // Calculate shadow
-    float bias = 0.0; // Adjust as needed
-    float shadow = ShadowCalculation(FragPosLightSpace, bias);
+    float shadow = ShadowCalculation(FragPosLightSpace, norm, normalize(-light.direction.xyz));
     
     // Rest of your existing directional light calculation code
     vec3 light_direction = normalize(-light.direction.xyz);
