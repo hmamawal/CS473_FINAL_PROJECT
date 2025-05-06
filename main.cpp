@@ -174,8 +174,8 @@ int main() {
         glClear(GL_DEPTH_BUFFER_BIT);
 
         // Use depth shader for shadow mapping
-        depth_shader_ptr->use();
-        depth_shader_ptr->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+        // depth_shader_ptr->use();
+        // depth_shader_ptr->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
         // Render the scene for depth map
         renderScene(
@@ -197,6 +197,7 @@ int main() {
 
         // Make sure you're using the main shader program
         shader_program_ptr->use();
+        shader_program_ptr->setBool("debug_shadows", false);
 
         // Set the lightSpaceMatrix uniform in the shader
         shader_program_ptr->setMat4("lightSpaceMatrix", lightSpaceMatrix);

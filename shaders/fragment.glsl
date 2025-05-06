@@ -60,6 +60,9 @@ uniform SpotLight spot_light;
 in vec4 FragPosLightSpace;
 uniform sampler2D shadow_map;
 
+// Add to fragment shader
+uniform bool debug_shadows = false;
+
 vec4 CalcSpotLight(SpotLight light, vec3 norm, vec3 frag, vec3 eye);
 
 vec4 CalcDirectionalLight (DirectionalLight light,vec3 norm,vec3 frag,vec3 eye);
@@ -100,6 +103,15 @@ void main()
     //Material colors are integrated into the directional light calculation
     if (fragment_shader_state == 2) {
         FragColor = directional_light_color;
+        return;
+    }
+
+    // Add to fragment shader
+    if (debug_shadows) {
+        vec3 projCoords = FragPosLightSpace.xyz / FragPosLightSpace.w;
+        projCoords = projCoords * 0.5 + 0.5;
+        float closestDepth = texture(shadow_map, projCoords.xy).r; 
+        FragColor = vec4(vec3(closestDepth), 1.0);
         return;
     }
 
@@ -172,33 +184,33 @@ void main()
 };
 
 vec4 CalcDirectionalLight (DirectionalLight light,vec3 norm,vec3 frag,vec3 eye) {
-
     if (!light.on) {
         return vec4(0.0,0.0,0.0,1.0);
     }
+    
+    // Calculate shadow
+    float bias = 0.0; // Adjust as needed
+    float shadow = ShadowCalculation(FragPosLightSpace, bias);
+    
+    // Rest of your existing directional light calculation code
     vec3 light_direction = normalize(-light.direction.xyz);
     vec3 normal = normalize(norm);
     float diffuse_coeff = max(dot(normal,light_direction),0.0);
-
+    
     vec3 view_direction = normalize(view_position.xyz-frag);
     vec3 reflect_direction = reflect(-light_direction,normal);
     float spec_coeff = pow(max(dot(view_direction,reflect_direction),0.0),256.0);
-
-    //handle materials
+    
+    // Apply shadow - multiply diffuse and specular components (not ambient)
     if ((fragment_shader_state == 2) || (fragment_shader_state == 3)) {
-        //need to use the different material components in the calculation
         return (light.ambient * vec4(ambient_color,opacity) 
-                + diffuse_coeff * light.diffuse * vec4(diffuse_color,opacity)
-                + spec_coeff * light.specular * vec4(specular_color,opacity));
+                + (1.0 - shadow) * diffuse_coeff * light.diffuse * vec4(diffuse_color,opacity)
+                + (1.0 - shadow) * spec_coeff * light.specular * vec4(specular_color,opacity));
     } else {
         return (light.ambient 
-            + diffuse_coeff * light.diffuse 
-            + spec_coeff * light.specular);
+            + (1.0 - shadow) * diffuse_coeff * light.diffuse 
+            + (1.0 - shadow) * spec_coeff * light.specular);
     }
-
-
-
-
 }
 
 vec4 CalcSpotLight(SpotLight light, vec3 norm, vec3 frag, vec3 eye) {
