@@ -55,6 +55,7 @@ Shader* shader_program_ptr = nullptr;
 Shader* font_program_ptr = nullptr;
 Shader* depth_shader_ptr = nullptr;
 Shader* post_processing_shader_ptr = nullptr;
+Shader* skybox_shader_ptr = nullptr; // Add skybox shader pointer
 
 // Post-processing effect selection
 int current_effect = 0; // 0 = no effect
@@ -77,6 +78,7 @@ int main() {
     CreateShaders(shader_program_ptr, font_program_ptr);
     CreateDepthShader(depth_shader_ptr);
     CreatePostProcessingShader(post_processing_shader_ptr);  // Initialize post-processing shader
+    CreateSkyboxShader(skybox_shader_ptr);  // Initialize skybox shader
     
     // Setup VAOs and models
     RenderingVAOs vaos = setupVAOs();
@@ -255,6 +257,9 @@ int main() {
         glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Draw skybox first (before other scene objects but after clearing the buffer)
+        renderSkybox(skybox_shader_ptr, models, camera, SCR_WIDTH, SCR_HEIGHT);
+        
         // Set up the main shader
         shader_program_ptr->use();
         shader_program_ptr->setBool("debug_shadows", false);
@@ -345,6 +350,16 @@ int main() {
     if (depth_shader_ptr != nullptr) {
         delete depth_shader_ptr;
         depth_shader_ptr = nullptr;
+    }
+
+    if (post_processing_shader_ptr != nullptr) {
+        delete post_processing_shader_ptr;
+        post_processing_shader_ptr = nullptr;
+    }
+
+    if (skybox_shader_ptr != nullptr) {
+        delete skybox_shader_ptr;
+        skybox_shader_ptr = nullptr;
     }
 
     // Delete the high_bar_avatar object

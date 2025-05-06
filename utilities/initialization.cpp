@@ -49,6 +49,15 @@ void CreatePostProcessingShader(Shader*& post_processing_shader) {
     }
 }
 
+void CreateSkyboxShader(Shader*& skybox_shader) {
+    skybox_shader = new Shader("shaders/skyboxVertex.glsl", "shaders/skyboxFragment.glsl");
+    if (skybox_shader == nullptr) {
+        std::cout << "Failed to create skybox shader" << std::endl;
+    } else {
+        std::cout << "Skybox shader created successfully" << std::endl;
+    }
+}
+
 void SetupAvatars(Avatar& baseAvatar, AvatarHighBar*& high_bar_avatar, GameModels& models) {
     // baseAvatar is now already initialized in main.cpp, so we don't modify it here
 

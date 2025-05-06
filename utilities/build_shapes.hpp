@@ -7,6 +7,12 @@
 // representing the filepath/name for the texture file input.
 unsigned int GetTexture (std::string texture_path, bool flipped = false);
 
+//Loads a cubemap from six image paths. Returns OpenGL texture ID.
+unsigned int GetCubeMap(const std::vector<std::string>& faces, bool flip = false);
+
+//Creates and returns a BasicShape cube for skybox rendering
+BasicShape GetCube(VAOStruct vao);
+
 //Creates and returns a BasicShape rectangle given a VAO, a bottom left point, a width,
 // a height, and a texture size used to cause a wrapping effect
 BasicShape GetTexturedRectangle (VAOStruct vao, glm::vec3 bottom_left, float width, float height,float texture_size = 1.0, bool flipped = false);

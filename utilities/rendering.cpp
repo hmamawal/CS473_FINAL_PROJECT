@@ -30,6 +30,10 @@ RenderingVAOs setupVAOs() {
     vaos.import_vao.attributes.push_back(BuildAttribute(1, GL_FLOAT, false, stride_size, 17*sizeof(float)));
     vaos.import_vao.attributes.push_back(BuildAttribute(1, GL_FLOAT, false, stride_size, 18*sizeof(float)));
     
+    // Skybox VAO setup
+    glGenVertexArrays(1, &(vaos.skybox_vao.id));
+    vaos.skybox_vao.attributes.push_back(BuildAttribute(3, GL_FLOAT, false, 3*sizeof(float), 0));
+    
     std::cout << "VAOs created and attributes set up successfully." << std::endl;
     
     return vaos;
@@ -80,6 +84,21 @@ GameModels loadModels(RenderingVAOs& vaos, ImportOBJ& importer) {
     // Create floor
     models.floor_texture = GetTexture("./textures/hull_texture.png");
     models.floor = GetTexturedRectangle(vaos.texture_vao, glm::vec3(-25.0, -25.0, 0.0), 50.0, 50.0, 20.0, false);
+
+    // Create skybox
+    models.skybox = GetCube(vaos.skybox_vao);
+    
+    // Load skybox textures
+    std::vector<std::string> skybox_faces = {
+        "./textures/skybox/right.jpg",
+        "./textures/skybox/left.jpg",
+        "./textures/skybox/top.jpg",
+        "./textures/skybox/bottom.jpg",
+        "./textures/skybox/front.jpg",
+        "./textures/skybox/back.jpg"
+    };
+    models.skybox_texture = GetCubeMap(skybox_faces, false);
+    std::cout << "Skybox cube and textures loaded" << std::endl;
     
     return models;
 }
@@ -302,11 +321,49 @@ void renderText(Shader* font_program, Font& arial_font, const Camera& camera) {
     arial_font.DrawText(display_string, glm::vec2(-0.1, 0.75), *font_program);
 }
 
+void renderSkybox(Shader* skybox_shader, GameModels& models, const Camera& camera, unsigned int scr_width, unsigned int scr_height) {
+    if (skybox_shader == nullptr) {
+        std::cerr << "Skybox shader is null!" << std::endl;
+        return;
+    }
+
+    // Save the current depth function
+    GLint currentDepthFunc;
+    glGetIntegerv(GL_DEPTH_FUNC, &currentDepthFunc);
+    
+    // Change depth function so depth test passes when values are equal to depth buffer's content
+    glDepthFunc(GL_LEQUAL);
+    
+    skybox_shader->use();
+    
+    // Create a view matrix that removes the translation (only rotation)
+    // This ensures the skybox is always centered at the camera position
+    Camera camera_copy = camera;
+    glm::mat4 view = glm::mat4(glm::mat3(camera_copy.GetViewMatrix())); // Remove translation
+    skybox_shader->setMat4("view", view);
+    
+    // Set projection matrix
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)scr_width / (float)scr_height, 0.1f, 100.0f);
+    skybox_shader->setMat4("projection", projection);
+    
+    // Bind the cubemap texture
+    skybox_shader->setInt("skybox", 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, models.skybox_texture);
+    
+    // Render the cube
+    models.skybox.Draw();
+    
+    // Reset to the original depth function
+    glDepthFunc(currentDepthFunc);
+}
+
 void cleanupResources(RenderingVAOs& vaos, GameModels& models) {
     // Cleanup VAOs
     glDeleteVertexArrays(1, &(vaos.basic_vao.id));
     glDeleteVertexArrays(1, &(vaos.import_vao.id));
     glDeleteVertexArrays(1, &(vaos.texture_vao.id));
+    glDeleteVertexArrays(1, &(vaos.skybox_vao.id));
     
     // Cleanup models
     models.baseModel.DeallocateShape();
@@ -317,6 +374,7 @@ void cleanupResources(RenderingVAOs& vaos, GameModels& models) {
     models.pommel_horse.DeallocateShape();
     models.pommel_horse2.DeallocateShape();
     models.floor.DeallocateShape();
+    models.skybox.DeallocateShape();
     
     std::cout << "All resources cleaned up successfully" << std::endl;
 }

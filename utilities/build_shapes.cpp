@@ -43,6 +43,44 @@ unsigned int GetTexture (std::string texture_path, bool flipped)
     return texture;
 }
 
+unsigned int GetCubeMap(const std::vector<std::string>& faces, bool flip) {
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    // Control vertical flip
+    stbi_set_flip_vertically_on_load(flip);
+
+    for (unsigned int i = 0; i < faces.size(); i++) {
+        int width, height, nrChannels;
+        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+        if (data) {
+            GLenum format = (nrChannels == 3 ? GL_RGB : GL_RGBA);
+            glTexImage2D(
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                0, format, width, height, 0,
+                format, GL_UNSIGNED_BYTE, data
+            );
+            stbi_image_free(data);
+        } else {
+            std::cerr << "Cubemap texture failed to load at " << faces[i] << std::endl;
+            stbi_image_free(data);
+        }
+    }
+
+    // Reset to default
+    stbi_set_flip_vertically_on_load(false);
+
+    // Filtering and wrapping
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
+}
+
 BasicShape GetTexturedRectangle (VAOStruct vao, glm::vec3 bottom_left, float width, 
                                  float height,float texture_size, bool flipped)
 {   
@@ -290,4 +328,74 @@ BasicShape GetStars (VAOStruct vao, int number_stars)
 
     return new_shape;
 
+}
+
+BasicShape GetCube(VAOStruct vao) {
+    // Vertices for a unit cube centered at the origin
+    float skyboxVertices[] = {
+        // positions          
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
+    };
+
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
+    
+    glBindVertexArray(vao.id);
+    for (const auto& attribute : vao.attributes) {
+        glEnableVertexAttribArray(attribute.number_per_vertex);
+        glVertexAttribPointer(
+            attribute.number_per_vertex, 
+            attribute.number_per_vertex, 
+            attribute.type_data, 
+            attribute.normalize_data, 
+            attribute.stride_bytes, 
+            (void*)(uintptr_t)attribute.offset_bytes
+        );
+    }
+    
+    BasicShape new_shape;
+    new_shape.Initialize(vao, skyboxVertices, sizeof(skyboxVertices), 36, GL_TRIANGLES);
+    return new_shape;
 }

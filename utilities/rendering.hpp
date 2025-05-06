@@ -21,6 +21,7 @@ struct RenderingVAOs {
     VAOStruct basic_vao;
     VAOStruct texture_vao;
     VAOStruct import_vao;
+    VAOStruct skybox_vao;
 };
 
 // Structure to hold all model objects
@@ -33,10 +34,12 @@ struct GameModels {
     BasicShape pommel_horse2;
     BasicShape LouGrossBuilding;
     BasicShape floor;
+    BasicShape skybox;
     
     // Textures
     unsigned int floor_texture;
     unsigned int tumbling_floor_texture;
+    unsigned int skybox_texture;
     std::vector<unsigned int> vault_table_textures;
     std::vector<unsigned int> building_textures;
 };
@@ -56,6 +59,9 @@ void renderScene(Shader* shader_program,
                 const glm::vec3& light_color,
                 const glm::vec4& light_direction,
                 bool is_depth_pass);
+
+// Render the skybox using a specific shader
+void renderSkybox(Shader* skybox_shader, GameModels& models, const Camera& camera, unsigned int scr_width, unsigned int scr_height);
 
 // Updated to use Shader pointer instead of reference
 void renderText(Shader* font_program, Font& arial_font, const Camera& camera);
