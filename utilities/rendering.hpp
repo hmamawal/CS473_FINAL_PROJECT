@@ -54,7 +54,8 @@ void renderScene(Shader* shader_program,
                 AvatarHighBar* high_bar_avatar,
                 const Camera& camera,
                 const glm::vec3& light_color,
-                const glm::vec4& light_direction);
+                const glm::vec4& light_direction,
+                bool is_depth_pass);
 
 // Updated to use Shader pointer instead of reference
 void renderText(Shader* font_program, Font& arial_font, const Camera& camera);

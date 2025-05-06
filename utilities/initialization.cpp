@@ -31,6 +31,15 @@ void CreateShaders(Shader*& shader_program_ptr, Shader*& font_program_ptr) {
     std::cout << "Shaders created" << std::endl;
 }
 
+void CreateDepthShader(Shader*& depth_shader) {
+    depth_shader = new Shader("shaders/depthVertexShader.glsl", "shaders/depthFragmentShader.glsl");
+    if (depth_shader == nullptr) {
+        std::cout << "Failed to create depth shader" << std::endl;
+    } else {
+        std::cout << "Depth shader created successfully" << std::endl;
+    }
+}
+
 void SetupAvatars(Avatar& baseAvatar, AvatarHighBar*& high_bar_avatar, GameModels& models) {
     // baseAvatar is now already initialized in main.cpp, so we don't modify it here
 

@@ -57,9 +57,36 @@ struct SpotLight {
 
 uniform SpotLight spot_light;
 
+in vec4 FragPosLightSpace;
+uniform sampler2D shadow_map;
+
 vec4 CalcSpotLight(SpotLight light, vec3 norm, vec3 frag, vec3 eye);
 
 vec4 CalcDirectionalLight (DirectionalLight light,vec3 norm,vec3 frag,vec3 eye);
+
+float ShadowCalculation(vec4 fragPosLightSpace, float bias)
+{
+    // Perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    
+    // Transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    
+    // Get closest depth value from light's perspective
+    float closestDepth = texture(shadow_map, projCoords.xy).r; 
+    
+    // Get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    
+    // Check whether current fragment is in shadow
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+
+    // Keep shadows within the light's far plane bounds
+    if(projCoords.z > 1.0)
+        shadow = 0.0;
+        
+    return shadow;
+}
 
 //  0: BasicShape objects that just have a set color (basic)
 //  1: BasicShape objects that have a texture

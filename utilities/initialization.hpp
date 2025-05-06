@@ -13,6 +13,7 @@
 // Function declarations for initialization tasks
 void InitializeMouseSettings(GLFWwindow* window);
 void CreateShaders(Shader*& shader_program_ptr, Shader*& font_program_ptr);
+void CreateDepthShader(Shader*& depth_shader);
 void SetupAvatars(Avatar& baseAvatar, AvatarHighBar*& high_bar_avatar, GameModels& models);
 void SetupCameraAndProjection(Shader* shader_program_ptr, unsigned int scr_width, unsigned int scr_height);
 void SetupFontShader(Shader* font_program_ptr);

@@ -133,7 +133,8 @@ void renderScene(Shader* shader_program,
                 AvatarHighBar* high_bar_avatar,
                 const Camera& camera,
                 const glm::vec3& light_color,
-                const glm::vec4& light_direction) {
+                const glm::vec4& light_direction,
+                bool is_depth_pass) {
     
     shader_program->use();
     
@@ -171,8 +172,18 @@ void renderScene(Shader* shader_program,
     glm::mat4 floor_local(1.0);
     floor_local = glm::translate(floor_local, glm::vec3(0.0, 0.0, -0.01));
     shader_program->setMat4("local", floor_local);
-    glBindTexture(GL_TEXTURE_2D, models.floor_texture);
+    
+    // Add condition for floor texture
+    if (!is_depth_pass) {
+        glActiveTexture(GL_TEXTURE0);
+        shader_program->setInt("textures[0]", 0);
+        glBindTexture(GL_TEXTURE_2D, models.floor_texture);
+    }
     models.floor.Draw();
+    // After rendering each textured object:
+    if (!is_depth_pass) {
+        glActiveTexture(GL_TEXTURE0);
+    }
     
     // Draw tumbling floor
     shader_program->setInt("shader_state", IMPORTED_TEXTURED);
@@ -180,8 +191,18 @@ void renderScene(Shader* shader_program,
     tumbling_floor_local = glm::translate(tumbling_floor_local, glm::vec3(0.0, 0.4, 0.0));
     shader_program->setMat4("model", identity);
     shader_program->setMat4("local", tumbling_floor_local);
-    glBindTexture(GL_TEXTURE_2D, models.tumbling_floor_texture);
+    
+    // Add condition for tumbling floor texture
+    if (!is_depth_pass) {
+        glActiveTexture(GL_TEXTURE0);
+        shader_program->setInt("textures[0]", 0);
+        glBindTexture(GL_TEXTURE_2D, models.tumbling_floor_texture);
+    }
     models.tumbling_floor.Draw();
+    // After rendering each textured object:
+    if (!is_depth_pass) {
+        glActiveTexture(GL_TEXTURE0);
+    }
     
     // Draw vault table
     shader_program->setInt("shader_state", IMPORTED_TEXTURED);
@@ -190,15 +211,24 @@ void renderScene(Shader* shader_program,
     shader_program->setMat4("model", identity);
     shader_program->setMat4("local", vault_table_local);
     
-    // Bind and set all textures for the VaultTable
-    for (int i = 0; i < models.vault_table_textures.size(); i++) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        std::string texture_string = "textures[" + std::to_string(i) + "]";
-        shader_program->setInt(texture_string, i);
-        glBindTexture(GL_TEXTURE_2D, models.vault_table_textures[i]);
+    // When binding textures, add a condition:
+    if (!is_depth_pass) {
+        // For the vault table
+        for (int i = 0; i < models.vault_table_textures.size(); i++) {
+            glActiveTexture(GL_TEXTURE0 + i);
+            std::string texture_string = "textures[" + std::to_string(i) + "]";
+            shader_program->setInt(texture_string, i);
+            glBindTexture(GL_TEXTURE_2D, models.vault_table_textures[i]);
+        }
     }
     models.vault_table.Draw();
-    glActiveTexture(GL_TEXTURE0); // Reset active texture
+    if (!is_depth_pass) {
+        glActiveTexture(GL_TEXTURE0); // Reset active texture
+    }
+    // After rendering each textured object:
+    if (!is_depth_pass) {
+        glActiveTexture(GL_TEXTURE0);
+    }
     
     // Draw Lou Gross Building
     shader_program->setInt("shader_state", IMPORTED_TEXTURED);
@@ -209,14 +239,22 @@ void renderScene(Shader* shader_program,
     shader_program->setMat4("local", building_local);
     
     // Bind building textures
-    for (int i = 0; i < models.building_textures.size(); i++) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        std::string texture_string = "textures[" + std::to_string(i) + "]";
-        shader_program->setInt(texture_string, i);
-        glBindTexture(GL_TEXTURE_2D, models.building_textures[i]);
+    if (!is_depth_pass) {
+        for (int i = 0; i < models.building_textures.size(); i++) {
+            glActiveTexture(GL_TEXTURE0 + i);
+            std::string texture_string = "textures[" + std::to_string(i) + "]";
+            shader_program->setInt(texture_string, i);
+            glBindTexture(GL_TEXTURE_2D, models.building_textures[i]);
+        }
     }
     models.LouGrossBuilding.Draw();
-    glActiveTexture(GL_TEXTURE0); // Reset active texture
+    if (!is_depth_pass) {
+        glActiveTexture(GL_TEXTURE0); // Reset active texture
+    }
+    // After rendering each textured object:
+    if (!is_depth_pass) {
+        glActiveTexture(GL_TEXTURE0);
+    }
     
     // Draw high bar
     shader_program->setInt("shader_state", IMPORTED_BASIC);
@@ -239,7 +277,7 @@ void renderScene(Shader* shader_program,
     // Draw second pommel horse
     shader_program->setInt("shader_state", IMPORTED_BASIC);
     glm::mat4 pommel_horse2_local(1.0);
-    pommel_horse2_local = glm::translate(pommel_horse2_local, glm::vec3(5.0, 0.0, -10.0));
+    pommel_horse2_local = glm::translate(pommel_horse2_local, glm::vec3(27.0, 0.0, -10.0));
     pommel_horse2_local = glm::rotate(pommel_horse2_local, glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
     shader_program->setMat4("model", identity);
     shader_program->setMat4("local", pommel_horse2_local);

@@ -38,8 +38,6 @@ out vec3 diffuse_color;
 out vec3 specular_color;
 //fragment position
 out vec3 fragment_position;
-//light space position
-out vec4 FragPosLightSpace;
 
 // //pass state
 // flat out int textured;
@@ -60,14 +58,21 @@ flat out int fragment_shader_state;
 //transformation matrices for the projection, view (camera), model (world), and 
 //  transform (local).  
 uniform mat4 projection, view, model, local;
-//light space matrix
+
 uniform mat4 lightSpaceMatrix;
+out vec4 fragment_position_light_space;
 
 void main()
 {
   //See chapter 6.2.2 for this operation
   norm = mat3(transpose(inverse(model*local))) * aNorm;
   fragment_shader_state = shader_state;
+  fragment_position_light_space = lightSpaceMatrix * model * local * vec4(aPos.xyz,1.0);
+
+  if (shader_state == 4) {
+    gl_Position = fragment_position_light_space; //lightSpaceMatrix * model * local * vec4(aPos.xyz,1.0);
+    return;
+  }
   if (shader_state == 1) {
     //Basic shape with texture (pass s, t and index = 0)
     texture_coordinates = aCoord;
@@ -92,6 +97,5 @@ void main()
 
   fragment_position = (model * local * vec4(aPos.x, aPos.y, aPos.z,1.0)).xyz;
   //figure out this vertex's location after applying the necessary matrices.
-  FragPosLightSpace = lightSpaceMatrix * model * local * vec4(aPos, 1.0);
   gl_Position = projection * view * vec4(fragment_position,1.0);
 };
