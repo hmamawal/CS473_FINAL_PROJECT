@@ -39,7 +39,7 @@ This project is a graphics application developed primarily in C++ using OpenGL. 
 
 ### Lighting Controls
 - `P` - Toggle directional light on/off
-- `R` - Toggle directional light color (white/red)
+- `R` - Toggle directional light color (white/blue)
 - `Arrow Keys` - Move directional light (up, down, left, right)
 - `L` - Toggle spotlight on/off 
 
