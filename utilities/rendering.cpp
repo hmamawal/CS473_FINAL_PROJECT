@@ -380,7 +380,7 @@ void renderText(Shader* font_program, Font& arial_font, const Camera& camera) {
     renderHUDBackground(font_program, -0.15f, 0.70f, 0.4f, 0.85f, bgColor);
     
     // Background for light direction info
-    renderHUDBackground(font_program, -0.15f, 0.60f, 0.4f, 0.70f, accentColor);
+    renderHUDBackground(font_program, -0.15f, 0.50f, 0.4f, 0.70f, accentColor);
     
     // Background for HUD toggle hint
     renderHUDBackground(font_program, -0.99f, -0.99f, -0.65f, -0.90f, bgColor);
@@ -410,7 +410,7 @@ void renderText(Shader* font_program, Font& arial_font, const Camera& camera) {
     light_string += light_y.substr(0, light_y.find(".") + 3) + ",";
     light_string += light_z.substr(0, light_z.find(".") + 3) + ")";
     
-    arial_font.DrawText(light_string, glm::vec2(-0.1, 0.65), *font_program);
+    arial_font.DrawText(light_string, glm::vec2(-0.1, 0.55), *font_program);
 
     // Add a directive about toggling the HUD
     arial_font.DrawText("Press 'H' to toggle HUD", glm::vec2(-0.95, -0.95), *font_program);
