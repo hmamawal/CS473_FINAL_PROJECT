@@ -59,7 +59,7 @@ void main()
             
         case 3: // Lighten effect
             // Increase brightness by 30%
-            result = texColor * 1.3;
+            result = texColor * 0.5;
             // Ensure we don't exceed 1.0
             result = min(result, vec3(1.0));
             break;
