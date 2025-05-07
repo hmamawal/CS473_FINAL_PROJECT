@@ -133,8 +133,8 @@ void setupLighting(Shader* shader_program, const glm::vec3& light_color,
 
     // Light colors
     shader_program->setVec4("spot_light.ambient", glm::vec4(0.05f, 0.05f, 0.05f, 1.0f));  
-    shader_program->setVec4("spot_light.diffuse", glm::vec4(1.0f, 0.95f, 0.8f, 1.0f)); // Warm light
-    shader_program->setVec4("spot_light.specular", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    shader_program->setVec4("spot_light.diffuse", glm::vec4(2.0f, 1.9f, 1.6f, 1.0f)); // Warm light
+    shader_program->setVec4("spot_light.specular", glm::vec4(2.0f, 2.0f, 2.0f, 1.0f));
 
     // Spotlight properties
     shader_program->setFloat("spot_light.cutOff", glm::cos(glm::radians(10.0f)));
