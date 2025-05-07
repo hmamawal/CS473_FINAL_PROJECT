@@ -90,12 +90,12 @@ GameModels loadModels(RenderingVAOs& vaos, ImportOBJ& importer) {
     
     // Load skybox textures
     std::vector<std::string> skybox_faces = {
-        "./textures/skybox/right.jpg",
-        "./textures/skybox/left.jpg",
-        "./textures/skybox/top.jpg",
-        "./textures/skybox/bottom.jpg",
-        "./textures/skybox/front.jpg",
-        "./textures/skybox/back.jpg"
+        "./textures/Storforsen/posx.jpg",  // right
+        "./textures/Storforsen/negx.jpg",  // left
+        "./textures/Storforsen/posy.jpg",  // top
+        "./textures/Storforsen/negy.jpg",  // bottom
+        "./textures/Storforsen/posz.jpg",  // front
+        "./textures/Storforsen/negz.jpg"   // back
     };
     models.skybox_texture = GetCubeMap(skybox_faces, false);
     std::cout << "Skybox cube and textures loaded" << std::endl;

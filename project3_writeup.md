@@ -72,6 +72,11 @@ These lessons will be valuable for future graphics programming projects and soft
   - [Shadow Depth Rendering](https://chatgpt.com/share/681ab0d8-fda0-8003-9fbc-2a0c07da7076): Clarification on shadow mapping depth techniques
   - [Post-Processing Pipeline](https://chatgpt.com/share/681abf9e-9364-8003-85bf-7a37d666fecc): Understanding of framebuffer effects implementation
 
+- **Humus - Textures**  
+  Humus.name, 2015. [Link](http://www.humus.name/index.php?page=Textures&ID=133). Accessed 7 May 2025.
+
+‌
+
 Throughout the project development, I thoroughly reviewed all AI-generated code, made necessary adjustments to fix issues, and ensured I understood the underlying graphics concepts being implemented. The understanding demonstrated in this write-up reflects my comprehension of the techniques applied in the project.
 
 
