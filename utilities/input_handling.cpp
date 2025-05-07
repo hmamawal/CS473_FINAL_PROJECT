@@ -28,15 +28,15 @@ void ProcessInput(GLFWwindow *window) {
         if (!r_key_pressed) {
             r_key_pressed = true;
             
-            // Toggle between red and white
-            if (point_light_color.r == 1.0f && point_light_color.g == 0.0f && point_light_color.b == 0.0f) {
+            // Toggle between blue and white
+            if (point_light_color.r == 0.0f && point_light_color.g == 0.0f && point_light_color.b == 1.0f) {
                 // Change back to white
                 point_light_color = glm::vec3(1.0f, 1.0f, 1.0f);
                 std::cout << "Point light color changed to white" << std::endl;
             } else {
-                // Change to red
-                point_light_color = glm::vec3(1.0f, 0.0f, 0.0f);
-                std::cout << "Point light color changed to red" << std::endl;
+                // Change to blue
+                point_light_color = glm::vec3(0.0f, 0.0f, 1.0f);
+                std::cout << "Point light color changed to blue" << std::endl;
             }
             
             // Update the light color in the shader
