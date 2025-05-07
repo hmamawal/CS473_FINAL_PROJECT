@@ -46,6 +46,12 @@ This project is a graphics application developed primarily in C++ using OpenGL. 
 ### HUD Controls
 - `H` - Toggle HUD on/off 
 
+### Post-Processing Effects
+- `0` - No effect (default)
+- `1` - Grayscale effect
+- `2` - Blur effect
+- `3` - Lighten effect (increases brightness by 30%)
+
 ### System Controls
 - `ESC` - Exit application
 

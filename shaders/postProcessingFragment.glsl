@@ -6,13 +6,6 @@ in vec2 TexCoords;
 uniform sampler2D screenTexture;
 uniform int effect;
 
-// Kernel for edge detection
-const float kernel[9] = float[](
-    1.0,  1.0, 1.0,
-    1.0, -8.0, 1.0,
-    1.0,  1.0, 1.0
-);
-
 // Kernel for box blur
 const float blurKernel[9] = float[](
     1.0/9.0, 1.0/9.0, 1.0/9.0,
@@ -54,37 +47,21 @@ void main()
     
     // Different post-processing effects based on the uniform
     switch(effect) {
-        case 1: // Invert colors
-            result = 1.0 - texColor;
-            break;
-            
-        case 2: // Grayscale
-            float average = (texColor.r + texColor.g + texColor.b) / 3.0;
+        case 1: // Grayscale
+            // Use the weighted approach for accurate grayscale conversion
+            float average = 0.2126 * texColor.r + 0.7152 * texColor.g + 0.0722 * texColor.b;
             result = vec3(average);
             break;
             
-        case 3: // Edge detection
-            result = applyKernel(kernel);
-            break;
-            
-        case 4: // Box blur
+        case 2: // Box blur
             result = applyKernel(blurKernel);
             break;
             
-        case 5: // Sharpen
-            // High-pass filter (sharpen)
-            const float sharpenKernel[9] = float[](
-                -1, -1, -1,
-                -1,  9, -1,
-                -1, -1, -1
-            );
-            result = applyKernel(sharpenKernel);
-            break;
-            
-        case 6: // Sepia tone
-            result.r = texColor.r * 0.393 + texColor.g * 0.769 + texColor.b * 0.189;
-            result.g = texColor.r * 0.349 + texColor.g * 0.686 + texColor.b * 0.168;
-            result.b = texColor.r * 0.272 + texColor.g * 0.534 + texColor.b * 0.131;
+        case 3: // Lighten effect
+            // Increase brightness by 30%
+            result = texColor * 1.3;
+            // Ensure we don't exceed 1.0
+            result = min(result, vec3(1.0));
             break;
             
         default: // No effect

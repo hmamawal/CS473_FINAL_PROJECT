@@ -60,13 +60,9 @@ uniform SpotLight spot_light;
 in vec4 FragPosLightSpace;
 uniform sampler2D shadow_map;
 
-// Add to fragment shader
-uniform bool debug_shadows = false;
-
 // Add post-processing uniform
 uniform int post_process_selection;
 
-// Add near the top of fragment.glsl, with other uniforms
 uniform vec4 color;
 
 vec4 CalcSpotLight(SpotLight light, vec3 norm, vec3 frag, vec3 eye);
@@ -299,15 +295,6 @@ void main()
     //Material colors are integrated into the directional light calculation
     if (fragment_shader_state == 2) {
         FragColor = directional_light_color;
-        return;
-    }
-
-    // Add to fragment shader
-    if (debug_shadows) {
-        vec3 projCoords = FragPosLightSpace.xyz / FragPosLightSpace.w;
-        projCoords = projCoords * 0.5 + 0.5;
-        float closestDepth = texture(shadow_map, projCoords.xy).r; 
-        FragColor = vec4(vec3(closestDepth), 1.0);
         return;
     }
 

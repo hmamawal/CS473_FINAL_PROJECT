@@ -233,43 +233,22 @@ void ProcessInput(GLFWwindow *window) {
     else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
         if (!effect_key_pressed) {
             effect_key_pressed = true;
-            current_effect = 1; // Invert colors
-            std::cout << "Post-processing effect: Invert colors" << std::endl;
+            current_effect = 1; // Grayscale
+            std::cout << "Post-processing effect: Grayscale" << std::endl;
         }
     }
     else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
         if (!effect_key_pressed) {
             effect_key_pressed = true;
-            current_effect = 2; // Grayscale
-            std::cout << "Post-processing effect: Grayscale" << std::endl;
+            current_effect = 2; // Blur
+            std::cout << "Post-processing effect: Blur" << std::endl;
         }
     }
     else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
         if (!effect_key_pressed) {
             effect_key_pressed = true;
-            current_effect = 3; // Edge detection
-            std::cout << "Post-processing effect: Edge detection" << std::endl;
-        }
-    }
-    else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) {
-        if (!effect_key_pressed) {
-            effect_key_pressed = true;
-            current_effect = 4; // Box blur
-            std::cout << "Post-processing effect: Blur" << std::endl;
-        }
-    }
-    else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) {
-        if (!effect_key_pressed) {
-            effect_key_pressed = true;
-            current_effect = 5; // Sharpen
-            std::cout << "Post-processing effect: Sharpen" << std::endl;
-        }
-    }
-    else if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) {
-        if (!effect_key_pressed) {
-            effect_key_pressed = true;
-            current_effect = 6; // Sepia tone
-            std::cout << "Post-processing effect: Sepia" << std::endl;
+            current_effect = 3; // Lighten
+            std::cout << "Post-processing effect: Lighten" << std::endl;
         }
     }
     else {
