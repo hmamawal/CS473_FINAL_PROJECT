@@ -32,13 +32,10 @@ I successfully implemented all planned features, though not without challenges:
 - Breaking the code into separate modules made debugging much easier
 - Implementing the HUD with toggle functionality improved user experience
 - The post-processing effects added visual variety to the simulation
-- Adding camera controls for first-person view made the experience more immersive
-- The cubemap skybox greatly enhanced the environment visuals
+- The cubemap skybox made everything feel less empty
 
 ### What Could Have Been Better
 - My initial shadow implementation failed because I didn't fully understand the shadow mapping process
-- The avatar animations could be more sophisticated and fluid
-- I should have addressed the camera issues when toggling to first-person view
 - Better planning for the project timeline might have prevented the long gap in development
 
 ### Lessons Learned
