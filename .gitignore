@@ -3,7 +3,7 @@
 *.o
 
 # Ignore Visual Studio Code settings
-.vscode/
+#.vscode/
 
 # Ignore build artifacts
 build/
